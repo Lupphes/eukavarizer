@@ -1,0 +1,76 @@
+name: "sequence_retriever"
+description: "Runs the downloader pipeline to fetch sequencing reads from ENA or NCBI."
+keywords:
+  - download
+  - python
+  - fastq
+  - sequencing-data
+  - ENA
+  - NCBI
+
+tools:
+  - name: "Python"
+    description: "Python script for retrieving sequencing reads."
+    homepage: "https://www.python.org/"
+    documentation: "https://docs.python.org/3/"
+    licence: "PSF"
+
+input:
+  - name: "taxonomy_id"
+    description: "NCBI Taxonomy ID for the organism to retrieve sequencing reads for."
+    type: "integer"
+    pattern: "^[0-9]+$"
+    required: true
+
+  - name: "library_strategy"
+    description: "Sequencing library strategy (e.g., WGS, Hi-C, synthetic long read)."
+    type: "string"
+    enum:
+      - "wgs"
+      - "synthetic-long-read"
+      - "hi-c"
+    required: true
+
+  - name: "instrument_platform"
+    description: "Sequencing platform used (e.g., Illumina, PacBio)."
+    type: "string"
+    enum:
+      - "illumina"
+      - "pacbio"
+    required: true
+
+  - name: "minimum_coverage"
+    description: "Minimum sequencing coverage required."
+    type: "integer"
+    minimum: 1
+    required: true
+
+  - name: "maximum_coverage"
+    description: "Maximum sequencing coverage allowed."
+    type: "integer"
+    minimum: 1
+    required: true
+
+  - name: "max_results"
+    description: "Maximum number of sequencing runs to retrieve."
+    type: "integer"
+    minimum: 1
+    required: true
+
+  - name: "data_dir"
+    description: "Directory where sequencing reads will be downloaded."
+    type: "string"
+    format: "file-path"
+    required: true
+
+output:
+  - name: "fastq_files"
+    description: "Path to the downloaded FASTQ sequencing files."
+    type: "file"
+    pattern: "^.*\\.fastq.gz$"
+
+authors:
+  - name: "Your Name"
+    email: "your.email@example.com"
+    github: "your-github-username"
+    affiliation: "Your Institution"

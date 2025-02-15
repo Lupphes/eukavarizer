@@ -1,0 +1,41 @@
+name: "refseq_retriever"
+description: "Runs the downloader pipeline to fetch reference genome files."
+keywords:
+  - download
+  - python
+  - fastq
+  - reference-genome
+  - ENA
+  - NCBI
+
+tools:
+  - name: "Python"
+    description: "Python script for retrieving reference genome data."
+    homepage: "https://www.python.org/"
+    documentation: "https://docs.python.org/3/"
+    licence: "PSF"
+
+input:
+  - name: "taxonomy_id"
+    description: "NCBI Taxonomy ID for the organism to retrieve sequences for."
+    type: "integer"
+    pattern: "^[0-9]+$"
+    required: true
+
+  - name: "data_dir"
+    description: "Directory where the reference genome will be downloaded."
+    type: "string"
+    format: "file-path"
+    required: true
+
+output:
+  - name: "refseq_path"
+    description: "Path to the downloaded reference genome file."
+    type: "file"
+    pattern: "^.*\\.fna.gz$"
+
+authors:
+  - name: "Your Name"
+    email: "your.email@example.com"
+    github: "your-github-username"
+    affiliation: "Your Institution"

@@ -15,21 +15,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { EUKAVARIZER  } from './workflows/eukavarizer'
+include { SEQRETRIEVAL            } from './workflows/seqretrieval'
+include { EUKAVARIZER             } from './workflows/eukavarizer'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,24 +26,34 @@ params.fasta = getGenomeAttribute('fasta')
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//
-// WORKFLOW: Run main analysis pipeline depending on type of input
-//
+// Define the workflow
 workflow NFCORE_EUKAVARIZER {
-
     take:
-    samplesheet // channel: samplesheet read in from --input
+        ch_taxonomy_id
+        ch_outdir
+        ch_local_sequences_dir
+        ch_local_refseq_path
 
     main:
+        SEQRETRIEVAL (
+            ch_taxonomy_id,
+            ch_outdir,
+            ch_local_sequences_dir,
+            ch_local_refseq_path
+        )
 
-    //
-    // WORKFLOW: Run pipeline
-    //
-    EUKAVARIZER (
-        samplesheet
-    )
+        //
+        // WORKFLOW: Run pipeline
+        //
+        // EUKAVARIZER (
+        //     SEQRETRIEVAL.out.fastq_files,
+        //     SEQRETRIEVAL.out.refseq_path,
+        //     ch_local_sequences_dir,
+        //     ch_local_refseq_path
+        // )
+
     emit:
-    multiqc_report = EUKAVARIZER.out.multiqc_report // channel: /path/to/multiqc_report.html
+        multiqc_report = "test" //EUKAVARIZER.out.multiqc_report
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +63,16 @@ workflow NFCORE_EUKAVARIZER {
 
 workflow {
 
+    //
+    // Input channels for the workflow
+    //
     main:
+    ch_taxonomy_id         = params.taxonomy_id ? Channel.value(params.taxonomy_id) : Channel.empty()
+    outdir_channel         = params.outdir ? Channel.value(params.outdir) : Channel.empty()
+    ch_local_sequences_dir = params.local_sequences_dir ? Channel.value(params.local_sequences_dir) : Channel.empty()
+    ch_local_refseq_path   = params.local_refseq_path ? Channel.value(params.local_refseq_path) : Channel.empty()
+
+
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
@@ -73,16 +81,19 @@ workflow {
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.outdir,
-        params.input
+        outdir_channel
     )
 
     //
     // WORKFLOW: Run main workflow
     //
     NFCORE_EUKAVARIZER (
-        PIPELINE_INITIALISATION.out.samplesheet
+        ch_taxonomy_id,
+        outdir_channel,
+        ch_local_sequences_dir,
+        ch_local_refseq_path
     )
+
     //
     // SUBWORKFLOW: Run completion tasks
     //

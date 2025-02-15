@@ -8,7 +8,7 @@ template:
   org: nf-core
   name: eukavarizer
   description: Structural Variance for Eukaryotic Genomes
-  author: Ondrej Sloup
+  author: Ondřej Sloup
   version: 1.0.0dev
   force: true
   outdir: .
