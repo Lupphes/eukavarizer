@@ -25,17 +25,18 @@
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
-                "local_sequences_dir": {
+                "sequence_dir": {
                     "type": "string",
                     "format": "directory-path",
                     "description": "Path to local directory containing input sequences.",
                     "help_text": "Specify a local directory with input sequence files.",
                     "fa_icon": "fas fa-folder"
                 },
-                "local_refseq_path": {
+                "genome_file": {
                     "type": "string",
-                    "format": "directory-path",
-                    "description": "Path to local reference sequence files.",
+                    "format": "file-path",
+                    "description": "Path to the local reference genome file",
+                    "pattern": ".*\\.(fa|fna|fasta|gz)$",
                     "help_text": "Specify a directory containing reference sequences.",
                     "fa_icon": "fas fa-folder"
                 },
@@ -59,16 +60,72 @@
             "fa_icon": "fas fa-database",
             "description": "Parameters related to sequencing retrieval and filtering.",
             "properties": {
-            "library_strategy": {
-                "type": "string",
-
-                "description": "List of sequencing strategies to include.",
-                "help_text": "Specify sequencing strategies to filter by (e.g., WGS, Hi-C, RNA-Seq).",
-                "fa_icon": "fas fa-vial"
+                "library_strategy": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "WGS", "wgs",
+                            "WGA", "wga",
+                            "WXS", "wxs",
+                            "RNA-Seq", "rna-seq",
+                            "ssRNA-seq", "ssrna-seq",
+                            "miRNA-Seq", "mirna-seq",
+                            "ncRNA-Seq", "ncrna-seq",
+                            "FL-cDNA", "fl-cdna",
+                            "EST", "est",
+                            "Hi-C", "hi-c",
+                            "ATAC-seq", "atac-seq",
+                            "WCS", "wcs",
+                            "RAD-Seq", "rad-seq",
+                            "AMPLICON", "amplicon",
+                            "CLONE", "clone",
+                            "POOLCLONE", "poolclone",
+                            "CLONEEND", "cloneend",
+                            "FINISHING", "finishing",
+                            "ChIP-Seq", "chip-seq",
+                            "MNase-Seq", "mnase-seq",
+                            "Ribo-Seq", "ribo-seq",
+                            "DNase-Hypersensitivity", "dnase-hypersensitivity",
+                            "Bisulfite-Seq", "bisulfite-seq",
+                            "CTS", "cts",
+                            "MRE-Seq", "mre-seq",
+                            "MeDIP-Seq", "medip-seq",
+                            "MBD-Seq", "mbd-seq",
+                            "Tn-Seq", "tn-seq",
+                            "VALIDATION", "validation",
+                            "FAIRE-seq", "faire-seq",
+                            "SELEX", "selex",
+                            "RIP-Seq", "rip-seq",
+                            "ChIA-PET", "chia-pet",
+                            "Synthetic-Long-Read", "synthetic-long-read",
+                            "Targeted-Capture", "targeted-capture",
+                            "Tethered Chromatin Conformation Capture", "tethered chromatin conformation capture",
+                            "OTHER", "other"
+                        ]
+                    },
+                    "description": "List of sequencing strategies to include.",
+                    "help_text": "Specify sequencing strategies to filter by (e.g., WGS, Hi-C, RNA-Seq).",
+                    "fa_icon": "fas fa-vial"
                 },
                 "instrument_platform": {
-                    "type": "string",
-
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "Illumina", "illumina",
+                            "PacBio", "pacbio",
+                            "Nanopore", "nanopore",
+                            "IonTorrent", "iontorrent",
+                            "BGISEQ", "bgiseq",
+                            "HiSeq", "hiseq",
+                            "NextSeq", "nextseq",
+                            "MiSeq", "miseq",
+                            "NovaSeq", "novaseq",
+                            "454", "454",
+                            "SOLiD", "solid"
+                        ]
+                    },
                     "description": "List of sequencing platforms to include.",
                     "help_text": "Specify sequencing platforms to filter by (e.g., Illumina, PacBio, Nanopore).",
                     "fa_icon": "fas fa-microscope"

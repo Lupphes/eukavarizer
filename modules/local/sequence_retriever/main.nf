@@ -19,21 +19,22 @@ process SEQUENCE_RETRIEVER {
         val(maximum_coverage)
         val(max_results)
         val(assembly_quality)
-        val(sequences_dir)
+        val(sequence_dir)
 
     output:
         path "$taxonomy_id/ena_results.json", emit: ena_results
-        path "$taxonomy_id/sequences/*.fastq.gz", emit: sequences
+        path "$taxonomy_id/sequences/*.fastq.gz", emit: sequence_files
 
 
     script:
     """
-    mkdir -p data/$taxonomy_id/sequences
+    echo "Checking for existing sequencing data at: $sequence_dir"
 
-    echo "Checking for existing sequencing data at: $sequences_dir"
+    if [[ -d "${sequence_dir}" && -n "\$(ls -A ${sequence_dir} 2>/dev/null)" ]]; then
+        echo "Using local sequencing data from: $sequence_dir for taxonomy ID: $taxonomy_id"
 
-    if [ -n "$sequences_dir" ] && [ -d "$sequences_dir" ]; then
-        echo "Using local sequencing data from: $sequences_dir for taxonomy ID: $taxonomy_id"
+        mkdir -p "$taxonomy_id/sequences"
+        cp -r "${sequence_dir}/" "$taxonomy_id/"
 
         seq_getter.py --mode ena \
             --taxonomy_id $taxonomy_id \
@@ -42,8 +43,8 @@ process SEQUENCE_RETRIEVER {
             --minimum_coverage $minimum_coverage \
             --maximum_coverage $maximum_coverage \
             --max_results $max_results \
-            --assembly_quality $assembly_quality \
-            --sequences_dir $sequences_dir \
+            \$( [ -n "$assembly_quality" ] && echo "--assembly_quality $assembly_quality" ) \
+            --sequences_dir $sequence_dir \
             --outdir . \
             --genome_size_ungapped $genome_size_ungapped
 
@@ -57,6 +58,7 @@ process SEQUENCE_RETRIEVER {
             --minimum_coverage $minimum_coverage \
             --maximum_coverage $maximum_coverage \
             --max_results $max_results \
+            \$( [ -n "$assembly_quality" ] && echo "--assembly_quality $assembly_quality" ) \
             --outdir . \
             --genome_size_ungapped $genome_size_ungapped
     fi

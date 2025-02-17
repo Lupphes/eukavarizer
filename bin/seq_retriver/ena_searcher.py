@@ -42,13 +42,6 @@ class ENASearcher:
         """
         query_parts = [f"tax_eq({self.taxonomy_id})"]
 
-        print(self.library_strategy)
-        print(self.instrument_platform)
-        print(self.min_coverage)
-        print(self.max_coverage)
-        print(self.assembly_quality)
-        print("DEBUG")
-
         if self.library_strategy and self.library_strategy != []:
             query_parts.append(
                 " OR ".join(

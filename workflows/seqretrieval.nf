@@ -17,12 +17,12 @@ workflow SEQRETRIEVAL {
     take:
         ch_taxonomy_id
         ch_outdir
-        ch_sequences_dir
-        ch_local_refseq_path
+        ch_sequence_dir
+        ch_genome_file
 
     main:
-        ch_library_strategy    = params.library_strategy ? Channel.value(params.library_strategy) : Channel.value("")
-        ch_instrument_platform = params.instrument_platform ? Channel.value(params.instrument_platform) : Channel.value("")
+        ch_library_strategy    = params.library_strategy ? Channel.value(params.library_strategy) : Channel.value([])
+        ch_instrument_platform = params.instrument_platform ? Channel.value(params.instrument_platform) : Channel.value([])
         ch_minimum_coverage    = params.minimum_coverage ? Channel.value(params.minimum_coverage) : Channel.value(1)
         ch_maximum_coverage    = params.maximum_coverage ? Channel.value(params.maximum_coverage) : Channel.value("")
         ch_max_results         = params.max_results ? Channel.value(params.max_results) : Channel.value(1)
@@ -34,7 +34,7 @@ workflow SEQRETRIEVAL {
         ch_refseq_json = REFSEQ_RETRIEVER(
             ch_taxonomy_id,
             ch_outdir,
-            ch_local_refseq_path
+            ch_genome_file
         )
 
         parsed_ch_refseq_json = ch_refseq_json.refseq_json
@@ -52,19 +52,19 @@ workflow SEQRETRIEVAL {
             ch_taxonomy_id,
             parsed_ch_refseq_json.map { it[1] },
             ch_outdir,
-            ch_library_strategy,
-            ch_instrument_platform,
+            ch_library_strategy.map { it.join(' ').trim() },
+            ch_instrument_platform.map { it.join(' ').trim() },
             ch_minimum_coverage,
             ch_maximum_coverage,
             ch_max_results,
             ch_assembly_quality,
-            ch_sequences_dir
+            ch_sequence_dir
         )
 
     emit:
-        refseq_path = ch_refseq_json.genome_file // genome_file
+        genome_file = ch_refseq_json.genome_file // genome_file
         genome_size_ungapped = parsed_ch_refseq_json.map { it[1] } // genome_size_ungapped
-        fastq_files = ch_ena_results.sequences // fullPaths
+        fastq_files = ch_ena_results.sequence_files // fullPaths
 }
 
 /*

@@ -1,19 +1,18 @@
 name: "sequence_retriever"
-description: "Runs the downloader pipeline to fetch sequencing reads from ENA or NCBI."
+description: "Downloads sequencing reads from ENA or NCBI based on filtering criteria."
 keywords:
   - download
-  - python
   - fastq
   - sequencing-data
   - ENA
   - NCBI
 
 tools:
-  - name: "Python"
-    description: "Python script for retrieving sequencing reads."
-    homepage: "https://www.python.org/"
-    documentation: "https://docs.python.org/3/"
-    licence: "PSF"
+  - name: "seq_getter.py"
+    description: "Python script to retrieve sequencing reads from ENA/NCBI."
+    homepage: "https://github.com/your-org/seq_getter"
+    documentation: "https://github.com/your-org/seq_getter/blob/main/README.md"
+    licence: "MIT"
 
 input:
   - name: "taxonomy_id"
@@ -22,21 +21,29 @@ input:
     pattern: "^[0-9]+$"
     required: true
 
+  - name: "genome_size_ungapped"
+    description: "Ungapped genome size in base pairs."
+    type: "integer"
+    minimum: 1
+    required: true
+
   - name: "library_strategy"
-    description: "Sequencing library strategy (e.g., WGS, Hi-C, synthetic long read)."
+    description: "Sequencing library strategy (e.g., WGS, Hi-C, RNA-Seq)."
     type: "string"
     enum:
-      - "wgs"
-      - "synthetic-long-read"
-      - "hi-c"
+      - "WGS"
+      - "RNA-Seq"
+      - "Hi-C"
+      - "Synthetic-Long-Read"
     required: true
 
   - name: "instrument_platform"
-    description: "Sequencing platform used (e.g., Illumina, PacBio)."
+    description: "Sequencing platform used (e.g., Illumina, PacBio, Nanopore)."
     type: "string"
     enum:
-      - "illumina"
-      - "pacbio"
+      - "Illumina"
+      - "PacBio"
+      - "Nanopore"
     required: true
 
   - name: "minimum_coverage"
@@ -57,20 +64,36 @@ input:
     minimum: 1
     required: true
 
-  - name: "data_dir"
-    description: "Directory where sequencing reads will be downloaded."
+  - name: "assembly_quality"
+    description: "Quality of the sequencing assembly."
     type: "string"
-    format: "file-path"
+    required: true
+
+  - name: "sequence_dir"
+    description: "Optional directory containing pre-downloaded sequencing reads."
+    type: "file"
+    format: "directory-path"
+    required: false
+
+  - name: "outdir"
+    description: "Output directory for storing downloaded sequencing reads."
+    type: "string"
+    format: "directory-path"
     required: true
 
 output:
-  - name: "fastq_files"
-    description: "Path to the downloaded FASTQ sequencing files."
+  - name: "ena_results"
+    description: "JSON metadata file with sequencing data retrieval results."
+    type: "file"
+    pattern: "^.*ena_results.json$"
+
+  - name: "sequence_files"
+    description: "Downloaded sequencing reads in FASTQ format."
     type: "file"
     pattern: "^.*\\.fastq.gz$"
 
 authors:
-  - name: "Your Name"
-    email: "your.email@example.com"
-    github: "your-github-username"
-    affiliation: "Your Institution"
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"

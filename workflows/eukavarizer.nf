@@ -19,7 +19,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_euka
 workflow EUKAVARIZER {
 
     take:
-        ch_refseq_path // Channel with reference genome from SEQRETRIEVAL
+        ch_genome_file // Channel with reference genome from SEQRETRIEVAL
         ch_fastq_files // Channel with FASTQ files from SEQRETRIEVAL
 
     main:

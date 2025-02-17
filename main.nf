@@ -32,8 +32,8 @@ workflow NFCORE_EUKAVARIZER {
     take:
         ch_taxonomy_id
         ch_outdir
-        ch_local_sequences_dir
-        ch_local_refseq_path
+        ch_sequence_dir
+        ch_genome_file
 
     main:
 
@@ -45,15 +45,15 @@ workflow NFCORE_EUKAVARIZER {
         seqretrieval_results = SEQRETRIEVAL(
             ch_taxonomy_id,
             ch_outdir,
-            ch_local_sequences_dir,
-            ch_local_refseq_path
+            ch_sequence_dir,
+            ch_genome_file
         )
 
         //
         // STEP 2: Run Main Analysis Pipeline
         //
         eukavarizer_results = EUKAVARIZER(
-            seqretrieval_results.refseq_path,
+            seqretrieval_results.genome_file,
             seqretrieval_results.fastq_files
         )
 
@@ -74,9 +74,9 @@ workflow {
     //
     main:
         ch_taxonomy_id         = Channel.value(params.taxonomy_id ?: '4932')
-        ch_outdir              = Channel.fromPath(params.outdir ?: './data')
-        ch_local_sequences_dir = Channel.fromPath(params.local_sequences_dir ?: "./data/raw/${params.taxonomy_id}/sequences")
-        ch_local_refseq_path   = Channel.fromPath(params.local_refseq_path ?: "./data/raw/${params.taxonomy_id}/GCF_000146045.2_R64_genomic.fna.gz")
+        ch_outdir              = Channel.value(params.outdir ?: './output')
+        sequence_dir           = Channel.value(params.sequence_dir ?: "")
+        ch_genome_file         = Channel.value(params.genome_file ?: "")
 
         //
         // SUBWORKFLOW: Run initialisation tasks
@@ -95,8 +95,8 @@ workflow {
         NFCORE_EUKAVARIZER (
             ch_taxonomy_id,
             ch_outdir,
-            ch_local_sequences_dir,
-            ch_local_refseq_path
+            sequence_dir,
+            ch_genome_file
         )
 
         //

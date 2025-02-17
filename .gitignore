@@ -186,3 +186,4 @@ work/
 logs/
 fastqc_results/
 pipeline_info/
+output/

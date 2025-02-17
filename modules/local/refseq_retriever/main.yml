@@ -1,19 +1,18 @@
 name: "refseq_retriever"
-description: "Runs the downloader pipeline to fetch reference genome files."
+description: "Downloads and processes reference genome files from NCBI RefSeq."
 keywords:
   - download
-  - python
-  - fastq
   - reference-genome
-  - ENA
-  - NCBI
+  - fasta
+  - ncbi
+  - refseq
 
 tools:
-  - name: "Python"
-    description: "Python script for retrieving reference genome data."
-    homepage: "https://www.python.org/"
-    documentation: "https://docs.python.org/3/"
-    licence: "PSF"
+  - name: "seq_getter.py"
+    description: "Python script to retrieve reference genome data from RefSeq."
+    homepage: "https://github.com/your-org/seq_getter"
+    documentation: "https://github.com/your-org/seq_getter/blob/main/README.md"
+    licence: "MIT"
 
 input:
   - name: "taxonomy_id"
@@ -22,20 +21,41 @@ input:
     pattern: "^[0-9]+$"
     required: true
 
-  - name: "data_dir"
-    description: "Directory where the reference genome will be downloaded."
+  - name: "outdir"
+    description: "Directory where the reference genome will be stored."
     type: "string"
-    format: "file-path"
+    format: "directory-path"
     required: true
 
+  - name: "genome_file"
+    description: "Optional existing genome file to avoid re-downloading."
+    type: "file"
+    format: "file-path"
+    required: false
+
 output:
-  - name: "refseq_path"
-    description: "Path to the downloaded reference genome file."
+  - name: "refseq_json"
+    description: "JSON metadata file with genome retrieval results."
+    type: "file"
+    pattern: "^.*refseq_results.json$"
+
+  - name: "genome_file"
+    description: "Downloaded genome file (if applicable)."
     type: "file"
     pattern: "^.*\\.fna.gz$"
 
+  - name: "refseq_parquet"
+    description: "Reference genome metadata in Parquet format."
+    type: "file"
+    pattern: "^.*assembly_summary_refseq.parquet$"
+
+  - name: "refseq_summary"
+    description: "Reference genome summary in text format."
+    type: "file"
+    pattern: "^.*assembly_summary_refseq.txt$"
+
 authors:
-  - name: "Your Name"
-    email: "your.email@example.com"
-    github: "your-github-username"
-    affiliation: "Your Institution"
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
