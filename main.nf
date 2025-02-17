@@ -28,6 +28,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_euka
 
 // Define the workflow
 workflow NFCORE_EUKAVARIZER {
+
     take:
         ch_taxonomy_id
         ch_outdir
@@ -35,7 +36,13 @@ workflow NFCORE_EUKAVARIZER {
         ch_local_refseq_path
 
     main:
-        SEQRETRIEVAL (
+
+        println "Running nf-core/eukavarizer pipeline"
+
+        //
+        // STEP 1: Retrieve Sequences & Reference Genome
+        //
+        seqretrieval_results = SEQRETRIEVAL(
             ch_taxonomy_id,
             ch_outdir,
             ch_local_sequences_dir,
@@ -43,18 +50,17 @@ workflow NFCORE_EUKAVARIZER {
         )
 
         //
-        // WORKFLOW: Run pipeline
+        // STEP 2: Run Main Analysis Pipeline
         //
-        // EUKAVARIZER (
-        //     SEQRETRIEVAL.out.fastq_files,
-        //     SEQRETRIEVAL.out.refseq_path,
-        //     ch_local_sequences_dir,
-        //     ch_local_refseq_path
-        // )
+        eukavarizer_results = EUKAVARIZER(
+            seqretrieval_results.refseq_path,
+            seqretrieval_results.fastq_files
+        )
 
     emit:
-        multiqc_report = "test" //EUKAVARIZER.out.multiqc_report
+        multiqc_report = eukavarizer_results.multiqc_report
 }
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -67,45 +73,44 @@ workflow {
     // Input channels for the workflow
     //
     main:
-    ch_taxonomy_id         = params.taxonomy_id ? Channel.value(params.taxonomy_id) : Channel.empty()
-    outdir_channel         = params.outdir ? Channel.value(params.outdir) : Channel.empty()
-    ch_local_sequences_dir = params.local_sequences_dir ? Channel.value(params.local_sequences_dir) : Channel.empty()
-    ch_local_refseq_path   = params.local_refseq_path ? Channel.value(params.local_refseq_path) : Channel.empty()
+        ch_taxonomy_id         = Channel.value(params.taxonomy_id ?: '4932')
+        ch_outdir              = Channel.fromPath(params.outdir ?: './data')
+        ch_local_sequences_dir = Channel.fromPath(params.local_sequences_dir ?: "./data/raw/${params.taxonomy_id}/sequences")
+        ch_local_refseq_path   = Channel.fromPath(params.local_refseq_path ?: "./data/raw/${params.taxonomy_id}/GCF_000146045.2_R64_genomic.fna.gz")
 
+        //
+        // SUBWORKFLOW: Run initialisation tasks
+        //
+        PIPELINE_INITIALISATION (
+            params.version,
+            params.validate_params,
+            params.monochrome_logs,
+            args,
+            ch_outdir
+        )
 
-    //
-    // SUBWORKFLOW: Run initialisation tasks
-    //
-    PIPELINE_INITIALISATION (
-        params.version,
-        params.validate_params,
-        params.monochrome_logs,
-        args,
-        outdir_channel
-    )
+        //
+        // WORKFLOW: Run main workflow
+        //
+        NFCORE_EUKAVARIZER (
+            ch_taxonomy_id,
+            ch_outdir,
+            ch_local_sequences_dir,
+            ch_local_refseq_path
+        )
 
-    //
-    // WORKFLOW: Run main workflow
-    //
-    NFCORE_EUKAVARIZER (
-        ch_taxonomy_id,
-        outdir_channel,
-        ch_local_sequences_dir,
-        ch_local_refseq_path
-    )
-
-    //
-    // SUBWORKFLOW: Run completion tasks
-    //
-    PIPELINE_COMPLETION (
-        params.email,
-        params.email_on_fail,
-        params.plaintext_email,
-        params.outdir,
-        params.monochrome_logs,
-        params.hook_url,
-        NFCORE_EUKAVARIZER.out.multiqc_report
-    )
+        //
+        // SUBWORKFLOW: Run completion tasks
+        //
+        PIPELINE_COMPLETION (
+            params.email,
+            params.email_on_fail,
+            params.plaintext_email,
+            params.outdir,
+            params.monochrome_logs,
+            params.hook_url,
+            NFCORE_EUKAVARIZER.out.multiqc_report
+        )
 }
 
 /*

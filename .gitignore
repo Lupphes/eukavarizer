@@ -185,3 +185,4 @@ work/
 .nextflow/*
 logs/
 fastqc_results/
+pipeline_info/

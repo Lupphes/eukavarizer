@@ -53,6 +53,58 @@
                 }
             }
         },
+        "seq_retrieval_options": {
+            "title": "Sequencing Retrieval Options",
+            "type": "object",
+            "fa_icon": "fas fa-database",
+            "description": "Parameters related to sequencing retrieval and filtering.",
+            "properties": {
+            "library_strategy": {
+                "type": "string",
+
+                "description": "List of sequencing strategies to include.",
+                "help_text": "Specify sequencing strategies to filter by (e.g., WGS, Hi-C, RNA-Seq).",
+                "fa_icon": "fas fa-vial"
+                },
+                "instrument_platform": {
+                    "type": "string",
+
+                    "description": "List of sequencing platforms to include.",
+                    "help_text": "Specify sequencing platforms to filter by (e.g., Illumina, PacBio, Nanopore).",
+                    "fa_icon": "fas fa-microscope"
+                },
+                "minimum_coverage": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Minimum sequencing coverage required.",
+                    "help_text": "Specify the minimum coverage threshold (e.g., 40).",
+                    "fa_icon": "fas fa-chart-line"
+                },
+                "maximum_coverage": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Maximum sequencing coverage allowed.",
+                    "help_text": "Specify the maximum coverage threshold (e.g., 70).",
+                    "fa_icon": "fas fa-chart-bar"
+                },
+                "max_results": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 1,
+                    "description": "Maximum number of results to retrieve.",
+                    "help_text": "Specify how many sequencing entries to retrieve.",
+                    "fa_icon": "fas fa-list-ol"
+                },
+                "assembly_quality": {
+                    "type": "string",
+                    "default": "default",
+                    "description": "Assembly quality filter.",
+                    "help_text": "Specify an assembly quality category.",
+                    "fa_icon": "fas fa-star"
+                }
+            }
+        },
+
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -239,6 +291,9 @@
         }
     },
     "allOf": [
+        {
+            "$ref": "#/$defs/seq_retrieval_options"
+        },
         {
             "$ref": "#/$defs/input_output_options"
         },

@@ -33,7 +33,7 @@ class RefSeqRetriver:
         - tuple: (genome_file_path, genome_size, genome_size_ungapped)
         """
         # Prepare tax-specific directory
-        tax_dir = os.path.join(self.outdir, str(taxonomy_id))
+        tax_dir = os.path.join(self.outdir, str(taxonomy_id), "refseq")
         os.makedirs(tax_dir, exist_ok=True)
 
         # Download the assembly summary if needed
@@ -68,7 +68,9 @@ class RefSeqRetriver:
 
         # If the genome file doesn't exist locally, download it
         if os.path.exists(genome_file_path):
-            print(f"Genome file already exists at {genome_file_path}. Skipping download.")
+            print(
+                f"Genome file already exists at {genome_file_path}. Skipping download."
+            )
         else:
             self._download_genome_file(full_path, genome_file_path)
 

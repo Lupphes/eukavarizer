@@ -36,7 +36,7 @@ SUPPORTED_LIBRARY_STRATEGY = [
     "Synthetic-Long-Read",  # Long-read assembly
     "Targeted-Capture",  # Target enrichment sequencing
     "Tethered Chromatin Conformation Capture",  # Chromatin capture
-    "OTHER"  # Unlisted library strategies
+    "OTHER",  # Unlisted library strategies
 ]
 
 SUPPORTED_INSTRUMENT_PLATFORM = [
@@ -50,7 +50,7 @@ SUPPORTED_INSTRUMENT_PLATFORM = [
     "MiSeq",  # Illumina MiSeq platform
     "NovaSeq",  # Illumina NovaSeq platform
     "454",  # Pyrosequencing (discontinued but still in legacy data)
-    "SOLiD"  # Sequencing by Oligonucleotide Ligation and Detection
+    "SOLiD",  # Sequencing by Oligonucleotide Ligation and Detection
 ]
 
 # Database URLs

@@ -1,6 +1,0 @@
-name: "downloader"
-description: "Runs the downloader pipeline to fetch files."
-keywords:
-  - download
-  - python
-  - fastq

@@ -12,9 +12,17 @@ class ENASearcher:
     and downloading FASTQ files based on various criteria.
     """
 
-    def __init__(self, taxonomy_id: int, library_strategy=None, instrument_platform=None,
-                 max_results: int = 10, min_coverage: int = None, max_coverage: int = None,
-                 assembly_quality=None, sort=False):
+    def __init__(
+        self,
+        taxonomy_id: int,
+        library_strategy=None,
+        instrument_platform=None,
+        max_results: int = 10,
+        min_coverage: int = None,
+        max_coverage: int = None,
+        assembly_quality=None,
+        sort=False,
+    ):
         self.taxonomy_id = taxonomy_id
         self.library_strategy = library_strategy
         self.instrument_platform = instrument_platform
@@ -34,20 +42,40 @@ class ENASearcher:
         """
         query_parts = [f"tax_eq({self.taxonomy_id})"]
 
-        if self.library_strategy:
-            query_parts.append(" OR ".join(f'library_strategy="{stype}"' for stype in self.library_strategy))
+        print(self.library_strategy)
+        print(self.instrument_platform)
+        print(self.min_coverage)
+        print(self.max_coverage)
+        print(self.assembly_quality)
+        print("DEBUG")
 
-        if self.instrument_platform:
-            query_parts.append(" OR ".join(f'instrument_platform="{platform}"' for platform in self.instrument_platform))
+        if self.library_strategy and self.library_strategy != []:
+            query_parts.append(
+                " OR ".join(
+                    f'library_strategy="{stype}"' for stype in self.library_strategy
+                )
+            )
+
+        if self.instrument_platform and self.instrument_platform != []:
+            query_parts.append(
+                " OR ".join(
+                    f'instrument_platform="{platform}"'
+                    for platform in self.instrument_platform
+                )
+            )
 
         if self.min_coverage is not None and genome_size_ungapped is not None:
-            query_parts.append(f"base_count>={genome_size_ungapped * self.min_coverage}")
+            query_parts.append(
+                f"base_count>={genome_size_ungapped * self.min_coverage}"
+            )
 
         if self.max_coverage is not None and genome_size_ungapped is not None:
-            query_parts.append(f"base_count<={genome_size_ungapped * self.max_coverage}")
+            query_parts.append(
+                f"base_count<={genome_size_ungapped * self.max_coverage}"
+            )
 
-        if self.assembly_quality:
-            query_parts.append(" OR ".join(f'assembly_quality="{quality}"' for quality in self.assembly_quality))
+        if self.assembly_quality and not self.assembly_quality == "":
+            query_parts.append(f"assembly_quality={self.assembly_quality}")
 
         query = " AND ".join(f"({part})" for part in query_parts if part)
 
@@ -56,7 +84,7 @@ class ENASearcher:
             "result": "read_run",
             "query": query,
             "fields": "run_accession,library_strategy,instrument_platform,base_count,"
-                      "read_count,description,last_updated,fastq_ftp,assembly_quality",
+            "read_count,description,last_updated,fastq_ftp,assembly_quality",
             "format": "json",
             "limit": 10000,
         }
@@ -76,7 +104,11 @@ class ENASearcher:
         # Calculate coverage if genome_size is known
         for record in results:
             base_count = int(record.get("base_count", 0))
-            record["coverage"] = None if genome_size_ungapped is None or genome_size_ungapped == 0 else base_count / genome_size_ungapped
+            record["coverage"] = (
+                None
+                if genome_size_ungapped is None or genome_size_ungapped == 0
+                else base_count / genome_size_ungapped
+            )
 
         # Define rankings for library strategies and platforms (lower rank = higher priority)
         library_strategy_rank = {"wgs": 1, "synthetic-long-read": 2, "hi-c": 3}
@@ -87,8 +119,12 @@ class ENASearcher:
             sorted_results = sorted(
                 results,
                 key=lambda x: (
-                    library_strategy_rank.get(x.get("library_strategy", "").lower(), float("inf")),
-                    instrument_platform_rank.get(x.get("instrument_platform", "").lower(), float("inf")),
+                    library_strategy_rank.get(
+                        x.get("library_strategy", "").lower(), float("inf")
+                    ),
+                    instrument_platform_rank.get(
+                        x.get("instrument_platform", "").lower(), float("inf")
+                    ),
                     -int(x.get("base_count", 0)),
                     x.get("last_updated", ""),
                 ),
@@ -96,9 +132,11 @@ class ENASearcher:
         else:
             sorted_results = results
 
-        return sorted_results[:self.max_results]
+        return sorted_results[: self.max_results]
 
-    def fetch_fastq_files(self, sequence_data: list, outdir: str = "data", max_files: int = None):
+    def fetch_fastq_files(
+        self, sequence_data: list, outdir: str = "data", max_files: int = None
+    ):
         """
         Download FASTQ files from the URLs provided in the sequence data.
 
