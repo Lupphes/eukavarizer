@@ -16,7 +16,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_euka
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow EUKAVARIZER {
+workflow ANALYSIS_FAST_MULTI {
 
     take:
         ch_genome_file // Channel with reference genome from SEQRETRIEVAL
@@ -28,15 +28,24 @@ workflow EUKAVARIZER {
         //
         ch_versions = Channel.empty()
         ch_multiqc_files = Channel.empty()
-        ch_fastq_files = ch_fastq_files
-            .flatMap { fastq_list -> fastq_list.collect { fastq -> tuple([ id: fastq.baseName ], file(fastq)) } }
-        ch_fastq_files.collect().view()
+
+        ch_fastq_files.view { "DEBUG: Received FASTQ files -> ${it}" }
+
+        // Normalize FASTQ input into a structured format
+        ch_formatted_fastq = ch_fastq_files
+            .map { fileList ->
+                def files = fileList instanceof List ? fileList.flatten() : [fileList] // Ensure list format
+                def sample_id = files[0].toString().tokenize('/')[-1].replaceAll(/(_\d+)?\.fastq\.gz$/, "")
+                def is_paired = files.size() == 2
+                return tuple([ id: sample_id, single_end: !is_paired ], files)
+            }
+            .view { "DEBUG: Formatted FASTQ -> ${it}" }
 
         //
         // MODULE: Run FastQC on Sequencing Data
         //
         FASTQC (
-            ch_fastq_files
+            ch_formatted_fastq
         )
 
         // Collect FastQC outputs for MultiQC

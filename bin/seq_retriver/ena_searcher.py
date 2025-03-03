@@ -129,51 +129,67 @@ class ENASearcher:
 
     def fetch_fastq_files(
         self, sequence_data: list, outdir: str = "data", max_files: int = None
-    ):
+    ) -> dict[str, list[str]]:
         """
-        Download FASTQ files from the URLs provided in the sequence data.
+        Download FASTQ files from the URLs provided in the sequence data, placing each run's files
+        in a subfolder named after its run accession.
 
         Parameters:
-        - sequence_data (list): List of dictionaries containing sequence data with 'fastq_ftp'.
-        - outdir (str): Directory to save the downloaded FASTQ files.
-        - max_files (int): Maximum number of files to download (default: None, meaning all).
+        - sequence_data (list): List of dicts with run metadata (including 'fastq_ftp').
+        - outdir (str): Base directory to save the downloaded FASTQ files.
+        - max_files (int): Maximum number of total files to download. None = no limit.
+
+        Returns:
+        - dict[str, list[str]]: run_accession -> list of downloaded file paths
         """
+        import requests
+        from tqdm import tqdm
+        from urllib.parse import urlsplit
+
         os.makedirs(outdir, exist_ok=True)
         downloaded_count = 0
 
-        with tqdm(
-            total=len(sequence_data), desc="Downloading FASTQ records", unit="rec"
-        ) as progress_bar:
+        # This dict will store run_accession -> [list_of_downloaded_file_paths]
+        run_to_files = {}
+
+        with tqdm(total=len(sequence_data), desc="Downloading FASTQ records", unit="rec") as progress_bar:
             for record in sequence_data:
                 fastq_ftp = record.get("fastq_ftp", None)
                 run_accession = record.get("run_accession", "N/A")
 
+                # Prepare a list to store all file paths for this run
+                record_files = []
+
                 if not fastq_ftp:
                     print(f"No FASTQ URL found for record: {run_accession}")
+                    run_to_files[run_accession] = record_files
                     progress_bar.update(1)
                     continue
 
-                # Split the FTP string into individual file URLs
+                # Split the FTP string into individual FASTQ URLs
                 fastq_urls = fastq_ftp.split(";")
 
+                # Create a subdirectory for this run
+                run_dir = os.path.join(outdir, run_accession)
+                os.makedirs(run_dir, exist_ok=True)
+
                 for url in fastq_urls:
-                    # Check if max_files limit is reached
                     if max_files is not None and downloaded_count >= max_files:
                         print("Download limit reached. Stopping.")
-                        return
+                        return run_to_files
 
                     filename = os.path.basename(urlsplit(url).path)
-                    file_path = os.path.join(outdir, filename)
+                    file_path = os.path.join(run_dir, filename)
 
-                    # Check if the file already exists
+                    # If the file already exists, skip it
                     if os.path.exists(file_path):
                         print(f"File already exists: {file_path}. Skipping download.")
+                        record_files.append(file_path)
                         continue
 
-                    # Download the file
+                    # Perform the download (ENA provides FTP; use http:// for direct GET)
                     print(f"Downloading {filename} from {url}...")
                     try:
-                        # ENA returns FTP links; use http:// for direct get
                         response = requests.get(f"http://{url}", stream=True)
                         response.raise_for_status()
 
@@ -184,16 +200,21 @@ class ENASearcher:
                             unit="B",
                             unit_scale=True,
                             unit_divisor=1024,
-                            leave=False,
+                            leave=False
                         ) as file_bar:
                             for chunk in response.iter_content(chunk_size=1024):
                                 f.write(chunk)
                                 file_bar.update(len(chunk))
 
                         print(f"Downloaded {filename} to {file_path}")
+                        record_files.append(file_path)
                         downloaded_count += 1
 
                     except requests.exceptions.RequestException as e:
                         print(f"Failed to download {filename} from {url}: {e}")
 
+                # Store the file paths for this run
+                run_to_files[run_accession] = record_files
                 progress_bar.update(1)
+
+        return run_to_files

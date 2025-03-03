@@ -82,6 +82,8 @@ workflow PIPELINE_COMPLETION {
     monochrome_logs // boolean: Disable ANSI colour codes in log output
     hook_url        //  string: hook URL for notifications
     multiqc_report  //  string: Path to MultiQC report
+    variants_bcf   //  string: Path to output files from the pipeline
+    variants_index    //  string: Path to output files from the pipeline
 
     main:
     summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")

@@ -100,59 +100,72 @@ class Pipeline:
     def run_ena(self):
         """Executes the ENA search and FASTQ file download pipeline."""
         if self.sequences_dir:
+            # If user provided a local directory, we skip downloading
             print(f"Using local sequences from directory: {self.sequences_dir}")
             files = self.list_sequence_files(self.sequences_dir)
             return {"sequences_dir": self.sequences_dir, "sequence_files": files}
         else:
             self.sequences_dir = os.path.join(
-                self.outdir, str(self.taxonomy_id), "sequences"
+                self.outdir,
+                str(self.taxonomy_id),
+                "sequences"
             )
 
         print("Searching for sequence data in ENA...")
+        # If no genome_size_ungapped is provided, or the user gave us a genome_file:
         if not self.genome_size_ungapped and self.genome_file:
-            self.genome_size, self.genome_size_ungapped = (
-                self.calculate_genome_size_from_file(self.genome_file)
-            )
+            self.genome_size, self.genome_size_ungapped = self.calculate_genome_size_from_file(self.genome_file)
         elif self.genome_size_ungapped:
             print(f"Using provided ungapped genome size: {self.genome_size_ungapped}")
         else:
-            print(
-                "Genome size not provided. Please provide the ungapped genome size for ENA search for better results."
-            )
+            print("Genome size not provided. The coverage filter may not be optimal without it.")
 
-        sequence_data = self.ena_searcher.search_sequence_data(
-            genome_size_ungapped=self.genome_size_ungapped
-        )
-
+        sequence_data = self.ena_searcher.search_sequence_data(genome_size_ungapped=self.genome_size_ungapped)
         if not sequence_data:
             print("No sequence data found.")
             return {"sequences_dir": self.sequences_dir, "sequence_data": []}
 
         print("Downloading FASTQ files...")
+        # We now capture the returned dict {run_accession -> list of file paths}
+        run_accession_to_files = self.ena_searcher.fetch_fastq_files(sequence_data, self.sequences_dir)
 
-        self.ena_searcher.fetch_fastq_files(sequence_data, self.sequences_dir)
+        # Optionally, you can still call list_sequence_files if you want a quick flat listing
+        # But your main structure is in run_accession_to_files
+        # This list won't show the pairing, just the total files in self.sequences_dir
+        all_downloaded = self.list_sequence_files(self.sequences_dir, print_files=False)
 
-        # relative_sequence_dir_file_path = os.path.relpath(self.sequences_dir, start=os.path.dirname(self.outdir))
-        files = self.list_sequence_files(self.sequences_dir)
-        return {"sequences_dir": self.sequences_dir, "sequence_files": files}
+        # Return both the base directory and the run-accession->files mapping
+        return {
+            "sequences_dir": self.sequences_dir,
+            "run_accession_to_files": run_accession_to_files,
+            "all_files_flat": all_downloaded
+        }
 
-    def list_sequence_files(
-        self, directory: str, print_files: bool = True
-    ) -> list[str]:
-        """Lists all sequence files in the specified directory and returns them as a list."""
-        if os.path.exists(directory):
-            files = os.listdir(directory)
-            if files:
-                if print_files:
-                    print("\nSequence files in the directory:")
-                    print("\n".join(f"- {file}" for file in files))
-                return files
-            else:
-                print("No sequence files found in the directory.")
-                return []
-        else:
+
+    def list_sequence_files(self, directory: str, print_files: bool = True) -> list[str]:
+        """
+        Recursively lists all files under 'directory' and returns a list of full paths.
+        """
+        if not os.path.exists(directory):
             print(f"Directory {directory} does not exist.")
             return []
+
+        file_paths = []
+        for root, dirs, files in os.walk(directory):
+            for name in files:
+                file_paths.append(os.path.join(root, name))
+
+        if not file_paths:
+            print("No sequence files found in the directory.")
+            return []
+
+        if print_files:
+            print("\nSequence files found in the directory:")
+            for fp in file_paths:
+                print(f"- {fp}")
+
+        return file_paths
+
 
     def calculate_genome_size_from_file(self, genome_file: str) -> tuple[int, int]:
         """Calculates genome size by summing sequence lengths from a genome file (handles both .gz and plain text)."""

@@ -23,14 +23,14 @@ process SEQUENCE_RETRIEVER {
 
     output:
         path "$taxonomy_id/ena_results.json", emit: ena_results
-        path "$taxonomy_id/sequences/*.fastq.gz", emit: sequence_files
+        path "$taxonomy_id/sequences/*/*.fastq.gz", emit: sequence_files
 
 
     script:
     """
     echo "Checking for existing sequencing data at: $sequence_dir"
 
-    if [[ -d "${sequence_dir}" && -n "\$(ls -A ${sequence_dir} 2>/dev/null)" ]]; then
+    if [ -d "$sequence_dir" ] && find "$sequence_dir" -type f -name "*.fastq.gz" | grep -q .; then
         echo "Using local sequencing data from: $sequence_dir for taxonomy ID: $taxonomy_id"
 
         mkdir -p "$taxonomy_id/sequences"
