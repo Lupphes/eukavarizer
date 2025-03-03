@@ -90,7 +90,8 @@ workflow NFCORE_EUKAVARIZER {
             input_generation_results.bam_files,
             input_generation_results.bam_indexes,
             input_generation_results.bgzip_fasta_file,
-            input_generation_results.fasta_index
+            input_generation_results.fasta_index,
+            input_generation_results.bwa_index
         )
 
         //
@@ -100,8 +101,8 @@ workflow NFCORE_EUKAVARIZER {
 
     emit:
         multiqc_report              = data_analysis_results.multiqc_report
-        structural_variants         = structural_results.variants
-        structural_variants_index   = structural_results.variants_index
+        structural_variants         = structural_results.delly_variants
+        structural_variants_index   = structural_results.delly_variants_index
         final_reports               = report_generation.output_files
 }
 
