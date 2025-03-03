@@ -1,4 +1,12 @@
 include { DELLY_CALL } from '../modules/local/delly/call/main.nf'
+include { MANTA_GERMLINE } from '../modules/nf-core/manta/germline/main'
+include { MANTA_SOMATIC } from '../modules/nf-core/manta/somatic/main'
+include { GRIDSS_GRIDSS } from '../modules/nf-core/gridss/gridss/main'
+include { GRIDSS_SOMATICFILTER } from '../modules/nf-core/gridss/somaticfilter/main'
+include { TIDDIT_SV } from '../modules/nf-core/tiddit/sv/main'
+include { SVABA } from '../modules/nf-core/svaba/main'
+include { SNIFFLES } from '../modules/nf-core/sniffles/main'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
