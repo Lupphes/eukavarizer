@@ -4,13 +4,14 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { GUNZIP         } from '../modules/nf-core/gunzip/main'
-include { BWA_INDEX      } from '../modules/nf-core/bwa/index/main'
-include { BWA_MEM        } from '../modules/nf-core/bwa/mem/main'
-include { SAMTOOLS_SORT  } from '../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX } from '../modules/nf-core/samtools/index/main'
-include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
-include { TABIX_BGZIP    } from '../modules/nf-core/tabix/bgzip/main'
+include { GUNZIP         }      from '../modules/nf-core/gunzip/main'
+include { BWA_INDEX      }      from '../modules/nf-core/bwa/index/main'
+include { BWA_MEM        }      from '../modules/nf-core/bwa/mem/main'
+include { SAMTOOLS_SORT  }      from '../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX }      from '../modules/nf-core/samtools/index/main'
+include { SAMTOOLS_FAIDX }      from '../modules/nf-core/samtools/faidx/main'
+include { SAMTOOLS_FAIDX as SAMTOOLS_FAIDX_ZIP }  from '../modules/nf-core/samtools/faidx/main'
+include { TABIX_BGZIP    }      from '../modules/nf-core/tabix/bgzip/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,12 +149,31 @@ workflow INPUT_GENERATION {
         ch_bgzipped_fasta.view { "DEBUG: BGZIPPED FASTA -> ${it}" }
         ch_gzi_index.view { "DEBUG: BGZIP INDEX FILE -> ${it}" }
 
+
+        /*
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            STEP 9: Generate FASTA Index for Gzipped FASTA
+            - Manta requires the FASTA file to be bgzipped and indexed
+            - We generate an additional `.fai` for the gzipped version
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        */
+
+        ch_bgzipped_fasta.view { "DEBUG: Input to SAMTOOLS_FAIDX_ZIP -> ${it}" }
+        ch_fasta_index_zipped = SAMTOOLS_FAIDX_ZIP(
+            ch_bgzipped_fasta.map { file -> tuple([id: file.baseName], file) },
+            [[], []]
+        ).fai
+
+
+        ch_fasta_index_zipped.view { "DEBUG: FASTA index for gzipped FASTA (.fai) -> ${it}" }
+
     emit:
-        bam_files        = ch_sorted_bam
-        bam_indexes      = ch_bam_index
-        fasta_file       = ch_unzipped_fasta.map { meta, fasta -> fasta }
-        fasta_index      = ch_fasta_index
-        bwa_index        = ch_bwa_index
-        bgzip_fasta_file = ch_bgzipped_fasta
-        fasta_gzi_index  = ch_gzi_index
+        bam_files        = ch_sorted_bam                    // Sorted BAM files
+        bam_indexes      = ch_bam_index                     // BAM index files (.bai)
+        fasta_file       = ch_unzipped_fasta.map { it[1] }  // Unzipped FASTA file
+        fasta_index      = ch_fasta_index                   // FASTA index (.fai) for unzipped FASTA
+        bwa_index        = ch_bwa_index                     // BWA index files
+        bgzip_fasta_file = ch_bgzipped_fasta                // Gzipped FASTA file
+        fasta_gzi_index  = ch_gzi_index                     // BGZIP index file (.gzi)
+        fasta_index_gz   = ch_fasta_index_zipped            // FASTA index (.fai) for gzipped FASTA
 }

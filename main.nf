@@ -91,7 +91,9 @@ workflow NFCORE_EUKAVARIZER {
             input_generation_results.bam_indexes,
             input_generation_results.bgzip_fasta_file,
             input_generation_results.fasta_index,
-            input_generation_results.bwa_index
+            input_generation_results.bwa_index,
+            input_generation_results.fasta_index_gz,
+            input_generation_results.fasta_file
         )
 
         //

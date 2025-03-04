@@ -16,8 +16,7 @@
  *   Local module that calls structural variants (deletions, duplications,
  *   inversions, translocations) in short-read data using Delly.
  */
-include { DELLY_CALL } from '../modules/local/delly/call/main.nf'
-
+include { DELLY_CALL } from '../modules/nf-core/delly/call/main.nf'
 
 /*
     ──────────────────────────────────────────────────────────
@@ -36,38 +35,39 @@ include { MANTA_GERMLINE } from '../modules/nf-core/manta/germline/main'
  *   Advanced, local assembly-based SV caller for short-read data
  *   (both germline and somatic).
  */
-// include { GRIDSS_GRIDSS } from '../modules/nf-core/gridss/gridss/main'
+include { GRIDSS_GRIDSS } from '../modules/nf-core/gridss/gridss/main'
 
 /*
  * DYSGU
  *   Machine-learning approach for structural variant calling from short reads.
  */
-// include { DYSGU } from '../modules/nf-core/dysgu/main'
+include { DYSGU } from '../modules/nf-core/dysgu/main'
 
 /*
  * TIDDIT_SV
  *   Coverage-based short-read SV detection, used in some popular pipelines.
  */
-// include { TIDDIT_SV } from '../modules/nf-core/tiddit/sv/main'
+include { TIDDIT_SV } from '../modules/nf-core/tiddit/sv/main'
 
 /*
  * SVABA
  *   Local assembly-based SV and indel detection (single-sample or tumor/normal).
  */
-// include { SVABA } from '../modules/nf-core/svaba/main'
+include { SVABA } from '../modules/nf-core/svaba/main' // Currently disabled
 
 /*
  * SNIFFLES
  *   Long-read (PacBio/ONT) structural variant caller using split-read logic.
  */
-// include { SNIFFLES } from '../modules/nf-core/sniffles/main'
+include { SNIFFLES } from '../modules/nf-core/sniffles/main' // Currently disabled
+include { BCFTOOLS_FILTER } from '../modules/nf-core/bcftools/filter/main'
+include { BCFTOOLS_QUERY } from '../modules/nf-core/bcftools/query/main'
 
 /*
  * CUTESV
  *   Alternative long-read structural variant caller, similar scope to Sniffles.
  */
-// include { CUTESV } from '../modules/nf-core/cutesv/main'
-
+include { CUTESV } from '../modules/nf-core/cutesv/main'
 
 /*
     ──────────────────────────────────────────────────────────
@@ -79,11 +79,13 @@ workflow STRUCTURAL_VARIANT_CALLING {
 
     /*
      * Input channels for:
-     *   1) ch_bam_files    => Aligned BAM files
-     *   2) ch_bam_indexes  => Corresponding BAM/CRAM indices
-     *   3) ch_genome_file  => Reference genome (FASTA)
-     *   4) ch_fasta_index  => FASTA index (.fai)
-     *   5) ch_bwa_index    => Directory containing BWA index files
+     *   1) ch_bam_files        => Aligned BAM files
+     *   2) ch_bam_indexes      => Corresponding BAM/CRAM indices
+     *   3) ch_genome_file      => Reference genome (FASTA)
+     *   4) ch_fasta_index      => FASTA index (.fai)
+     *   5) ch_bwa_index        => Directory containing BWA index files
+     *   6) ch_fasta_index_gz   => FASTA index (.fai) for gzipped FASTA
+     *   7) ch_fasta_file       => FASTA file (uncompressed)
      */
     take:
         ch_bam_files
@@ -91,6 +93,8 @@ workflow STRUCTURAL_VARIANT_CALLING {
         ch_genome_file
         ch_fasta_index
         ch_bwa_index
+        ch_fasta_index_gz
+        ch_fasta_file
 
     main:
         view("🔬 Running Structural Variant Calling (currently only DELLY)")
@@ -130,127 +134,148 @@ workflow STRUCTURAL_VARIANT_CALLING {
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 2) DELLY CALL (Active)
+        STEP 2) DELLY CALL
         - Calls short-read SVs (deletions, duplications, inversions, etc.)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
+
         structural_delly = DELLY_CALL(
-            bam_inputs,     // (meta, bam, bai)
-            fasta_input,    // (meta2, fasta)
-            fai_input       // (meta3, fai)
+            ch_bam_files
+            .join(ch_bam_indexes, by: 0)
+            .map { meta, bam, bai -> tuple(meta, bam, bai, [], [], []) },
+            fasta_input,
+            fai_input
         )
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 3) MANTA_GERMLINE (Commented)
+        STEP 3) MANTA_GERMLINE
         - For germline short-read SVs, including large deletions, inversions, etc.
-        - Typically: (meta,bam,bai, [bed?],[bed?]), (meta2,fasta), (meta3,fai)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-
-        // structural_manta_germline = MANTA_GERMLINE(
-        //     bam_inputs,
-        //     fasta_input,
-        //     fai_input,
-        //     null  // or Channel.empty() if you have no intervals
-        // )
-
+        structural_manta_germline = MANTA_GERMLINE(
+            bam_inputs.map { meta, bam, bai -> tuple(meta, bam, bai, [], []) },
+            fasta_input,
+            ch_fasta_index_gz,
+            []
+        )
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 4) GRIDSS_GRIDSS (Commented)
+        STEP 4) GRIDSS_GRIDSS
         - Advanced local assembly-based approach for short-read data,
         capturing complex rearrangements (germline or somatic).
-        - Usually: (meta,bam), (meta2,fasta), (meta3,fai), (meta4,bwa_index).
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-
-        // structural_gridss = GRIDSS_GRIDSS(
-        //     bam_inputs.map { meta, bam, bai -> tuple(meta, bam) },
-        //     fasta_input,
-        //     fai_input,
-        //     bwa_input
-        // )
-
+        structural_gridss = GRIDSS_GRIDSS(
+            bam_inputs.map { meta, bam, bai -> tuple(meta, bam) },
+            ch_fasta_file.map { fasta -> tuple([id: fasta.baseName], fasta) },
+            fai_input.map { meta, fai -> tuple(meta, fai) },
+            bwa_input.map { meta, bwa -> tuple(meta, bwa[1]) }
+        )
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 5) DYSGU (Commented)
+        STEP 5) DYSGU
         - A machine-learning approach for short-read SV detection.
-        - Typically: (meta,bam,bai), (meta2,fasta), (meta3,fai).
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
+
+        // ch_bam_files.view { it -> println "1 BAM FILE INPUT: $it" }
+        // ch_bam_indexes.view { it -> println "1 BAM INDEX INPUT: $it" }
+        // fasta_input.view { it -> println "1 FASTA INPUT: $it" }
+        // ch_fasta_index.view { it -> println "1 FASTA INDEX INPUT: $it" }
+
         // structural_dysgu = DYSGU(
-        //     bam_inputs,
-        //     fasta_input,
-        //     fai_input
+        //     ch_bam_files
+        //         .join(ch_bam_indexes, by: 0)
+        //         .map { meta, bam, bai -> tuple(meta, bam, bai) },
+        //     fasta_input
+        //         .map { meta, fasta -> tuple(fasta.simpleName, meta, fasta) } // Ensure consistent FASTA ID
+        //         .join(
+        //             ch_fasta_index.map { meta, fai -> tuple(fai.simpleName, meta, fai) }, // Ensure consistent FAI ID
+        //             by: 0
+        //         )
+        //         .map { id, meta_fasta, fasta, meta_fai, fai -> tuple(meta_fasta, fasta, fai) } // Reassemble metadata
         // )
+
 
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         STEP 6) TIDDIT_SV (Commented)
         - Coverage-based short-read SV detection method used in some pipelines.
-        - Typically: (meta,bam,bai), (meta2,fasta), (meta3,bwa_index?).
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-
-        // structural_tiddit = TIDDIT_SV(
-        //     bam_inputs,
-        //     fasta_input,
-        //     bwa_input // if TIDDIT needs BWA index
-        // )
-
-
+        structural_tiddit = TIDDIT_SV(
+            bam_inputs,
+            fasta_input,
+            bwa_input.map { meta, bwa -> tuple(meta, bwa[1]) }
+        )
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 7) SVABA (Commented)
+        STEP 7) SVABA
         - Local assembly-based method to detect SVs & Indels in single-sample
         or tumor/normal short-read data.
-        - Minimal usage: (meta,bam,bai), (meta2,fasta).
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
+        // 🚀 Run SVABA
         // structural_svaba = SVABA(
-        //     bam_inputs,
-        //     fasta_input
+        //     ch_bam_files
+        //         .join(ch_bam_indexes, by: 0)
+        //         .map { meta, bam, bai -> tuple(meta, null, null, bam, bai) },       // (meta, tumorbam, tumorbai, normalbam=null, normalbai=null)
+        //     ch_genome_file.map { fasta -> tuple([id: fasta.baseName], fasta) },     // (meta2, fasta)
+        //     ch_fasta_index.map { meta, fai -> tuple(meta, fai) },                   // (meta2, fasta_fai)
+        //     ch_bwa_index.map { meta, bwa -> tuple(meta, bwa) },                     // (meta3, bwa_index)
+        //     "",                                                                      // (meta4, dbsnp)
+        //     "",                                                        // (meta4, dbsnp_tbi)
+        //     ""                                                    // (meta5, regions)
         // )
 
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        STEP 8) SNIFFLES (Commented)
+        STEP 8) SNIFFLES
         - For long-read (PacBio/ONT) SV calling using split-read signals.
-        - Typically 5 arguments: (meta,bam,bai), (meta2,fasta),
-        (meta3,tandem_file?), val vcf_output, val snf_output.
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        // structural_sniffles = SNIFFLES(
-        //     bam_inputs,
-        //     fasta_input,
-        //     Channel.value( tuple([id:'dummy'], file('tandem.bed')) ),
-        //     Channel.value("sniffles_output.vcf.gz"),
-        //     Channel.value("sniffles_output.snf")
+        // filtered_tandem_vcf = BCFTOOLS_FILTER(
+        //     structural_manta_germline.candidate_sv_vcf.map { meta, vcf, tbi -> tuple(meta, vcf, tbi) }
         // )
 
+        // tandem_repeats_bed = BCFTOOLS_QUERY(
+        //     filtered_tandem_vcf.vcf
+        //     .join(filtered_tandem_vcf.tbi, by: 0)
+        //     .map { meta, vcf, tbi -> tuple(meta, vcf, tbi) },
+        //     [],
+        //     [],
+        //     []
+        // )
+
+        // structural_sniffles = SNIFFLES(
+        //     ch_bam_files
+        //         .join(ch_bam_indexes, by: 0)
+        //         .map { meta, bam, bai -> tuple(meta, bam, bai) },
+        //     ch_genome_file
+        //         .map { fasta -> tuple([id: fasta.baseName], fasta) },
+        //     tandem_repeats_bed,
+        //     [],
+        //     []
+        // )
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         STEP 9) CUTESV (Commented)
         - Another long-read SV caller, similar in scope to Sniffles.
-        - Typically: (meta,bam,bai), (meta2,fasta), (meta3,fai).
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-
-        // structural_cutesv = CUTESV(
-        //     bam_inputs,
-        //     fasta_input,
-        //     fai_input
-        // )
-
-
+        structural_cutesv = CUTESV(
+            bam_inputs,
+            fasta_input
+        )
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,11 +283,16 @@ workflow STRUCTURAL_VARIANT_CALLING {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     */
     emit:
-        // Only DELLY is currently active -> BCF + CSI index
-        delly_variants       = structural_delly.bcf
-        delly_variants_index = structural_delly.csi
-
-    // For future expansions, you'd add Manta, GRIDSS, etc. outputs below:
-    // manta_germline_sv_vcf = structural_manta_germline.candidate_sv_vcf
-    // ...
+        delly_variants                      = structural_delly.bcf
+        delly_variants_index                = structural_delly.csi
+        manta_sv_variants                   = structural_manta_germline.candidate_sv_vcf
+        manta_sv_variants_index             = structural_manta_germline.candidate_sv_vcf_tbi
+        manta_diploid_sv_variants           = structural_manta_germline.diploid_sv_vcf
+        manta_diploid_sv_variants_index     = structural_manta_germline.diploid_sv_vcf_tbi
+        gridss_variants                     = structural_gridss.vcf
+        // dysgu_variants                      = structural_dysgu.vcf
+        // dysgu_tbi                           = structural_dysgu.tbi
+        tiddit_variants                     = structural_tiddit.vcf
+        tiddit_ploidy                       = structural_tiddit.ploidy
+        cutesv_variants                     = structural_cutesv.vcf
 }
