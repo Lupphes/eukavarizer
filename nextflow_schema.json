@@ -161,7 +161,56 @@
                 }
             }
         },
-
+        "reporting_options": {
+            "title": "Reporting options",
+            "type": "object",
+            "fa_icon": "fas fa-chart-line",
+            "description": "Options for controlling the reporting of structural variants and related metrics.",
+            "properties": {
+                "max_distance_breakpoints": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "Maximum distance between breakpoints for reporting purposes.",
+                    "help_text": "This parameter sets the maximum allowable distance between breakpoints in reported structural variants. If no value is provided, the default is 1000 base pairs.",
+                    "fa_icon": "fas fa-random"
+                },
+                "min_supporting_callers": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "Minimum number of supporting callers for a structural variant to be reported.",
+                    "help_text": "Defines how many different callers are required to support a variant before it is included in the final report. The default value is 1.",
+                    "fa_icon": "fas fa-users"
+                },
+                "account_for_type": {
+                    "type": "integer",
+                    "default": true,
+                    "description": "Whether to account for variant types in the report (e.g., DEL, DUP).",
+                    "help_text": "If enabled (default), variant types will be considered during the reporting process. If set to false, type information will be excluded from the report.",
+                    "fa_icon": "fas fa-tag"
+                },
+                "account_for_sv_strands": {
+                    "type": "integer",
+                    "default": false,
+                    "description": "Whether to account for structural variant strands in the report.",
+                    "help_text": "If enabled, the strands of the structural variants (e.g., forward or reverse) will be taken into account when reporting. Default is false.",
+                    "fa_icon": "fas fa-sync-alt"
+                },
+                "estimate_distanced_by_sv_size": {
+                    "type": "integer",
+                    "default": false,
+                    "description": "Whether to estimate the distance based on structural variant size.",
+                    "help_text": "If enabled, the distance between breakpoints will be estimated based on the size of the structural variant. Default is false.",
+                    "fa_icon": "fas fa-calculator"
+                },
+                "min_sv_size": {
+                    "type": "integer",
+                    "default": 30,
+                    "description": "Minimum size of structural variants to report.",
+                    "help_text": "Sets the minimum size of structural variants (in base pairs) that will be included in the report. Variants smaller than this value will be excluded from the results. The default size is 30 bp.",
+                    "fa_icon": "fas fa-arrows-alt-v"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -256,6 +305,72 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
+                "delly_flag": {
+                "type": "boolean",
+                "description": "Enable or disable Delly algorithm.",
+                "help_text": "Set this flag to true to enable the Delly algorithm for structural variant detection.",
+                "fa_icon": "fas fa-cogs"
+                },
+                "manta_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Manta for germline variant detection.",
+                    "help_text": "Set this flag to true to enable Manta for germline SV calling.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "gridss_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable GRIDSS for structural variant detection.",
+                    "help_text": "Set this flag to true to enable GRIDSS for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "dysgu_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Dysgu algorithm.",
+                    "help_text": "Set this flag to true to enable Dysgu for variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "tiddit_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Tiddit algorithm.",
+                    "help_text": "Set this flag to true to enable Tiddit for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "svaba_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable SVABA algorithm.",
+                    "help_text": "Set this flag to true to enable SVABA for variant calling.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "sniffles_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Sniffles algorithm.",
+                    "help_text": "Set this flag to true to enable Sniffles for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "cutesv_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable CuteSV algorithm.",
+                    "help_text": "Set this flag to true to enable CuteSV for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "debug_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable debug views for pipeline steps.",
+                    "help_text": "Set this flag to true to enable debug views for each pipeline step. Use for troubleshooting and detailed logging.",
+                    "fa_icon": "fas fa-bug"
+                },
+                "fastqc_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable FastQC for sequence quality control.",
+                    "help_text": "Set this flag to true to enable FastQC for sequence quality control. This will run quality checks on the input fastq files.",
+                    "fa_icon": "fas fa-flask"
+                },
+                "multiqc_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable MultiQC for generating reports.",
+                    "help_text": "Set this flag to true to enable MultiQC for summarising quality metrics from FastQC or other tools. A final report will be generated at the end.",
+                    "fa_icon": "fas fa-chart-bar"
+                },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",

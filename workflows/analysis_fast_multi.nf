@@ -19,8 +19,10 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_euka
 workflow ANALYSIS_FAST_MULTI {
 
     take:
-        ch_genome_file // Channel with reference genome from SEQRETRIEVAL
-        ch_fastq_files // Channel with FASTQ files from SEQRETRIEVAL
+        ch_fastq_files  // Channel with FASTQ files from SEQRETRIEVAL
+        debug_flag   // Debug flag
+        fastqc_flag  // FastQC flag
+        multiqc_flag // MultiQC flag
 
     main:
         //
@@ -28,8 +30,6 @@ workflow ANALYSIS_FAST_MULTI {
         //
         ch_versions = Channel.empty()
         ch_multiqc_files = Channel.empty()
-
-        ch_fastq_files.view { "DEBUG: Received FASTQ files -> ${it}" }
 
         // Normalize FASTQ input into a structured format
         ch_formatted_fastq = ch_fastq_files
@@ -39,19 +39,28 @@ workflow ANALYSIS_FAST_MULTI {
                 def is_paired = files.size() == 2
                 return tuple([ id: sample_id, single_end: !is_paired ], files)
             }
-            .view { "DEBUG: Formatted FASTQ -> ${it}" }
 
-        //
-        // MODULE: Run FastQC on Sequencing Data
-        //
-        FASTQC (
-            ch_formatted_fastq
-        )
+        if (debug_flag) {
+            ch_formatted_fastq.view { "DEBUG: Formatted FASTQ -> ${it}" }
+        }
 
-        // Collect FastQC outputs for MultiQC
-        ch_fastqc_report = FASTQC.out.html
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect { it[1] })
-        ch_versions = ch_versions.mix(FASTQC.out.versions)
+        if (fastqc_flag) {
+            //
+            // MODULE: Run FastQC on Sequencing Data
+            //
+            FASTQC(
+                ch_formatted_fastq
+            )
+
+            // Collect FastQC outputs for MultiQC
+            ch_fastqc_report = FASTQC.out.html
+            ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect { it[1] })
+            ch_versions = ch_versions.mix(FASTQC.out.versions)
+
+            if (debug_flag) {
+                ch_formatted_fastq.view { "DEBUG: Formatted FASTQ -> ${it}" }
+            }
+        }
 
         //
         // Collate and save software versions
@@ -64,51 +73,60 @@ workflow ANALYSIS_FAST_MULTI {
                 newLine: true
             ).set { ch_collated_versions }
 
-        //
-        // MODULE: MultiQC
-        //
-        ch_multiqc_config = Channel.fromPath(
-            "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-        ch_multiqc_custom_config = params.multiqc_config ?
-            Channel.fromPath(params.multiqc_config, checkIfExists: true) :
-            Channel.empty()
-        ch_multiqc_logo = params.multiqc_logo ?
-            Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
-            Channel.empty()
+        if (multiqc_flag) {
+            //
+            // MODULE: MultiQC
+            //
+            ch_multiqc_config = Channel.fromPath(
+                "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+            ch_multiqc_custom_config = params.multiqc_config ?
+                Channel.fromPath(params.multiqc_config, checkIfExists: true) :
+                Channel.empty()
+            ch_multiqc_logo = params.multiqc_logo ?
+                Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
+                Channel.empty()
 
-        summary_params = paramsSummaryMap(
-            workflow, parameters_schema: "nextflow_schema.json")
-        ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
-        ch_multiqc_files = ch_multiqc_files.mix(
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+            summary_params = paramsSummaryMap(
+                workflow, parameters_schema: "nextflow_schema.json")
+            ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
+            ch_multiqc_files = ch_multiqc_files.mix(
+                ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
-        ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            file(params.multiqc_methods_description, checkIfExists: true) :
-            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-        ch_methods_description = Channel.value(
-            methodsDescriptionText(ch_multiqc_custom_methods_description))
+            ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
+                file(params.multiqc_methods_description, checkIfExists: true) :
+                file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+            ch_methods_description = Channel.value(
+                methodsDescriptionText(ch_multiqc_custom_methods_description))
 
-        ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(
-            ch_methods_description.collectFile(
-                name: 'methods_description_mqc.yaml',
-                sort: true
+            ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
+            ch_multiqc_files = ch_multiqc_files.mix(
+                ch_methods_description.collectFile(
+                    name: 'methods_description_mqc.yaml',
+                    sort: true
+                )
             )
-        )
 
-        MULTIQC (
-            ch_multiqc_files.collect(),
-            ch_multiqc_config.toList(),
-            ch_multiqc_custom_config.toList(),
-            ch_multiqc_logo.toList(),
-            [],
-            []
-        )
+            MULTIQC(
+                ch_multiqc_files.collect(),
+                ch_multiqc_config.toList(),
+                ch_multiqc_custom_config.toList(),
+                ch_multiqc_logo.toList(),
+                [], // Placeholder if you need to add more config files
+                []  // Placeholder for any additional parameters
+            )
+
+
+            if (debug_flag) {
+                ch_multiqc_files.collect().view { "DEBUG: MultiQC files -> ${it}" }
+            }
+        }
+
 
     emit:
-        fastqc_report = ch_fastqc_report.toList() // Path to FastQC reports
-        multiqc_report = MULTIQC.out.report.toList() // Path to MultiQC report
-        versions = ch_versions // Path to versions.yml
+        fastqc_report = fastqc_flag ? ch_fastqc_report.toList() : null // Path to FastQC reports, or null if FastQC is not run
+        multiqc_report = multiqc_flag ? MULTIQC.out.report.toList() : null // Path to MultiQC report, or null if MultiQC is not run
+        versions = ch_versions // Path to versions.yml (this is always generated)
+
 }
 
 /*

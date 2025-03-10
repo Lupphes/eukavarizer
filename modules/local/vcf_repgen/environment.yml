@@ -1,0 +1,11 @@
+name: vcf_repgen
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.9  # Adjust if needed
+  - pandas
+  - plotly
+  - vcfpy
+  - dominate

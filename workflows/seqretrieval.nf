@@ -19,6 +19,7 @@ workflow SEQRETRIEVAL {
         ch_outdir
         ch_sequence_dir
         ch_genome_file
+        debug_flag
 
     main:
         ch_library_strategy    = params.library_strategy ? Channel.value(params.library_strategy) : Channel.value([])
@@ -63,22 +64,26 @@ workflow SEQRETRIEVAL {
 
         raw_fastqs_ch = ch_ena_results.sequence_files
 
-        // Debugging: Check the channel output
-        raw_fastqs_ch.view { "DEBUG: raw_fastqs_ch -> ${it.getClass()} | ${it}" }
+        if (debug_flag) {
+            raw_fastqs_ch.view { "DEBUG: raw_fastqs_ch -> ${it.getClass()} | ${it}" }
+        }
 
-            // Correct file grouping with proper handling of ArrayList
-            grouped_fastqs = raw_fastqs_ch
-                .flatMap { file -> // Flatten in case of nested lists
-                    file instanceof List ? file : [file] // Ensure we are iterating over individual file paths
-                }
-                .map { file -> tuple(file.getParent().getName(), file) } // Extract run_accession from parent folder
-                .groupTuple()
-                .map { run_accession, files ->
-                    def paired = files.findAll { it.toString().contains("_1") || it.toString().contains("_2") }
-                    def unpaired = files - paired
-                    tuple(run_accession, paired, unpaired)
-                }
-                .view { "DEBUG: grouped_fastqs -> ${it}" }
+        // Correct file grouping with proper handling of ArrayList
+        grouped_fastqs = raw_fastqs_ch
+            .flatMap { file -> // Flatten in case of nested lists
+                file instanceof List ? file : [file] // Ensure we are iterating over individual file paths
+            }
+            .map { file -> tuple(file.getParent().getName(), file) } // Extract run_accession from parent folder
+            .groupTuple()
+            .map { run_accession, files ->
+                def paired = files.findAll { it.toString().contains("_1") || it.toString().contains("_2") }
+                def unpaired = files - paired
+                tuple(run_accession, paired, unpaired)
+            }
+
+        if (debug_flag) {
+            grouped_fastqs.view { "DEBUG: grouped_fastqs -> ${it}" }
+        }
 
     emit:
         genome_file = ch_refseq_json.genome_file // genome_file

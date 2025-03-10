@@ -27,13 +27,15 @@ workflow INPUT_GENERATION {
     take:
         grouped_fastqs  // FASTQ input files (Paired and Unpaired)
         ch_genome_file  // Reference genome (FASTA.GZ)
+        debug_flag   // Debug flag
 
     main:
-        log.info "🚀 Starting INPUT_GENERATION workflow"
+        view("🚀 Starting INPUT_GENERATION workflow")
 
-        // Debug: Display input files
-        grouped_fastqs.view { "DEBUG: Received grouped FASTQ files -> ${it}" }
-        ch_genome_file.view { "DEBUG: Received genome file -> ${it}" }
+        if (debug_flag) {
+            grouped_fastqs.view { "DEBUG: Received grouped FASTQ files -> ${it}" }
+            ch_genome_file.view { "DEBUG: Received genome file -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,7 +46,9 @@ workflow INPUT_GENERATION {
             ch_genome_file.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
         ).gunzip
 
-        ch_unzipped_fasta.view { "DEBUG: Decompressed genome -> ${it}" }
+        if (debug_flag) {
+            ch_unzipped_fasta.view { "DEBUG: Decompressed genome -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,7 +57,9 @@ workflow INPUT_GENERATION {
         */
         ch_bwa_index = BWA_INDEX(ch_unzipped_fasta).index
 
-        ch_bwa_index.view { "DEBUG: BWA index -> ${it}" }
+        if (debug_flag) {
+            ch_bwa_index.view { "DEBUG: BWA index -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,8 +68,9 @@ workflow INPUT_GENERATION {
             - Assigns sample IDs
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        // Debug: View the raw grouped fastqs before processing
-        grouped_fastqs.view { "DEBUG: Raw grouped FASTQs -> ${it}" }
+        if (debug_flag) {
+            grouped_fastqs.view { "DEBUG: Raw grouped FASTQs -> ${it}" }
+        }
 
         ch_prepared_fastqs = grouped_fastqs.map { run_accession, paired, unpaired ->
             def meta = [id: run_accession, single_end: paired.size() != 2] // Ensure correct meta map
@@ -72,29 +79,31 @@ workflow INPUT_GENERATION {
             return tuple(meta, reads)
         }
 
-        // Debug: Check structure before sending to BWA_MEM
-        ch_prepared_fastqs.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
+        if (debug_flag) {
+            ch_prepared_fastqs.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            STEP 4: Align Reads to Reference Genome (BWA-MEM)
+            STEP 4: Align Reads to Reference Genome (BWA-MEM) Sequences
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        // Debug: View BWA_MEM inputs before execution
-        ch_prepared_fastqs.view { "DEBUG: BWA_MEM input -> ${it}" }
-        ch_bwa_index.view { "DEBUG: BWA index input -> ${it}" }
-        ch_unzipped_fasta.view { "DEBUG: Unzipped FASTA input -> ${it}" }
+        if (debug_flag) {
+            ch_prepared_fastqs.view { "DEBUG: BWA_MEM input -> ${it}" }
+            ch_bwa_index.view { "DEBUG: BWA index input -> ${it}" }
+            ch_unzipped_fasta.view { "DEBUG: Unzipped FASTA input -> ${it}" }
+        }
 
         ch_aligned_bam = BWA_MEM(
-            ch_prepared_fastqs,  // This now contains meta + list of reads
+            ch_prepared_fastqs,
             ch_bwa_index.map { meta, index -> tuple(meta, index) },
             ch_unzipped_fasta.map { meta, fasta -> tuple(meta, fasta) },
             true
         ).bam
 
-        // Debug: View output from BWA_MEM
-        ch_aligned_bam.view { "DEBUG: BWA_MEM output BAM -> ${it}" }
-
+        if (debug_flag) {
+            ch_aligned_bam.view { "DEBUG: BWA_MEM output BAM -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,27 +113,31 @@ workflow INPUT_GENERATION {
         ch_sorted_bam = SAMTOOLS_SORT(
             ch_aligned_bam.map { meta, bam ->
                 def new_meta = meta.clone()
-                new_meta.id = "${meta.id}_sorted"
-                new_meta.prefix = "${meta.id}_sorted"
+                new_meta.id = "${meta.id}_samtools_sort"
+                new_meta.prefix = "${meta.id}_samtools_sort"
                 tuple(new_meta, bam)
             },
             ch_unzipped_fasta.map { meta, fasta -> tuple(meta, fasta) }
         ).bam
 
-        ch_sorted_bam.view { "DEBUG: Sorted BAM files -> ${it}" }
+        if (debug_flag) {
+            ch_sorted_bam.view { "DEBUG: Sorted BAM files -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            STEP 6: Index BAM Files
+            STEP 6: Index BAM Sequence Files
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         ch_bam_index = SAMTOOLS_INDEX(ch_sorted_bam).bai
 
-        ch_bam_index.view { "DEBUG: BAM index files -> ${it}" }
+        if (debug_flag) {
+            ch_bam_index.view { "DEBUG: BAM index files -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            STEP 7: Generate FASTA Index (.fai)
+            STEP 7: Generate Sequence FASTA Index (.fai)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         ch_fasta_index = SAMTOOLS_FAIDX(
@@ -132,7 +145,9 @@ workflow INPUT_GENERATION {
             [[], []]
         ).fai
 
-        ch_fasta_index.view { "DEBUG: FASTA index (.fai) -> ${it}" }
+        if (debug_flag) {
+            ch_fasta_index.view { "DEBUG: FASTA index (.fai) -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,9 +161,10 @@ workflow INPUT_GENERATION {
         ch_bgzipped_fasta = ch_bgzipped_fasta_tuple.output.map { meta, file -> file }
         ch_gzi_index = ch_bgzipped_fasta_tuple.gzi
 
-        ch_bgzipped_fasta.view { "DEBUG: BGZIPPED FASTA -> ${it}" }
-        ch_gzi_index.view { "DEBUG: BGZIP INDEX FILE -> ${it}" }
-
+        if (debug_flag) {
+            ch_bgzipped_fasta.view { "DEBUG: BGZIPPED FASTA -> ${it}" }
+            ch_gzi_index.view { "DEBUG: BGZIP INDEX FILE -> ${it}" }
+        }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,15 +173,18 @@ workflow INPUT_GENERATION {
             - We generate an additional `.fai` for the gzipped version
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
+        if (debug_flag) {
+            ch_bgzipped_fasta.view { "DEBUG: Input to SAMTOOLS_FAIDX_ZIP -> ${it}" }
+        }
 
-        ch_bgzipped_fasta.view { "DEBUG: Input to SAMTOOLS_FAIDX_ZIP -> ${it}" }
         ch_fasta_index_zipped = SAMTOOLS_FAIDX_ZIP(
             ch_bgzipped_fasta.map { file -> tuple([id: file.baseName], file) },
             [[], []]
         ).fai
 
-
-        ch_fasta_index_zipped.view { "DEBUG: FASTA index for gzipped FASTA (.fai) -> ${it}" }
+        if (debug_flag) {
+            ch_fasta_index_zipped.view { "DEBUG: FASTA index for gzipped FASTA (.fai) -> ${it}" }
+        }
 
     emit:
         bam_files        = ch_sorted_bam                    // Sorted BAM files
