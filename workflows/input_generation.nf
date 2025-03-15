@@ -25,16 +25,16 @@ include { TABIX_BGZIP    }      from '../modules/nf-core/tabix/bgzip/main'
 workflow INPUT_GENERATION {
 
     take:
-        grouped_fastqs  // FASTQ input files (Paired and Unpaired)
-        ch_genome_file  // Reference genome (FASTA.GZ)
+        reference_genome  // Reference genome (FASTA.GZ)
+        grouped_fastq  // FASTQ input files (Paired and Unpaired)
         debug_flag   // Debug flag
 
     main:
         view("🚀 Starting INPUT_GENERATION workflow")
 
         if (debug_flag) {
-            grouped_fastqs.view { "DEBUG: Received grouped FASTQ files -> ${it}" }
-            ch_genome_file.view { "DEBUG: Received genome file -> ${it}" }
+            grouped_fastq.view { "DEBUG: Received grouped FASTQ files -> ${it}" }
+            reference_genome.view { "DEBUG: Received genome file -> ${it}" }
         }
 
         /*
@@ -42,12 +42,12 @@ workflow INPUT_GENERATION {
             STEP 1: Decompress Reference Genome (if needed)
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        ch_unzipped_fasta = GUNZIP(
-            ch_genome_file.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
+        genome_unzipped = GUNZIP(
+            reference_genome.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
         ).gunzip
 
         if (debug_flag) {
-            ch_unzipped_fasta.view { "DEBUG: Decompressed genome -> ${it}" }
+            genome_unzipped.view { "DEBUG: Decompressed genome -> ${it}" }
         }
 
         /*
@@ -55,10 +55,10 @@ workflow INPUT_GENERATION {
             STEP 2: Generate BWA Index
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        ch_bwa_index = BWA_INDEX(ch_unzipped_fasta).index
+        genome_bwa_index = BWA_INDEX(genome_unzipped).index
 
         if (debug_flag) {
-            ch_bwa_index.view { "DEBUG: BWA index -> ${it}" }
+            genome_bwa_index.view { "DEBUG: BWA index -> ${it}" }
         }
 
         /*
@@ -69,10 +69,10 @@ workflow INPUT_GENERATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         if (debug_flag) {
-            grouped_fastqs.view { "DEBUG: Raw grouped FASTQs -> ${it}" }
+            grouped_fastq.view { "DEBUG: Raw grouped FASTQs -> ${it}" }
         }
 
-        ch_prepared_fastqs = grouped_fastqs.map { run_accession, paired, unpaired ->
+        processed_grouped_sequences = grouped_fastq.map { run_accession, paired, unpaired ->
             def meta = [id: run_accession, single_end: paired.size() != 2] // Ensure correct meta map
             def reads = paired.size() == 2 ? [paired[0], paired[1]] : [paired[0]] // Handle single/paired
 
@@ -80,7 +80,7 @@ workflow INPUT_GENERATION {
         }
 
         if (debug_flag) {
-            ch_prepared_fastqs.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
+            processed_grouped_sequences.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
         }
 
         /*
@@ -89,15 +89,15 @@ workflow INPUT_GENERATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         if (debug_flag) {
-            ch_prepared_fastqs.view { "DEBUG: BWA_MEM input -> ${it}" }
-            ch_bwa_index.view { "DEBUG: BWA index input -> ${it}" }
-            ch_unzipped_fasta.view { "DEBUG: Unzipped FASTA input -> ${it}" }
+            processed_grouped_sequences.view { "DEBUG: BWA_MEM input -> ${it}" }
+            genome_bwa_index.view { "DEBUG: BWA index input -> ${it}" }
+            genome_unzipped.view { "DEBUG: Unzipped FASTA input -> ${it}" }
         }
 
         ch_aligned_bam = BWA_MEM(
-            ch_prepared_fastqs,
-            ch_bwa_index.map { meta, index -> tuple(meta, index) },
-            ch_unzipped_fasta.map { meta, fasta -> tuple(meta, fasta) },
+            processed_grouped_sequences,
+            genome_bwa_index.map { meta, index -> tuple(meta, index) },
+            genome_unzipped.map { meta, fasta -> tuple(meta, fasta) },
             true
         ).bam
 
@@ -117,7 +117,7 @@ workflow INPUT_GENERATION {
                 new_meta.prefix = "${meta.id}_samtools_sort"
                 tuple(new_meta, bam)
             },
-            ch_unzipped_fasta.map { meta, fasta -> tuple(meta, fasta) }
+            genome_unzipped.map { meta, fasta -> tuple(meta, fasta) }
         ).bam
 
         if (debug_flag) {
@@ -141,7 +141,7 @@ workflow INPUT_GENERATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         ch_fasta_index = SAMTOOLS_FAIDX(
-            ch_unzipped_fasta.map { tuple(it[0], it[1]) }, // (meta, fasta)
+            genome_unzipped.map { tuple(it[0], it[1]) }, // (meta, fasta)
             [[], []]
         ).fai
 
@@ -155,7 +155,7 @@ workflow INPUT_GENERATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         ch_bgzipped_fasta_tuple = TABIX_BGZIP(
-            ch_unzipped_fasta.map { meta, fasta -> tuple(meta, fasta) }
+            genome_unzipped.map { meta, fasta -> tuple(meta, fasta) }
         )
 
         ch_bgzipped_fasta = ch_bgzipped_fasta_tuple.output.map { meta, file -> file }
@@ -189,9 +189,9 @@ workflow INPUT_GENERATION {
     emit:
         bam_files        = ch_sorted_bam                    // Sorted BAM files
         bam_indexes      = ch_bam_index                     // BAM index files (.bai)
-        fasta_file       = ch_unzipped_fasta.map { it[1] }  // Unzipped FASTA file
+        fasta_file       = genome_unzipped.map { it[1] }  // Unzipped FASTA file
         fasta_index      = ch_fasta_index                   // FASTA index (.fai) for unzipped FASTA
-        bwa_index        = ch_bwa_index                     // BWA index files
+        bwa_index        = genome_bwa_index                     // BWA index files
         bgzip_fasta_file = ch_bgzipped_fasta                // Gzipped FASTA file
         fasta_gzi_index  = ch_gzi_index                     // BGZIP index file (.gzi)
         fasta_index_gz   = ch_fasta_index_zipped            // FASTA index (.fai) for gzipped FASTA

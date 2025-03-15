@@ -6,6 +6,8 @@
 include { REFSEQ_RETRIEVER      } from '../modules/local/refseq_retriever/main'
 include { SEQUENCE_RETRIEVER    } from '../modules/local/sequence_retriever/main'
 
+// nf-core modules install pbtk/bam2fastq
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -62,21 +64,21 @@ workflow SEQRETRIEVAL {
             ch_sequence_dir
         )
 
-        raw_fastqs_ch = ch_ena_results.sequence_files
+        raw_fastqs = ch_ena_results.fastq_files
 
         if (debug_flag) {
-            raw_fastqs_ch.view { "DEBUG: raw_fastqs_ch -> ${it.getClass()} | ${it}" }
+            raw_fastqs.view { "DEBUG: raw_fastqs -> ${it.getClass()} | ${it}" }
         }
 
         // Correct file grouping with proper handling of ArrayList
-        grouped_fastqs = raw_fastqs_ch
+        grouped_fastqs = raw_fastqs
             .flatMap { file -> // Flatten in case of nested lists
                 file instanceof List ? file : [file] // Ensure we are iterating over individual file paths
             }
             .map { file -> tuple(file.getParent().getName(), file) } // Extract run_accession from parent folder
             .groupTuple()
             .map { run_accession, files ->
-                def paired = files.findAll { it.toString().contains("_1") || it.toString().contains("_2") }
+                def paired = files.findAll { it.toString().contains('_1') || it.toString().contains('_2') }
                 def unpaired = files - paired
                 tuple(run_accession, paired, unpaired)
             }
@@ -88,7 +90,7 @@ workflow SEQRETRIEVAL {
     emit:
         genome_file = ch_refseq_json.genome_file // genome_file
         genome_size_ungapped = parsed_ch_refseq_json.map { it[1] } // genome_size_ungapped
-        fastq_files = ch_ena_results.sequence_files // fullPaths
+        fastq_files = ch_ena_results.fastq_files // fullPaths
         grouped_fastqs = grouped_fastqs // grouped_fastqs
 }
 

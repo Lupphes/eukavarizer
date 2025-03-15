@@ -1,10 +1,6 @@
 process REFSEQ_RETRIEVER {
-    // Docker
-    // container 'eukalyzer/seq_retriver:latest'
-    // containerOptions "-v ${params.outdir}/data:/data"
-
-    // Conda
-    conda "envs/environment.yml"
+    tag "$taxonomy_id"
+    conda "${moduleDir}/environment.yml"
 
     // Settings
     publishDir "$outdir", mode: 'copy', overwrite: false

@@ -4,8 +4,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python=3.12
-  - pandas=2.2.3
-  - plotly=6.0.0
-  - vcfpy=0.13.8
-  - dominate=2.9.1
+  - bioconda::cutadapt=4.9
+  - bioconda::trim-galore=0.6.10
+  - conda-forge::pigz=2.8

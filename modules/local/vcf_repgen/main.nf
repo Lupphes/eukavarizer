@@ -1,6 +1,5 @@
 process VCF_REPGEN {
     tag "$taxonomy_id"
-
     conda "${moduleDir}/environment.yml"
 
     publishDir "${outdir}/reports", mode: 'copy'
@@ -14,7 +13,9 @@ process VCF_REPGEN {
         val outdir
 
     output:
-        path "${taxonomy_id}/report.html", emit: html
+        path "index.html", emit: html_index
+        path "merged_report.html", emit: html_merged
+        path "survivor_report.html", emit: html_survivor
 
     script:
     """
@@ -22,6 +23,6 @@ process VCF_REPGEN {
                         \$(for vcf in ${other_vcfs}; do echo "--other_vcfs \$vcf"; done) \\
                         --survivor_vcf ${survivor_vcf} \\
                         --survivor_stats ${survivor_stats} \\
-                        --output_dir ${outdir}/${taxonomy_id}
+                        --output_dir .
     """
 }

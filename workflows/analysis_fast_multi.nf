@@ -10,6 +10,11 @@ include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pi
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 
+// ✔️ FastQC + MultiQC (Initial) → Identify overall data quality
+// ✔️ Trim Galore! → Handles adapters + low-quality bases dynamically
+// ✔️ BBDuk → Handles overrepresented sequences + contamination
+// ✔️ FastQC + MultiQC (Final) → Validate improvements and final quality
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW

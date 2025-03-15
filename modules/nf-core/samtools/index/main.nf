@@ -21,7 +21,6 @@ process SAMTOOLS_INDEX {
 
     script:
     def args = task.ext.args ?: ''
-    println "DEBUG: Running SAMTOOLS_INDEX with input -> ${input}"
     """
     samtools \\
         index \\
@@ -34,7 +33,6 @@ process SAMTOOLS_INDEX {
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
-
 
     stub:
     def args = task.ext.args ?: ''

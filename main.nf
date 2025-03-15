@@ -23,6 +23,9 @@ include { PIPELINE_INITIALISATION       } from './subworkflows/local/utils_nfcor
 include { PIPELINE_COMPLETION           } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 include { STRUCTURAL_VARIANT_CALLING    } from './workflows/structural_variant_calling'
 
+// nf-core modules install igv/js
+// nf-core modules install igvreports
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,8 +91,8 @@ workflow NFCORE_EUKAVARIZER {
         view("🔹 Checking inputs for INPUT_GENERATION")
 
         input_generation_results = INPUT_GENERATION(
-            seqretrieval_results.grouped_fastqs,
             seqretrieval_results.genome_file,
+            seqretrieval_results.grouped_fastqs,
             debug_flag
         )
 
@@ -169,7 +172,9 @@ workflow NFCORE_EUKAVARIZER {
         multiqc_report              = data_analysis_results.multiqc_report
         structural_variants         = structural_results.delly_variants
         structural_variants_index   = structural_results.delly_variants_index
-        final_reports               = report_generation.output_files
+        html_index                  = report_generation.html_index
+        html_merged                 = report_generation.html_merged
+        html_survivor               = report_generation.html_survivor
 }
 
 /*
@@ -266,7 +271,9 @@ workflow {
             NFCORE_EUKAVARIZER.out.multiqc_report,
             NFCORE_EUKAVARIZER.out.structural_variants,
             NFCORE_EUKAVARIZER.out.structural_variants_index,
-            NFCORE_EUKAVARIZER.out.final_reports
+            NFCORE_EUKAVARIZER.out.html_index,
+            NFCORE_EUKAVARIZER.out.html_merged,
+            NFCORE_EUKAVARIZER.out.html_survivor
         )
 }
 

@@ -9,10 +9,6 @@ include { SURVIVOR_STATS        }       from '../modules/nf-core/survivor/stats/
 include { BCFTOOLS_MERGE        }       from '../modules/nf-core/bcftools/merge/main'
 include { VCF_REPGEN            }       from '../modules/local/vcf_repgen/main'
 
-// Then tools to use
-// nf-core modules install annotsv/annotsv
-// nf-core modules install svanalyzer/svbenchmark
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -245,17 +241,24 @@ workflow REPORT_GENERATION {
             [[],[]]
         )
 
+        // STEP 4: Generate HTML report
+        html_report = VCF_REPGEN(
+            bcftool_report.vcf.map { it[1] },
+            all_vcf_paths.flatten(),
+            merged_variants.map { it[1] },
+            stats_out.stats.map { it[1] },
+            ch_taxonomy_id,
+            ch_outdir
+        )
 
-        // report = VCF_REPGEN(
-        //     bcftool_report.vcf.map { it[1] },
-        //     all_vcf_paths.flatten(),
-        //     merged_variants.map { it[1] },
-        //     stats_out.stats.map { it[1] },
-        //     ch_taxonomy_id,
-        //     ch_outdir
-        // )
+        // S
+        // nf-core modules install annotsv/annotsv
+        // nf-core modules install svanalyzer/svbenchmark
+
 
     emit:
-        output_files = "report"
+        html_index = html_report.html_index
+        html_merged = html_report.html_merged
+        html_survivor = html_report.html_survivor
 
 }

@@ -1,10 +1,6 @@
 process SEQUENCE_RETRIEVER {
-    // Docker
-    // container 'eukalyzer/seq_retriver:latest'
-    // containerOptions "-v ${params.outdir}/data:/data"
-
-    // Conda
-    conda "envs/environment.yml"
+    tag "$taxonomy_id"
+    conda "${moduleDir}/environment.yml"
 
     // Settings
     publishDir "$outdir", mode: 'copy'
@@ -21,9 +17,19 @@ process SEQUENCE_RETRIEVER {
         val(assembly_quality)
         val(sequence_dir)
 
-    output:
-        path "$taxonomy_id/ena_results.json", emit: ena_results
-        path "$taxonomy_id/sequences/*/*.fastq.gz", emit: sequence_files
+output:
+    path "$taxonomy_id/ena_results.json", emit: ena_results
+    path "$taxonomy_id/sequences/*/*.fastq.gz", emit: fastq_files, optional: true
+    path "$taxonomy_id/sequences/*/*.bam", emit: bam_files, optional: true
+    path "$taxonomy_id/sequences/*/*.sam", emit: sam_files, optional: true
+    path "$taxonomy_id/sequences/*/*.cram", emit: cram_files, optional: true
+    path "$taxonomy_id/sequences/*/*.fasta", emit: fasta_files, optional: true
+    path "$taxonomy_id/sequences/*/*.fa", emit: fa_files, optional: true
+    path "$taxonomy_id/sequences/*/*.vcf", emit: vcf_files, optional: true
+    path "$taxonomy_id/sequences/*/*.gff", emit: gff_files, optional: true
+    path "$taxonomy_id/sequences/*/*.gtf", emit: gtf_files, optional: true
+
+    // nf-core modules install pbtk/bam2fastq
 
 
     script:
