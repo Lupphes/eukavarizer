@@ -91,10 +91,10 @@ workflow REPORT_GENERATION {
             path_delly_variants_index       = delly_variants_index.map { it[1] }
             meta_delly                      = delly_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_delly_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_delly_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_delly_variants_index)
-            all_meta = all_meta.combine(meta_delly)
+            all_vcf_paths = all_vcf_paths.concat(path_delly_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_delly_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_delly_variants_index)
+            all_meta = all_meta.concat(meta_delly)
         }
 
         if (manta_flag) {
@@ -103,30 +103,30 @@ workflow REPORT_GENERATION {
             path_manta_small_variants_index       = manta_small_variants_index.map { it[1] }
             meta_manta_small                      = manta_small_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_manta_small_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_manta_small_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_manta_small_variants_index)
-            all_meta = all_meta.combine(meta_manta_small)
+            all_vcf_paths = all_vcf_paths.concat(path_manta_small_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_manta_small_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_manta_small_variants_index)
+            all_meta = all_meta.concat(meta_manta_small)
 
             path_manta_candidate_variants             = manta_candidate_variants.map { it[1] }
             path_manta_candidate_variants_bgzipped    = manta_candidate_variants_bgzipped.map { it[1] }
             path_manta_candidate_variants_index       = manta_candidate_variants_index.map { it[1] }
             meta_manta_candidate                      = manta_candidate_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_manta_candidate_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_manta_candidate_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_manta_candidate_variants_index)
-            all_meta = all_meta.combine(meta_manta_candidate)
+            all_vcf_paths = all_vcf_paths.concat(path_manta_candidate_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_manta_candidate_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_manta_candidate_variants_index)
+            all_meta = all_meta.concat(meta_manta_candidate)
 
             path_manta_diploid_variants             = manta_diploid_variants.map { it[1] }
             path_manta_diploid_variants_bgzipped    = manta_diploid_variants_bgzipped.map { it[1] }
             path_manta_diploid_variants_index       = manta_diploid_variants_index.map { it[1] }
             meta_manta_diploid                      = manta_diploid_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_manta_diploid_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_manta_diploid_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_manta_diploid_variants_index)
-            all_meta = all_meta.combine(meta_manta_diploid)
+            all_vcf_paths = all_vcf_paths.concat(path_manta_diploid_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_manta_diploid_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_manta_diploid_variants_index)
+            all_meta = all_meta.concat(meta_manta_diploid)
         }
 
         if (gridss_flag) {
@@ -135,10 +135,10 @@ workflow REPORT_GENERATION {
             path_gridss_variants_index      = gridss_variants_index.map { it[1] }
             meta_gridss                     = gridss_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_gridss_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_gridss_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_gridss_variants_index)
-            all_meta = all_meta.combine(meta_gridss)
+            all_vcf_paths = all_vcf_paths.concat(path_gridss_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_gridss_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_gridss_variants_index)
+            all_meta = all_meta.concat(meta_gridss)
         }
 
         if (dysgu_flag) {
@@ -147,10 +147,10 @@ workflow REPORT_GENERATION {
             path_dysgu_variants_index      = dysgu_variants_index.map { it[1] }
             meta_dysgu                     = dysgu_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_dysgu_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_dysgu_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_dysgu_variants_index)
-            all_meta = all_meta.combine(meta_dysgu)
+            all_vcf_paths = all_vcf_paths.concat(path_dysgu_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_dysgu_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_dysgu_variants_index)
+            all_meta = all_meta.concat(meta_dysgu)
         }
 
         if (tiddit_flag) {
@@ -159,10 +159,10 @@ workflow REPORT_GENERATION {
             path_tiddit_variants_index      = tiddit_variants_index.map { it[1] }
             meta_tiddit                     = tiddit_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_tiddit_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_tiddit_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_tiddit_variants_index)
-            all_meta = all_meta.combine(meta_tiddit)
+            all_vcf_paths = all_vcf_paths.concat(path_tiddit_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_tiddit_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_tiddit_variants_index)
+            all_meta = all_meta.concat(meta_tiddit)
         }
 
         if (cutesv_flag) {
@@ -171,35 +171,26 @@ workflow REPORT_GENERATION {
             path_cutesv_variants_index      = cutesv_variants_index.map { it[1] }
             meta_cutesv                     = cutesv_variants.map { it[0] }
 
-            all_vcf_paths = all_vcf_paths.combine(path_cutesv_variants)
-            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.combine(path_cutesv_variants_bgzipped)
-            all_tbi_paths = all_tbi_paths.combine(path_cutesv_variants_index)
-            all_meta = all_meta.combine(meta_cutesv)
+            all_vcf_paths = all_vcf_paths.concat(path_cutesv_variants)
+            all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.concat(path_cutesv_variants_bgzipped)
+            all_tbi_paths = all_tbi_paths.concat(path_cutesv_variants_index)
+            all_meta = all_meta.concat(meta_cutesv)
         }
+\
+        all_vcf_paths = all_vcf_paths.filter { it }.toList()
+        all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.filter { it }.toList()
+        all_tbi_paths = all_tbi_paths.filter { it }.toList()
+        all_meta = all_meta.filter { it }.toList()
 
-        all_vcf_paths = all_vcf_paths.toList()
-        all_vcf_bgzipped_paths = all_vcf_bgzipped_paths.toList()
-        all_tbi_paths = all_tbi_paths.toList()
-        all_meta = all_meta.toList()
+        meta_custom = Channel.of([id: "survivor_merge"])
 
-        meta_custom = meta_gridss.map { metadata ->
-            def id = metadata.id
-            def single_end = metadata.single_end
-            [
-                id: "survivor_merge_${id}",
-                single_end: "${single_end}"
-            ]
-        }
+        survivor_input = meta_custom.combine(all_vcf_paths.toList())
 
-        survivor_input = meta_custom.combine(all_vcf_paths)
 
-        if (debug_flag) {
             meta_custom.view    { "DEBUG -> meta_custom: ${it}" }
             all_vcf_paths.view  { "DEBUG -> all_vcf_paths: ${it}" }
             survivor_input.view { "DEBUG -> survivor_input: ${it}" }
-        }
 
-        // Now, pass the flattened list to SURVIVOR_MERGE
         merged_variants = SURVIVOR_MERGE(
             survivor_input,
             ch_max_distance_breakpoints,
@@ -222,13 +213,9 @@ workflow REPORT_GENERATION {
         }
 
         // STEP 3: Merge VCF files with BCFTOOLS
+        bfcmerge_meta = Channel.of([id: "bfcmerge_merge"])
 
-        bfcmerge_meta = genome_file.map { name ->
-            [
-                id: "bcftools_merge_${name.baseName}",
-            ]
-        }
-        bcfmerge_input = bfcmerge_meta.combine(all_vcf_bgzipped_paths).combine(all_tbi_paths)
+        bcfmerge_input = bfcmerge_meta.combine(all_vcf_bgzipped_paths.toList()).combine(all_tbi_paths.toList())
 
         if (debug_flag) {
             bcfmerge_input.view { "DEBUG -> bcfmerge_input: ${it}" }
@@ -236,9 +223,9 @@ workflow REPORT_GENERATION {
 
         bcftool_report = BCFTOOLS_MERGE(
             bcfmerge_input,
-            [[],[]],
-            [[],[]],
-            [[],[]]
+            [[], []],
+            [[], []],
+            [[], []]
         )
 
         // STEP 4: Generate HTML report
@@ -251,7 +238,6 @@ workflow REPORT_GENERATION {
             ch_outdir
         )
 
-        // S
         // nf-core modules install annotsv/annotsv
         // nf-core modules install svanalyzer/svbenchmark
 

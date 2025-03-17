@@ -73,15 +73,26 @@ workflow INPUT_GENERATION {
         }
 
         processed_grouped_sequences = grouped_fastq.map { run_accession, paired, unpaired ->
-            def meta = [id: run_accession, single_end: paired.size() != 2] // Ensure correct meta map
-            def reads = paired.size() == 2 ? [paired[0], paired[1]] : [paired[0]] // Handle single/paired
+            def meta = [id: run_accession, single_end: paired.size() != 2]
 
-            return tuple(meta, reads)
+            def reads
+            if (paired.size() == 2) {
+                reads = [paired[0], paired[1]]
+            } else if (unpaired.size() == 1) {
+                reads = [unpaired[0]]
+            } else {
+                reads = []
+            }
+
+            if (reads) {
+                tuple(meta, reads)
+            }
         }
 
-        if (debug_flag) {
-            processed_grouped_sequences.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
-        }
+
+        // if (debug_flag) {
+            // processed_grouped_sequences.view { "DEBUG: Formatted FASTQ tuples -> ${it}" }
+        // }
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,10 +100,12 @@ workflow INPUT_GENERATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         if (debug_flag) {
-            processed_grouped_sequences.view { "DEBUG: BWA_MEM input -> ${it}" }
+
             genome_bwa_index.view { "DEBUG: BWA index input -> ${it}" }
             genome_unzipped.view { "DEBUG: Unzipped FASTA input -> ${it}" }
         }
+
+        // processed_grouped_sequences.view { "DEBUG: BWA_MEM input -> ${it}" }
 
         ch_aligned_bam = BWA_MEM(
             processed_grouped_sequences,
@@ -189,9 +202,9 @@ workflow INPUT_GENERATION {
     emit:
         bam_files        = ch_sorted_bam                    // Sorted BAM files
         bam_indexes      = ch_bam_index                     // BAM index files (.bai)
-        fasta_file       = genome_unzipped.map { it[1] }  // Unzipped FASTA file
+        fasta_file       = genome_unzipped.map { it[1] }    // Unzipped FASTA file
         fasta_index      = ch_fasta_index                   // FASTA index (.fai) for unzipped FASTA
-        bwa_index        = genome_bwa_index                     // BWA index files
+        bwa_index        = genome_bwa_index                 // BWA index files
         bgzip_fasta_file = ch_bgzipped_fasta                // Gzipped FASTA file
         fasta_gzi_index  = ch_gzi_index                     // BGZIP index file (.gzi)
         fasta_index_gz   = ch_fasta_index_zipped            // FASTA index (.fai) for gzipped FASTA

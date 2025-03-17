@@ -21,13 +21,8 @@ output:
     path "$taxonomy_id/ena_results.json", emit: ena_results
     path "$taxonomy_id/sequences/*/*.fastq.gz", emit: fastq_files, optional: true
     path "$taxonomy_id/sequences/*/*.bam", emit: bam_files, optional: true
-    path "$taxonomy_id/sequences/*/*.sam", emit: sam_files, optional: true
     path "$taxonomy_id/sequences/*/*.cram", emit: cram_files, optional: true
-    path "$taxonomy_id/sequences/*/*.fasta", emit: fasta_files, optional: true
-    path "$taxonomy_id/sequences/*/*.fa", emit: fa_files, optional: true
-    path "$taxonomy_id/sequences/*/*.vcf", emit: vcf_files, optional: true
-    path "$taxonomy_id/sequences/*/*.gff", emit: gff_files, optional: true
-    path "$taxonomy_id/sequences/*/*.gtf", emit: gtf_files, optional: true
+
 
     // nf-core modules install pbtk/bam2fastq
 

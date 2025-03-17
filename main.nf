@@ -84,10 +84,10 @@ workflow NFCORE_EUKAVARIZER {
             multiqc_flag
         )
 
-        // //
-        // // STEP 3: Preprocess and generate INPUT for Structural Analysis
-        // // with alignments
-        // //
+        //
+        // STEP 3: Preprocess and generate INPUT for Structural Analysis
+        // with alignments
+        //
         view("🔹 Checking inputs for INPUT_GENERATION")
 
         input_generation_results = INPUT_GENERATION(

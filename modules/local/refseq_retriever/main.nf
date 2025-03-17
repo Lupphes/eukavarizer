@@ -11,8 +11,8 @@ process REFSEQ_RETRIEVER {
         val(genome_file)
 
     output:
-        path "$taxonomy_id/refseq_results.json", emit: refseq_json
-        path "$taxonomy_id/refseq/*.fna.gz", emit: genome_file
+        path "$taxonomy_id/refseq_results.json", emit: json
+        path "$taxonomy_id/refseq/*.fna.gz", emit: reference_genome
         path "assembly_summary_refseq.parquet", emit: refseq_parquet, optional: true
         path "assembly_summary_refseq.txt", emit: refseq_summary, optional: true
 

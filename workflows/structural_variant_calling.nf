@@ -166,9 +166,14 @@ workflow STRUCTURAL_VARIANT_CALLING {
 
             ch_delly_input = ch_bam_files
                 .map { meta, bam ->
-                    def meta_delly = meta + [id: "${meta.id}_${name_delly}", prefix: "${meta.prefix}_${name_delly}"]
-                    tuple(meta_delly, bam)
+                    if (bam.size() > 1000) {
+                        def meta_delly = meta + [id: "${meta.id}_${name_delly}", prefix: "${meta.prefix}_${name_delly}"]
+                        tuple(meta_delly, bam)
+                    } else {
+                        null
+                    }
                 }
+                .filter { it != null }
                 .join(
                     ch_bam_indexes.map { meta, bai ->
                         tuple(meta + [id: "${meta.id}_${name_delly}", prefix: "${meta.prefix}_${name_delly}"], bai)
