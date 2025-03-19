@@ -187,9 +187,9 @@ workflow REPORT_GENERATION {
         survivor_input = meta_custom.combine(all_vcf_paths.toList())
 
 
-            meta_custom.view    { "DEBUG -> meta_custom: ${it}" }
-            all_vcf_paths.view  { "DEBUG -> all_vcf_paths: ${it}" }
-            survivor_input.view { "DEBUG -> survivor_input: ${it}" }
+            // meta_custom.view    { "DEBUG -> meta_custom: ${it}" }
+            // all_vcf_paths.view  { "DEBUG -> all_vcf_paths: ${it}" }
+            // survivor_input.view { "DEBUG -> survivor_input: ${it}" }
 
         merged_variants = SURVIVOR_MERGE(
             survivor_input,

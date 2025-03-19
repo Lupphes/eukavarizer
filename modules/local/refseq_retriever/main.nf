@@ -24,12 +24,12 @@ process REFSEQ_RETRIEVER {
         mkdir -p "$taxonomy_id/refseq"
         cp "${genome_file}" "$taxonomy_id/refseq/"
 
-        seq_getter.py --mode refseq --taxonomy_id $taxonomy_id --outdir . --genome_file $genome_file
+        biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir . --genome_file $genome_file
 
     else
         echo "Downloading reference genome for taxonomy ID: $taxonomy_id"
 
-        seq_getter.py --mode refseq --taxonomy_id $taxonomy_id --outdir .
+        biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir .
     fi
 
     cat     './$taxonomy_id/refseq_results.json'

@@ -37,7 +37,7 @@ output:
         mkdir -p "$taxonomy_id/sequences"
         cp -r "${sequence_dir}/" "$taxonomy_id/"
 
-        seq_getter.py --mode ena \
+        biodbcore --mode ena \
             --taxonomy_id $taxonomy_id \
             --library_strategy $library_strategy \
             --instrument_platform $instrument_platform \
@@ -52,7 +52,7 @@ output:
     else
         echo "No local sequencing data found. Downloading sequencing reads for taxonomy ID: $taxonomy_id"
 
-        seq_getter.py --mode ena \
+        biodbcore --mode ena \
             --taxonomy_id $taxonomy_id \
             --library_strategy $library_strategy \
             --instrument_platform $instrument_platform \

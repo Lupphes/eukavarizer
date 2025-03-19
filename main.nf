@@ -1,4 +1,5 @@
 #!/usr/bin/env nextflow
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     nf-core/eukavarizer
@@ -9,12 +10,14 @@
 ----------------------------------------------------------------------------------------
 */
 
+nextflow.enable.dsl = 2
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS / WORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { EUKAVARIZER                   } from './workflows/eukavarizer'
 include { SEQRETRIEVAL                  } from './workflows/seqretrieval'
 include { ANALYSIS_FAST_MULTI           } from './workflows/analysis_fast_multi'
 include { INPUT_GENERATION              } from './workflows/input_generation'
@@ -23,17 +26,12 @@ include { PIPELINE_INITIALISATION       } from './subworkflows/local/utils_nfcor
 include { PIPELINE_COMPLETION           } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 include { STRUCTURAL_VARIANT_CALLING    } from './workflows/structural_variant_calling'
 
-// nf-core modules install igv/js
-// nf-core modules install igvreports
-
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// Define the workflow
 workflow NFCORE_EUKAVARIZER {
 
     take:
@@ -61,8 +59,6 @@ workflow NFCORE_EUKAVARIZER {
         ch_min_sv_size
 
     main:
-
-        view("🚀 Running nf-core/eukavarizer pipeline")
         //
         // STEP 1: Retrieve Sequences & Reference Genome
         //
@@ -78,7 +74,7 @@ workflow NFCORE_EUKAVARIZER {
         // STEP 2: Run Main Analysis Pipeline
         //
         data_analysis_results = ANALYSIS_FAST_MULTI(
-            seqretrieval_results.fastq_files,
+            seqretrieval_results.grouped_fastqs,
             debug_flag,
             fastqc_flag,
             multiqc_flag
@@ -92,7 +88,7 @@ workflow NFCORE_EUKAVARIZER {
 
         input_generation_results = INPUT_GENERATION(
             seqretrieval_results.genome_file,
-            seqretrieval_results.grouped_fastqs,
+            data_analysis_results.processed_files,
             debug_flag
         )
 
@@ -185,14 +181,14 @@ workflow NFCORE_EUKAVARIZER {
 
 workflow {
 
-    //
-    // Input channels for the workflow
-    //
     main:
-        ch_taxonomy_id      = Channel.value(params.taxonomy_id)
-        ch_outdir           = Channel.value(params.outdir)
-        ch_sequence_dir     = Channel.value(params.sequence_dir)
-        ch_genome_file      = Channel.value(params.genome_file)
+        //
+        // Input channels for the workflow
+        //
+        ch_taxonomy_id              = Channel.value(params.taxonomy_id)
+        ch_outdir                   = Channel.value(params.outdir)
+        ch_sequence_dir             = Channel.value(params.sequence_dir)
+        ch_reference_genome         = Channel.value(params.genome_file)
         ch_sequence_dir_abs = params.sequence_dir ? Channel.value(file(params.sequence_dir).toAbsolutePath()) : Channel.value('')
 
         // Enable/Disable individual algorithms
@@ -238,7 +234,7 @@ workflow {
             ch_outdir,
             ch_sequence_dir_abs,
             ch_sequence_dir,
-            ch_genome_file,
+            ch_reference_genome,
             delly_flag,
             manta_flag,
             gridss_flag,

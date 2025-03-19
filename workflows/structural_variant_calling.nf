@@ -224,13 +224,34 @@ workflow STRUCTURAL_VARIANT_CALLING {
         if (manta_flag) {
             name_manta = "manta"
 
+            first = bam_inputs
+                .filter { meta, bam, bai ->
+                    !meta.single_end // Only keep paired-end reads
+                }
+                .map { meta, bam, bai ->
+                    tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], bam, bai, [], [])
+                }
+
+            second = fasta_input.map { meta, fasta ->
+                tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], fasta)
+            }
+
+            third = ch_fasta_index_gz.map { meta, fai ->
+                tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], fai)
+            }
+
+            first.view { "DEBUG: first -> ${it}" }
+            second.view { "DEBUG: second -> ${it}" }
+            third.view { "DEBUG: third -> ${it}" }
+
+            bam_inputs.view { "DEBUG: bam_inputs -> ${it}" }
+            fasta_input.view { "DEBUG: fasta_input -> ${it}" }
+            ch_fasta_index_gz.view { "DEBUG: ch_fasta_index_gz -> ${it}" }
+
             structural_manta = MANTA_GERMLINE(
-                bam_inputs.map { meta, bam, bai ->
-                    tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], bam, bai, [], []) },
-                fasta_input.map { meta, fasta ->
-                    tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], fasta) },
-                ch_fasta_index_gz.map { meta, fai ->
-                    tuple(meta + [id: "${meta.id}_${name_manta}", prefix: "${meta.prefix}_${name_manta}"], fai) },
+                first,
+                second,
+                third,
                 []
             )
 

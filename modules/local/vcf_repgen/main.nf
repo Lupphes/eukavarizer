@@ -1,8 +1,9 @@
 process VCF_REPGEN {
     tag "$taxonomy_id"
-    conda "${moduleDir}/environment.yml"
 
-    publishDir "${outdir}/reports", mode: 'copy'
+    conda "${moduleDir}/environment.yml"
+    container 'docker.io/luppo/varify:latest'
+
 
     input:
         path merged_vcf
@@ -19,7 +20,7 @@ process VCF_REPGEN {
 
     script:
     """
-    vcf_gen.py --merged_vcf ${merged_vcf} \\
+    varify --merged_vcf ${merged_vcf} \\
                         \$(for vcf in ${other_vcfs}; do echo "--other_vcfs \$vcf"; done) \\
                         --survivor_vcf ${survivor_vcf} \\
                         --survivor_stats ${survivor_stats} \\
