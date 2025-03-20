@@ -3,7 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { REFSEQ_RETRIEVER      } from '../modules/local/refseq_retriever/main'
+include { BIODBCORE_REFSEQ      } from '../modules/local/refseq_retriever/main'
 include { SEQUENCE_RETRIEVER    } from '../modules/local/sequence_retriever/main'
 
 include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ } from '../modules/nf-core/samtools/collatefastq/main'
@@ -38,7 +38,7 @@ workflow SEQRETRIEVAL {
         //
         // STEP 1: Retrieve Reference Genome
         //
-        refseq = REFSEQ_RETRIEVER(
+        refseq = BIODBCORE_REFSEQ(
             ch_taxonomy_id,
             ch_outdir,
             ch_genome_file

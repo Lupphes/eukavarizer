@@ -1,4 +1,4 @@
-process REFSEQ_RETRIEVER {
+process BIODBCORE_REFSEQ {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
 

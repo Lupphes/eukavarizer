@@ -1,4 +1,4 @@
-process SEQUENCE_RETRIEVER {
+process BIODBCORE_ENA {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
 
