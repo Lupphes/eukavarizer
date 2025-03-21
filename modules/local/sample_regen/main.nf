@@ -12,12 +12,17 @@ process SAMPLE_REHEADER {
     val(new_name)
 
     output:
-    tuple val(meta), path("reheadered_${new_name}.vcf"), emit: vcf
-    tuple val(meta), path("reheadered_${new_name}.vcf.gz"), emit: vcfgz
-    tuple val(meta), path("reheadered_${new_name}.vcf.gz.tbi"), emit: tbi
-    tuple val(meta), path("reheadered_${new_name}.vcf.gz.csi"), emit: csi
+    tuple val(meta), path("reheadered_${new_name}.vcf"), emit: vcf, optional: true
+    tuple val(meta), path("reheadered_${new_name}.vcf.gz"), emit: vcfgz, optional: true
+    tuple val(meta), path("reheadered_${new_name}.vcf.gz.tbi"), emit: tbi, optional: true
+    tuple val(meta), path("reheadered_${new_name}.vcf.gz.csi"), emit: csi, optional: true
+    path "versions.yml", emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
+    def args = task.ext.args ?: ''
     """
     # Determine file extension and ensure compatibility
     if [[ "${vcf}" == *.vcf.gz ]]; then
@@ -39,17 +44,27 @@ process SAMPLE_REHEADER {
         bcftools reheader -s sample_names_${new_name}.txt -o reheadered_${new_name}.vcf.gz "\${VCF_INPUT}"
 
         # Index the new VCF (both TBI and CSI)
-        tabix -p vcf reheadered_${new_name}.vcf.gz  # Generates .tbi
-        bcftools index --csi reheadered_${new_name}.vcf.gz  # Generates .csi
+        tabix -p vcf reheadered_${new_name}.vcf.gz
+        bcftools index --csi reheadered_${new_name}.vcf.gz
 
         # Also provide an uncompressed VCF
         bcftools view reheadered_${new_name}.vcf.gz -Ov -o reheadered_${new_name}.vcf
     else
         echo "No samples found in VCF. Skipping reheadering."
-        cp "\${VCF_INPUT}" "reheadered_${new_name}.vcf.gz"
-        tabix -p vcf "reheadered_${new_name}.vcf.gz"
-        bcftools index --csi "reheadered_${new_name}.vcf.gz"
-        bcftools view "reheadered_${new_name}.vcf.gz" -Ov -o "reheadered_${new_name}.vcf"
     fi
+
+    # Capture versions
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        bcftools: \$(bcftools --version | head -n 1 | sed 's/^.*bcftools //')
+    END_VERSIONS
+    """
+
+    stub:
+    """
+    touch reheadered_${new_name}.vcf.gz
+    touch reheadered_${new_name}.vcf.gz.tbi
+    touch reheadered_${new_name}.vcf.gz.csi
+    touch versions.yml
     """
 }

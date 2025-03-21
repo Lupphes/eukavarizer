@@ -1,0 +1,115 @@
+id: sniffles_$INFO/SVTYPE
+
+alt:
+  BND: TRA  # Unify BND and TRA for consistency
+  DUP: DUP:TANDEM
+
+info:
+  CALLER:
+    value: sniffles
+    number: 1
+    type: string
+    description: The caller used to determine this variant
+
+  SVLEN:
+    value: $INFO/SVLEN
+    number: 1
+    type: integer
+    description: Length of structural variation
+    alts:
+      INS: $INFO/SUPPORT_LONG  # Use Sniffles-specific SUPPORT_LONG for insertions
+      TRA: 1
+      DEL: $INFO/SVLEN
+
+  SVTYPE:
+    value: $INFO/SVTYPE
+    number: 1
+    type: string
+    description: Type of structural variant
+
+  END:
+    value: $INFO/END
+    number: 1
+    type: integer
+    description: End position of the structural variant
+    alts:
+      TRA: $INFO/POS2
+
+  CHR2:
+    value:
+    number: 1
+    type: string
+    description: Chromosome for second position
+    alts:
+      TRA: $INFO/CHR2
+
+  CIPOS:
+    value: $INFO/STDEV_POS
+    number: 2
+    type: integer
+    description: Confidence interval around POS
+    alts:
+      DEL: ~$INFO/STDEV_POS,-$INFO/STDEV_POS
+
+  CIEND:
+    value: $INFO/STDEV_LEN
+    number: 2
+    type: integer
+    description: Confidence interval around END
+    alts:
+      DEL: ~$INFO/STDEV_LEN,-$INFO/STDEV_LEN
+
+  SUPPORT:
+    value: $INFO/SUPPORT
+    number: 1
+    type: integer
+    description: Number of reads supporting the structural variation
+
+  VAF:
+    value: $INFO/VAF
+    number: 1
+    type: float
+    description: Variant allele frequency
+
+  IMPRECISE:
+    value: $INFO/IMPRECISE
+    number: 0
+    type: flag
+    description: Imprecise structural variation
+
+  PRECISE:
+    value: $INFO/PRECISE
+    number: 0
+    type: flag
+    description: Precise structural variation
+
+  MOSAIC:
+    value: $INFO/MOSAIC
+    number: 0
+    type: flag
+    description: Mosaic structural variation
+
+format:
+  GT:
+    value: $FORMAT/GT
+    number: 1
+    type: string
+    description: Genotype
+
+  PR:
+    value: $FORMAT/DR
+    number: 2
+    type: integer
+    description: Number of reference reads
+
+  SR:
+    value: $FORMAT/DV
+    number: 2
+    type: integer
+    description: Number of variant reads
+
+  PS:
+    value: $FORMAT/PS
+    number: 1
+    type: integer
+    description: Phase block ID

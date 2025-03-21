@@ -3,8 +3,8 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { BIODBCORE_REFSEQ      } from '../modules/local/refseq_retriever/main'
-include { SEQUENCE_RETRIEVER    } from '../modules/local/sequence_retriever/main'
+// include { BIODBCORE_REFSEQ      } from '../modules/local/refseq_retriever/main'
+// include { SEQUENCE_RETRIEVER    } from '../modules/local/sequence_retriever/main'
 
 include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ } from '../modules/nf-core/samtools/collatefastq/main'
 include { SAMTOOLS_COLLATEFASTQ as CRAM_SAMTOOLS_COLLATEFASTQ } from '../modules/nf-core/samtools/collatefastq/main'

@@ -1,0 +1,131 @@
+id: tiddit_$INFO/SVTYPE
+alt:
+  BND: TRA
+  DUP:TANDEM: DUP
+  DUP:INV: DUP
+  INV: INV
+
+info:
+  CALLER:
+    value: tiddit
+    number: 1
+    type: string
+    description: The caller used to determine this variant
+
+  SVLEN:
+    value: $INFO/SVLEN
+    number: 1
+    type: integer
+    description: The length of the structural variant
+    alts:
+      DEL: -$INFO/SVLEN
+      DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
+      DUP:INV: $INFO/SVLEN
+      INV: $INFO/SVLEN
+      TRA: 0
+      BND: 0
+
+  SVTYPE:
+    value: $INFO/SVTYPE
+    number: 1
+    type: string
+    description: Type of structural variant
+
+  END:
+    value: $INFO/END
+    number: 1
+    type: integer
+    description: End position of the structural variant
+    alts:
+      TRA: $INFO/REGIONB/1
+      BND: $INFO/REGIONB/1
+
+  IMPRECISE:
+    value: 1
+    number: 0
+    type: flag
+    description: Imprecise structural variation
+
+  REGIONA:
+    value: $INFO/REGIONA
+    number: 2
+    type: integer
+    description: Start and end of region A
+
+  REGIONB:
+    value: $INFO/REGIONB
+    number: 2
+    type: integer
+    description: Start and end of region B
+
+  LFA:
+    value: $INFO/LFA
+    number: 2
+    type: integer
+    description: Read-pairs and split reads in region A
+
+  LFB:
+    value: $INFO/LFB
+    number: 2
+    type: integer
+    description: Read-pairs and split reads in region B
+
+  LTE:
+    value: $INFO/LTE
+    number: 2
+    type: integer
+    description: Read-pairs and split reads supporting the event
+
+format:
+  GT:
+    value: $FORMAT/GT
+    number: 1
+    type: string
+    description: Genotype
+
+  CN:
+    value: $FORMAT/CN
+    number: 1
+    type: integer
+    description: Copy number genotype for imprecise events
+    alts:
+      DUP:TANDEM: .
+      DUP:INV: .
+      INV: .
+      BND: .
+
+  DV:
+    value: $FORMAT/DV
+    number: 1
+    type: integer
+    description: Number of paired-ends that support the event
+
+  RV:
+    value: $FORMAT/RV
+    number: 1
+    type: integer
+    description: Number of split reads that support the event
+
+  DR:
+    value: $FORMAT/DR
+    number: 2
+    type: integer
+    description: Number of paired-ends supporting the reference allele
+
+  RR:
+    value: $FORMAT/RR
+    number: 2
+    type: integer
+    description: Number of reads supporting the reference allele
+
+  COV:
+    value: $FORMAT/COV
+    number: 3
+    type: float
+    description: Coverage at A, B, and between
+    alts:
+      DUP:TANDEM: .
+      DUP:INV: .
+      INV: .
+      BND: .

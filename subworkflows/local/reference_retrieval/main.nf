@@ -9,7 +9,7 @@ include { GUNZIP                } from '../../../modules/nf-core/gunzip/main'
 include { BWA_INDEX             } from '../../../modules/nf-core/bwa/index/main'
 include { TABIX_BGZIP           } from '../../../modules/nf-core/tabix/bgzip/main'
 include { SAMTOOLS_FAIDX        } from '../../../modules/nf-core/samtools/faidx/main'
-
+include { SAMTOOLS_FAIDX as SAMTOOLS_BGZIP_FAIDX  } from '../../../modules/nf-core/samtools/faidx/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,6 +55,11 @@ workflow REFERENCE_RETRIEVAL {
             GUNZIP.out.gunzip
         )
 
+        SAMTOOLS_BGZIP_FAIDX(
+            TABIX_BGZIP.out.output,
+            [[], []]
+        )
+
         SAMTOOLS_FAIDX(
             GUNZIP.out.gunzip,
             [[], []]
@@ -62,11 +67,14 @@ workflow REFERENCE_RETRIEVAL {
 
 
     emit:
-        reference_genome                        = BIODBCORE_REFSEQ.out.reference_genome    // reference_genome
-        reference_genome_ungapped_size          = reference_genome_ungapped_size           // reference_genome_ungapped_size
+        reference_genome                        = BIODBCORE_REFSEQ.out.reference_genome
+        reference_genome_ungapped_size          = reference_genome_ungapped_size
         reference_genome_unzipped               = GUNZIP.out.gunzip
         reference_genome_bgzipped               = TABIX_BGZIP.out.output
         reference_genome_bwa_index              = BWA_INDEX.out.index
+        reference_genome_bgzipped_index         = TABIX_BGZIP.out.gzi
+        reference_genome_bgzipped_faidx         = SAMTOOLS_BGZIP_FAIDX.out.fai
+        reference_genome_faidx                  = SAMTOOLS_FAIDX.out.fai
 }
 
 /*

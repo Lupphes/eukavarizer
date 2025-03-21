@@ -1,0 +1,130 @@
+id: cutesv_$INFO/SVTYPE
+alt:
+  BND: TRA
+  DEL: DEL
+  INS: INS
+  DUP: DUP
+  INV: INV
+
+info:
+  CALLER:
+    value: cutesv
+    number: 1
+    type: string
+    description: The caller used to determine this variant
+
+  SVLEN:
+    value: $INFO/SVLEN
+    number: 1
+    type: integer
+    description: The length of the structural variant
+    alts:
+      DEL: -$INFO/SVLEN
+      INS: $INFO/SVLEN
+      DUP: $INFO/SVLEN
+      INV: $INFO/SVLEN
+      BND: 0
+      TRA: 0
+
+  SVTYPE:
+    value: $INFO/SVTYPE
+    number: 1
+    type: string
+    description: Type of structural variant
+
+  CHR2:
+    value: $INFO/CHR2
+    number: 1
+    type: string
+    description: Chromosome for second position
+    alts:
+      TRA: $INFO/CHR2
+      BND: $INFO/CHR2
+
+  END:
+    value: $INFO/END
+    number: 1
+    type: integer
+    description: End position of the structural variant
+    alts:
+      TRA: $INFO/END
+      BND: $INFO/END
+
+  CIPOS:
+    value: $INFO/CIPOS
+    number: 2
+    type: integer
+    description: Confidence interval around POS
+
+  CILEN:
+    value: $INFO/CILEN
+    number: 2
+    type: integer
+    description: Confidence interval around inserted/deleted material
+
+  RE:
+    value: $INFO/RE
+    number: 1
+    type: integer
+    description: Number of reads supporting this variant
+
+  STRAND:
+    value: $INFO/STRAND
+    number: .
+    type: string
+    description: Strand orientation
+
+  RNAMES:
+    value: $INFO/RNAMES
+    number: .
+    type: string
+    description: Supporting read names
+
+  AF:
+    value: $INFO/AF
+    number: 1
+    type: float
+    description: Allele Frequency
+
+  PRECISE:
+    value: 1
+    number: 0
+    type: flag
+    description: Precise structural variant
+
+  IMPRECISE:
+    value: 1
+    number: 0
+    type: flag
+    description: Imprecise structural variant
+
+format:
+  GT:
+    value: $FORMAT/GT
+    number: 1
+    type: string
+    description: Genotype
+
+  DR:
+    value: $FORMAT/DR
+    number: 1
+    type: integer
+    description: Number of high-quality reference reads
+
+  DV:
+    value: $FORMAT/DV
+    number: 1
+    type: integer
+    description: Number of high-quality variant reads
+
+  PL:
+    value: $FORMAT/PL
+    number: .
+    type: integer
+    description: Phred-scaled genotype likelihoods
+
+  GQ:
+    value: $FORMAT/GQ
+    number: 1
+    type: integer
+    description: Genotype quality

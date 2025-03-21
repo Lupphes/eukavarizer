@@ -28,9 +28,8 @@ workflow SEQUENCE_PROCESSOR {
     take:
         taxonomy_id
         outdir
-        reference_genome
-        reference_genome_ungapped_size
         sequences_abs_dir
+        reference_genome_ungapped_size
         reference_genome_unzipped
         reference_genome_bgzipped
         reference_genome_bwa_index
@@ -56,9 +55,9 @@ workflow SEQUENCE_PROCESSOR {
             sequences_abs_dir
         )
 
-        raw_fastqs = BIODBCORE_ENA.out.fastq_files
-        raw_bam = BIODBCORE_ENA.out.bam_files
-        raw_cram = BIODBCORE_ENA.out.cram_files
+        raw_fastqs  = BIODBCORE_ENA.out.fastq_files
+        raw_bam     = BIODBCORE_ENA.out.bam_files
+        raw_cram    = BIODBCORE_ENA.out.cram_files
 
 
         // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
@@ -121,9 +120,8 @@ workflow SEQUENCE_PROCESSOR {
             }
 
         bam_unpaired = BAM_SAMTOOLS_COLLATEFASTQ.out.fastq_singleton
-            .filter { _meta, files -> files.size() == 1 }
             .map { meta, fastqs ->
-                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs.flatten() : []]
+                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs : []]
             }
 
         // Process CRAM reads (paired + unpaired)
@@ -136,23 +134,22 @@ workflow SEQUENCE_PROCESSOR {
             }
 
         cram_unpaired = CRAM_SAMTOOLS_COLLATEFASTQ.out.fastq_singleton
-            .filter { _meta, files -> files.size() == 1 }
             .map { meta, fastqs ->
-                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs.flatten() : []]
+                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs : []]
             }
 
-        grouped_fastqs = grouped_fastqs
+        collected_fastqs = grouped_fastqs
             .mix(bam_paired)
             .mix(bam_unpaired)
             .mix(cram_paired)
             .mix(cram_unpaired)
 
         QUALITY_CONTROL(
-            grouped_fastqs
+            collected_fastqs
         )
 
         BWA_MEM(
-            grouped_fastqs,
+            QUALITY_CONTROL.out.fastq_filtered,
             reference_genome_bwa_index,
             reference_genome_unzipped,
             true
@@ -160,10 +157,7 @@ workflow SEQUENCE_PROCESSOR {
 
         SAMTOOLS_SORT(
             BWA_MEM.out.bam.map { meta, bam ->
-                def new_meta = meta.clone()
-                new_meta.id = "${meta.id}_samtools_sort"
-                new_meta.prefix = "${meta.id}_samtools_sort"
-                tuple(new_meta, bam)
+                tuple(meta + [id: "${meta.id}_sas"], bam)
             },
             reference_genome_unzipped
         )
@@ -173,10 +167,12 @@ workflow SEQUENCE_PROCESSOR {
         )
 
 
-
     emit:
-        fastq_files                 = BIODBCORE_ENA.out.fastq_files
-        grouped_fastqs              = grouped_fastqs
+        fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered
+        fastq_bam                   = SAMTOOLS_SORT.out.bam             // Sorted BAM files (.bam)
+        fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai            // BAM index files (.bai)
+        // fasta_file       = genome_unzipped.map { it[1] }    // Unzipped FASTA file
+        // fasta_index      = ch_fasta_index                   // FASTA index (.fai) for unzipped FASTA
 }
 
 /*

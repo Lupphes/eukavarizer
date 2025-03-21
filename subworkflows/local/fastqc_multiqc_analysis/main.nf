@@ -98,7 +98,7 @@ workflow FASTQC_MULTIQC_ANALYSIS {
     emit:
         fastqc_report = params.fastqc_flag ? ch_fastqc_report.toList() : null       // Path to FastQC reports, or null if FastQC is not run
         multiqc_report = params.multiqc_flag ? MULTIQC.out.report.toList() : null   // Path to MultiQC report, or null if MultiQC is not run
-        processed_files = fastq_files                                               // Processed FASTQ files
+        versions = ch_versions                                                      // Processed FASTQ files
 }
 
 /*

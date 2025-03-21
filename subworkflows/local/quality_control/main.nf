@@ -66,8 +66,8 @@ workflow QUALITY_CONTROL {
     emit:
         fastqc_report   = params.fastqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.fastqc_report.toList() : null      // Path to FastQC reports, or null if FastQC is not run
         multiqc_report  = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.multiqc_report.toList() : null    // Path to MultiQC report, or null if MultiQC is not run
-        processed_files = fastq_files                                                                               // Processed FASTQ files
-        versions        = SEQTK_SAMPLE.out.reads                                                                    // Path to versions.yml (this is always generated)
+        fastq_filtered  = SEQTK_SAMPLE.out.reads                                                                    // Processed FASTQ files
+        versions        = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.versions : null                   // Path to versions.yml (this is always generated)
 
 }
 

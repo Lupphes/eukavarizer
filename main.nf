@@ -17,19 +17,22 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { EUKAVARIZER                   } from './workflows/eukavarizer'
+include { EUKAVARIZER               } from './workflows/eukavarizer'
 
-include { REFERENCE_RETRIEVAL                   } from './subworkflows/local/reference_retrieval'
-include { SEQUENCE_PROCESSOR                     } from './subworkflows/local/sequence_processor'
-include { REPORT_GENERATION                     } from './subworkflows/local/report_generation'
+include { REFERENCE_RETRIEVAL       } from './subworkflows/local/reference_retrieval'
+include { SEQUENCE_PROCESSOR        } from './subworkflows/local/sequence_processor'
+include { SV_UNIFICATION            } from './subworkflows/local/sv_unification'
+include { REPORT_GENERATION         } from './subworkflows/local/report_generation'
 
 // include { SEQRETRIEVAL                  } from './workflows/seqretrieval'
 // include { ANALYSIS_FAST_MULTI           } from './workflows/analysis_fast_multi'
 // include { INPUT_GENERATION              } from './workflows/input_generation'
 // include { REPORT_GENERATION  as OUTDATED            } from './workflows/report_generation'
-include { PIPELINE_INITIALISATION       } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
-include { PIPELINE_COMPLETION           } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
+include { PIPELINE_INITIALISATION   } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
+include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 // include { STRUCTURAL_VARIANT_CALLING    } from './workflows/structural_variant_calling'
+
+params.gridss_flag                  = true // Tech Debt: Gridss is always enabled
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,17 +48,6 @@ workflow NFCORE_EUKAVARIZER {
         ch_sequences_abs_dir
         ch_sequence_dir
         ch_reference_genome
-        delly_flag
-        manta_flag
-        gridss_flag
-        dysgu_flag
-        tiddit_flag
-        svaba_flag
-        sniffles_flag
-        cutesv_flag
-        debug_flag
-        fastqc_flag
-        multiqc_flag
         ch_max_distance_breakpoints
         ch_min_supporting_callers
         ch_account_for_type
@@ -74,15 +66,25 @@ workflow NFCORE_EUKAVARIZER {
         SEQUENCE_PROCESSOR(
             ch_taxonomy_id,
             ch_outdir,
-            ch_reference_genome,
-            REFERENCE_RETRIEVAL.out.reference_genome_ungapped_size,
             ch_sequences_abs_dir,
+            REFERENCE_RETRIEVAL.out.reference_genome_ungapped_size,
             REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
             REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
             REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
         )
 
-        // EUKAVARIZER()
+        EUKAVARIZER(
+            SEQUENCE_PROCESSOR.out.fastq_bam,
+            SEQUENCE_PROCESSOR.out.fastq_bam_indexes,
+            REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
+            REFERENCE_RETRIEVAL.out.reference_genome_faidx,
+            REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
+            REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
+            REFERENCE_RETRIEVAL.out.reference_genome_unzipped
+        )
+
+        SV_UNIFICATION (
+        )
 
         // REPORT_GENERATION()
 
@@ -218,21 +220,7 @@ workflow {
         ch_reference_genome         = Channel.value(params.genome_file)
         ch_sequence_dir_abs = params.sequence_dir ? Channel.value(file(params.sequence_dir).toAbsolutePath()) : Channel.value('')
 
-        // Enable/Disable individual algorithms
-        delly_flag              = params.delly_flag
-        manta_flag              = params.manta_flag
-        gridss_flag             = true // Tech Debt: Gridss is always enabled
-        dysgu_flag              = params.dysgu_flag
-        tiddit_flag             = params.tiddit_flag
-        svaba_flag              = params.svaba_flag
-        sniffles_flag           = params.sniffles_flag
-        cutesv_flag             = params.cutesv_flag
-        fastqc_flag             = params.fastqc_flag
-        multiqc_flag            = params.multiqc_flag
 
-
-        // Enable/Disable debug views (set to true to show debug views for each step)
-        debug_flag            = params.debug_flag
 
         // Report Options
         ch_max_distance_breakpoints         = params.max_distance_breakpoints ? Channel.value(params.max_distance_breakpoints) : Channel.value(1000)
@@ -262,17 +250,6 @@ workflow {
             ch_sequence_dir_abs,
             ch_sequence_dir,
             ch_reference_genome,
-            delly_flag,
-            manta_flag,
-            gridss_flag,
-            dysgu_flag,
-            tiddit_flag,
-            svaba_flag,
-            sniffles_flag,
-            cutesv_flag,
-            debug_flag,
-            fastqc_flag,
-            multiqc_flag,
             ch_max_distance_breakpoints,
             ch_min_supporting_callers,
             ch_account_for_type,
