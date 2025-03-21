@@ -17,15 +17,11 @@ process BIODBCORE_ENA {
         val(assembly_quality)
         val(sequence_dir)
 
-output:
-    path "$taxonomy_id/ena_results.json", emit: ena_results
-    path "$taxonomy_id/sequences/*/*.fastq.gz", emit: fastq_files, optional: true
-    path "$taxonomy_id/sequences/*/*.bam", emit: bam_files, optional: true
-    path "$taxonomy_id/sequences/*/*.cram", emit: cram_files, optional: true
-
-
-    // nf-core modules install pbtk/bam2fastq
-
+    output:
+        path "$taxonomy_id/ena_results.json", emit: ena_results
+        path "$taxonomy_id/sequences/*/*.fastq.gz", emit: fastq_files, optional: true
+        path "$taxonomy_id/sequences/*/*.bam", emit: bam_files, optional: true
+        path "$taxonomy_id/sequences/*/*.cram", emit: cram_files, optional: true
 
     script:
     """

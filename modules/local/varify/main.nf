@@ -1,8 +1,9 @@
 process VARIFY {
     tag "$taxonomy_id"
-
     conda "${moduleDir}/environment.yml"
-    // container 'docker.io/luppo/varify:latest'
+
+    // Settings
+    publishDir "$outdir", mode: 'copy'
 
     input:
         path merged_vcf

@@ -3,5 +3,8 @@
 channels:
   - conda-forge
   - bioconda
+
 dependencies:
-  - bioconda::duphold=0.2.1
+  - bioconda::htslib=1.20
+  - bioconda::minimap2=2.28
+  - bioconda::samtools=1.20

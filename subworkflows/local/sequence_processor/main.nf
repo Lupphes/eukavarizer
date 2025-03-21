@@ -25,6 +25,8 @@ include { SAMTOOLS_COLLATEFASTQ as CRAM_SAMTOOLS_COLLATEFASTQ   } from '../../..
 
 include { QUALITY_CONTROL       } from '../../../subworkflows/local/quality_control/main'
 
+include { SEQKIT_SIZE           } from '../../../modules/local/seqkit/size/main'
+include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
 include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
 
 include { SAMTOOLS_SORT         } from '../../../modules/nf-core/samtools/sort/main'
@@ -156,17 +158,46 @@ workflow SEQUENCE_PROCESSOR {
             collected_fastqs
         )
 
+        SEQKIT_SIZE(
+            QUALITY_CONTROL.out.fastq_filtered
+        )
+
+        // Add median_bp to the metadata
+        aligned_bam = SEQKIT_SIZE.out.median_bp.map { meta, fastq, median_bp ->
+            def length = median_bp.text.trim().toInteger()
+            tuple(meta + [median_bp: length], fastq)
+        }
+
+        minimap2_bam = aligned_bam
+            .filter { meta, _fastq -> meta.median_bp > params.minimap2_threshold }
+
+        bwa_bam = aligned_bam
+            .filter { meta, _fastq -> meta.median_bp <= params.minimap2_threshold }
+
+        MINIMAP2_ALIGN(
+            minimap2_bam,
+            reference_genome_unzipped,
+            true,
+            [],
+            false,
+            true
+        )
+
         BWA_MEM(
-            QUALITY_CONTROL.out.fastq_filtered,
+            bwa_bam,
             reference_genome_bwa_index,
             reference_genome_unzipped,
             true
         )
 
-        SAMTOOLS_SORT(
-            BWA_MEM.out.bam.map { meta, bam ->
+        mixed_bam_inputs = MINIMAP2_ALIGN.out.bam
+            .mix(BWA_MEM.out.bam)
+            .map { meta, bam ->
                 tuple(meta + [id: "${meta.id}_sas"], bam)
-            },
+            }
+
+        SAMTOOLS_SORT(
+            mixed_bam_inputs,
             reference_genome_unzipped
         )
 
@@ -176,11 +207,9 @@ workflow SEQUENCE_PROCESSOR {
 
 
     emit:
-        fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered
-        fastq_bam                   = SAMTOOLS_SORT.out.bam             // Sorted BAM files (.bam)
-        fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai            // BAM index files (.bai)
-        // fasta_file       = genome_unzipped.map { it[1] }    // Unzipped FASTA file
-        // fasta_index      = ch_fasta_index                   // FASTA index (.fai) for unzipped FASTA
+        fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files
+        fastq_bam                   = SAMTOOLS_SORT.out.bam                 // Sorted BAM files (.bam)
+        fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai                // BAM index files (.bai)
 }
 
 /*

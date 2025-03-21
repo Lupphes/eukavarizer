@@ -94,9 +94,8 @@ workflow SV_UNIFICATION {
         )
 
         vcf_index_bfcmerge = BCFTOOLS_MERGE.out.vcf
-            .join(BCFTOOLS_MERGE.out.index, by: 0)
-            .map { meta, vfc, tbi ->
-                tuple(meta, vfc, tbi)
+            .map { meta, vfc ->
+                tuple(meta, vfc, [])
             }
 
         BCFTOOLS_FILTER(
@@ -104,9 +103,8 @@ workflow SV_UNIFICATION {
         )
 
         vcf_index_bfcmerge_filtered = BCFTOOLS_FILTER.out.vcf
-            .join(BCFTOOLS_FILTER.out.tbi, by: 0)
-            .map { meta, vfc, tbi ->
-                tuple(meta, vfc, tbi)
+            .map { meta, vfc ->
+                tuple(meta, vfc, [])
             }
 
         BCFTOOLS_STATS(

@@ -27,6 +27,9 @@ include { REPORT_GENERATION         } from './subworkflows/local/report_generati
 include { PIPELINE_INITIALISATION   } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 
+// Sequence Processor Parameters
+params.minimap2_threshold               = params.minimap2_threshold ?: 300
+
 // Eukavarizer Pipeline Parameters
 params.gridss_flag                      = true // Tech Debt: Gridss is always enabled
 
@@ -39,10 +42,10 @@ params.estimate_distanced_by_sv_size    = params.estimate_distanced_by_sv_size ?
 params.min_sv_size                      = params.min_sv_size ?: 30
 
 // Survivor Filter Parameters
-params.min_sv_size_filter               = params.min_sv_size ?: 50
-params.max_sv_size_filter               = params.max_sv_size ?: 100000
-params.min_allele_freq_filter           = params.min_allele_freq ?: 0.01
-params.min_num_reads_filter             = params.min_num_reads ?: 3
+params.min_sv_size_filter               = params.min_sv_size_filter ?: 50
+params.max_sv_size_filter               = params.max_sv_size_filter ?: 100000
+params.min_allele_freq_filter           = params.min_allele_freq_filter ?: 0.01
+params.min_num_reads_filter             = params.min_num_reads_filter ?: 3
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
