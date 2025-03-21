@@ -1,7 +1,20 @@
 /*
- * SNIFFLES
- *   Long-read (PacBio/ONT) structural variant caller using split-read logic.
- */
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SNIFFLES WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow detects structural variants (SVs) from long-read data using Sniffles:
+    1. **SNIFFLES** – Calls SVs using split-read and coverage-based methods.
+    2. **SAMPLE_REHEADER** – Renames and reheaders the VCF output.
+    3. **SVYNC** – Synchronizes and refines SV calls.
+    4. **GUNZIP** – Decompresses the final VCF file.
+
+    Outputs:
+    - `vcf` – Reheaded VCF file
+    - `svync_vcf` – Synchronized VCF file
+    - `svync_vcfgz` – Gzipped synchronized VCF file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 include { SNIFFLES          } from '../../../modules/nf-core/sniffles/main'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'

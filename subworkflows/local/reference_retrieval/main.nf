@@ -1,8 +1,24 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
+    REFERENCE_RETRIEVAL WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow retrieves and processes reference genomes:
+    1. **BIODBCORE_REFSEQ** – Downloads reference genome from RefSeq.
+    2. **GUNZIP** – Decompresses the reference genome.
+    3. **BWA_INDEX** – Creates BWA index for the reference genome.
+    4. **TABIX_BGZIP** – Compresses the reference genome with bgzip.
+    5. **SAMTOOLS_FAIDX** – Creates a FASTA index for the uncompressed genome.
+    6. **SAMTOOLS_BGZIP_FAIDX** – Creates a FASTA index for the bgzipped genome.
+
+    Outputs:
+    - `reference_genome` – Original reference genome file.
+    - `reference_genome_unzipped` – Unzipped reference genome.
+    - `reference_genome_bgzipped` – Bgzipped reference genome.
+    - `reference_genome_bwa_index` – BWA index.
+    - `reference_genome_faidx` – FASTA index for the uncompressed genome.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 include { BIODBCORE_REFSEQ      } from '../../../modules/local/biodbcore/refseq/main'
 
 include { GUNZIP                } from '../../../modules/nf-core/gunzip/main'
@@ -10,12 +26,6 @@ include { BWA_INDEX             } from '../../../modules/nf-core/bwa/index/main'
 include { TABIX_BGZIP           } from '../../../modules/nf-core/tabix/bgzip/main'
 include { SAMTOOLS_FAIDX        } from '../../../modules/nf-core/samtools/faidx/main'
 include { SAMTOOLS_FAIDX as SAMTOOLS_BGZIP_FAIDX  } from '../../../modules/nf-core/samtools/faidx/main'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN MAIN WORKFLOW
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 workflow REFERENCE_RETRIEVAL {
 

@@ -1,12 +1,24 @@
 /*
- * CUTESV
- *   Alternative long-read structural variant caller, similar scope to Sniffles.
- */
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CUTESV WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow calls structural variants (SVs) using CuteSV for long-read data:
+    1. **CUTESV** – Detects SVs using split-read and coverage-based methods.
+    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
+    3. **SVYNC** – Synchronizes and refines SV calls.
+    4. **GUNZIP** – Decompresses the final VCF file.
+
+    Outputs:
+    - `vcf` – Reheaded VCF file
+    - `svync_vcf` – Synchronized VCF file
+    - `svync_vcfgz` – Gzipped synchronized VCF file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 include { CUTESV            } from '../../../modules/nf-core/cutesv/main'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
 include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
-
 
 workflow SV_CALLING_CUTESV {
     take:

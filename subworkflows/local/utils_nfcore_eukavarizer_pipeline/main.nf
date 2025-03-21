@@ -1,10 +1,14 @@
-//
-// Subworkflow with functionality specific to the nf-core/eukavarizer pipeline
-//
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS
+    PIPELINE INITIALISATION AND COMPLETION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PIPELINE_INITIALISATION:
+    - Sets up the pipeline by validating input parameters and configuration.
+    - Prints the pipeline version and configuration information.
+
+    PIPELINE_COMPLETION:
+    - Handles the pipeline's completion tasks.
+    - Sends completion emails, generates summaries, and handles errors or failures.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -17,11 +21,6 @@ include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    SUBWORKFLOW TO INITIALISE PIPELINE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 workflow PIPELINE_INITIALISATION {
 
@@ -82,11 +81,6 @@ workflow PIPELINE_COMPLETION {
     monochrome_logs // boolean: Disable ANSI colour codes in log output
     hook_url        //  string: hook URL for notifications
     multiqc_report  //  string: Path to MultiQC report
-    variants_bcf    //  string: Path to output files from the pipeline
-    variants_index  //  string: Path to output files from the pipeline
-    html_index      //  string: Path to output files from the pipeline
-    html_merged     //  string: Path to output files from the pipeline
-    html_survivor
 
     main:
     summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")

@@ -187,3 +187,6 @@ logs/
 fastqc_results/
 pipeline_info/
 output/
+SRR8615297/
+HG002/
+HG002_reads/

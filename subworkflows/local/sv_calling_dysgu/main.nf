@@ -1,7 +1,20 @@
 /*
- * DYSGU
- *   Machine-learning approach for structural variant calling from short reads.
- */
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    DYSGU WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow calls structural variants (SVs) using Dysgu's machine-learning model:
+    1. **DYSGU** – Detects SVs from short-read data.
+    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
+    3. **SVYNC** – Synchronizes and refines SV calls.
+    4. **GUNZIP** – Decompresses the final VCF file.
+
+    Outputs:
+    - `vcf` – Reheaded VCF file
+    - `svync_vcf` – Synchronized VCF file
+    - `svync_vcfgz` – Gzipped synchronized VCF file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 include { DYSGU             } from '../../../modules/nf-core/dysgu/main'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'

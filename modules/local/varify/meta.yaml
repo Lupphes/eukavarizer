@@ -1,0 +1,60 @@
+name: "varify"
+description: "Generates an HTML report from a merged VCF file, individual VCF files, and SURVIVOR analysis."
+keywords:
+  - vcf
+  - report
+  - survivor
+  - visualization
+input:
+  - - meta:
+        type: map
+        description: "Sample metadata"
+    - merged_vcf:
+        type: file
+        description: "Merged VCF file"
+        pattern: "*.vcf"
+  - - meta:
+        type: map
+        description: "Sample metadata for comparison VCFs"
+    - other_vcfs:
+        type: list[file]
+        description: "List of individual VCF files for comparison"
+        pattern: "*.vcf"
+  - - meta:
+        type: map
+        description: "Sample metadata for SURVIVOR merged VCF"
+    - survivor_vcf:
+        type: file
+        description: "SURVIVOR merged VCF file"
+        pattern: "*.vcf"
+  - - meta:
+        type: map
+        description: "Sample metadata for SURVIVOR stats"
+    - survivor_stats:
+        type: file
+        description: "SURVIVOR stats table"
+        pattern: "*.tsv"
+  - taxonomy_id:
+      type: string
+      description: "Sample taxonomy ID"
+  - outdir:
+      type: file
+      description: "Output directory for reports"
+output:
+  - index_html:
+      type: file
+      description: "Generated index HTML report"
+      pattern: "*.html"
+  - merged_report:
+      type: file
+      description: "Generated merged report"
+      pattern: "*.html"
+  - survivor_report:
+      type: file
+      description: "Generated SURVIVOR report"
+      pattern: "*.html"
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"

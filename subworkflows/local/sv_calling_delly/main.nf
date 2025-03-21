@@ -1,9 +1,19 @@
-
 /*
- * DELLY_CALL
- *   Local module that calls structural variants (deletions, duplications,
- *   inversions, translocations) in short-read data using Delly.
- */
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    DELLY_CALL WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow calls structural variants (SVs) using Delly:
+    1. **DELLY_CALL** – Detects deletions, duplications, inversions, and translocations.
+    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
+    3. **SVYNC** – Synchronizes and refines SV calls.
+    4. **GUNZIP** – Decompresses the final VCF file.
+
+    Outputs:
+    - `vcf` – Reheaded VCF file
+    - `svync_vcf` – Synchronized VCF file
+    - `svync_vcfgz` – Gzipped synchronized VCF file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
 include { DELLY_CALL        } from '../../../modules/nf-core/delly/call/main.nf'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'

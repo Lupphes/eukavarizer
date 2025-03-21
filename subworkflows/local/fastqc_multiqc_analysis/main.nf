@@ -1,8 +1,18 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
+    FASTQC_MULTIQC_ANALYSIS WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow runs quality control and summarises the results:
+    1. **FASTQC** – Runs FastQC on raw FASTQ files (if enabled).
+    2. **MULTIQC** – Compiles reports from FastQC and other sources (if enabled).
+
+    Outputs:
+    - `fastqc_report` – FastQC report (if enabled).
+    - `multiqc_report` – MultiQC report (if enabled).
+    - `versions` – Collected software versions.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 include { FASTQC        } from '../../../modules/nf-core/fastqc/main'
 include { MULTIQC       } from '../../../modules/nf-core/multiqc/main'
 
@@ -10,12 +20,6 @@ include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../../nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../..//nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../../local/utils_nfcore_eukavarizer_pipeline'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN MAIN WORKFLOW
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 workflow FASTQC_MULTIQC_ANALYSIS {
 

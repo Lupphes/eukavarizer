@@ -1,7 +1,19 @@
 /*
- * MANTA_GERMLINE
- *   For germline short-read SV calling (large deletions, inversions, etc.).
- */
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    MANTA_GERMLINE WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow calls structural variants (SVs) using MANTA for germline samples:
+    1. **MANTA_GERMLINE** – Detects large deletions, inversions, and duplications.
+    2. **SAMPLE_REHEADER** – Reheaders and renames output VCF files.
+    3. **SVYNC** – Synchronizes and refines SV calls.
+    4. **GUNZIP** – Decompresses the final VCF files.
+
+    Outputs:
+    - `small_vcf` – Small indel calls
+    - `candidate_vcf` – Candidate SV calls
+    - `diploid_vcf` – Diploid SV calls
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
 include { MANTA_GERMLINE                                  } from '../../../modules/nf-core/manta/germline/main'
 

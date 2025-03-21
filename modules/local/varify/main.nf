@@ -1,9 +1,8 @@
-process VCF_REPGEN {
+process VARIFY {
     tag "$taxonomy_id"
 
     conda "${moduleDir}/environment.yml"
-    container 'docker.io/luppo/varify:latest'
-
+    // container 'docker.io/luppo/varify:latest'
 
     input:
         path merged_vcf

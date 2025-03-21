@@ -1,8 +1,22 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
+    SEQUENCE_PROCESSOR WORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    This workflow processes sequencing data and prepares it for structural variant calling:
+    1. **BIODBCORE_ENA** – Downloads sequencing data from ENA.
+    2. **SAMTOOLS_COLLATEFASTQ** – Converts BAM/CRAM to paired and unpaired FASTQ files.
+    3. **QUALITY_CONTROL** – Filters and quality checks the FASTQ files.
+    4. **BWA_MEM** – Aligns reads to a reference genome.
+    5. **SAMTOOLS_SORT** – Sorts the BAM files.
+    6. **SAMTOOLS_INDEX** – Indexes the sorted BAM files.
+
+    Outputs:
+    - `fastq_filtered` – Filtered FASTQ files
+    - `fastq_bam` – Sorted BAM files
+    - `fastq_bam_indexes` – BAM index files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 include { BIODBCORE_REFSEQ      } from '../../../modules/local/biodbcore/refseq/main'
 include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
@@ -16,12 +30,6 @@ include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
 include { SAMTOOLS_SORT         } from '../../../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_FAIDX        } from '../../../modules/nf-core/samtools/faidx/main'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN MAIN WORKFLOW
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 workflow SEQUENCE_PROCESSOR {
 
