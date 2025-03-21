@@ -58,10 +58,6 @@ workflow SV_CALLING_MANTA {
             tuple(meta + [id: "${meta.id}"], fai)
         }
 
-        first.view { "DEBUG first: $it" }
-        second.view { "DEBUG second: $it" }
-        third.view { "DEBUG third: $it" }
-
         MANTA_GERMLINE(
             first,
             second,

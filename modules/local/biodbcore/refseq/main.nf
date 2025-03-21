@@ -2,9 +2,6 @@ process BIODBCORE_REFSEQ {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
 
-    // Settings
-    publishDir "$outdir", mode: 'copy', overwrite: false
-
     input:
         val(taxonomy_id)
         val(outdir)

@@ -2,9 +2,6 @@ process BIODBCORE_ENA {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
 
-    // Settings
-    publishDir "$outdir", mode: 'copy'
-
     input:
         val(taxonomy_id)
         val(genome_size_ungapped)

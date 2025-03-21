@@ -17,7 +17,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { BIODBCORE_REFSEQ      } from '../../../modules/local/biodbcore/refseq/main'
 include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
 include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ    } from '../../../modules/nf-core/samtools/collatefastq/main'
@@ -31,7 +30,6 @@ include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
 
 include { SAMTOOLS_SORT         } from '../../../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
-include { SAMTOOLS_FAIDX        } from '../../../modules/nf-core/samtools/faidx/main'
 
 workflow SEQUENCE_PROCESSOR {
 
