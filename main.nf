@@ -31,7 +31,7 @@ include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eu
 params.minimap2_threshold               = params.minimap2_threshold ?: 300
 
 // Eukavarizer Pipeline Parameters
-params.gridss_flag                      = true // Tech Debt: Gridss is always enabled
+params.gridss_flag                      = true //TODO: Tech Debt: Gridss is always enabled
 
 // Report Generation Parameters
 params.max_distance_breakpoints         = params.max_distance_breakpoints ?: 1000
@@ -56,60 +56,69 @@ params.min_num_reads_filter             = params.min_num_reads_filter ?: 3
 workflow NFCORE_EUKAVARIZER {
 
     take:
-        ch_taxonomy_id
-        ch_outdir
-        ch_sequences_abs_dir
-        ch_sequence_dir
-        ch_reference_genome
+        taxonomy_id
+        outdir
+        sequences_abs_dir
+        reference_genome
 
     main:
 
         REFERENCE_RETRIEVAL(
-            ch_taxonomy_id,
-            ch_outdir,
-            ch_reference_genome
+            taxonomy_id,
+            outdir,
+            reference_genome
         )
 
         SEQUENCE_PROCESSOR(
-            ch_taxonomy_id,
-            ch_outdir,
-            ch_sequences_abs_dir,
+            taxonomy_id,
+            outdir,
+            sequences_abs_dir,
             REFERENCE_RETRIEVAL.out.reference_genome_ungapped_size,
             REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
             REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
             REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
         )
 
-        EUKAVARIZER(
-            SEQUENCE_PROCESSOR.out.fastq_bam,
-            SEQUENCE_PROCESSOR.out.fastq_bam_indexes,
-            REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
-            REFERENCE_RETRIEVAL.out.reference_genome_faidx,
-            REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
-            REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
-            REFERENCE_RETRIEVAL.out.reference_genome_unzipped
-        )
+        if (params.gridss_flag || params.delly_flag || params.manta_flag ||
+            params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
+            params.dysgu_flag || params.svaba_flag) {
 
-        SV_UNIFICATION (
-            EUKAVARIZER.out.vcf_list,
-            EUKAVARIZER.out.vcfgz_list,
-            EUKAVARIZER.out.tbi_list
-        )
+            EUKAVARIZER(
+                SEQUENCE_PROCESSOR.out.fastq_bam,
+                SEQUENCE_PROCESSOR.out.fastq_bam_indexes,
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
+                REFERENCE_RETRIEVAL.out.reference_genome_faidx,
+                REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_index
+            )
 
-        REPORT_GENERATION(
-            ch_taxonomy_id,
-            ch_outdir,
-            EUKAVARIZER.out.vcf_list,
-            SV_UNIFICATION.out.survivor_vcf,
-            SV_UNIFICATION.out.survivor_stats,
-            SV_UNIFICATION.out.bcfmerge_vcf
-        )
+            SV_UNIFICATION (
+                EUKAVARIZER.out.vcf_list,
+                EUKAVARIZER.out.vcfgz_list,
+                EUKAVARIZER.out.tbi_list
+            )
+
+            REPORT_GENERATION(
+                taxonomy_id,
+                outdir,
+                EUKAVARIZER.out.vcf_list,
+                SV_UNIFICATION.out.survivor_vcf,
+                SV_UNIFICATION.out.survivor_stats,
+                SV_UNIFICATION.out.bcfmerge_vcf
+            )
+
+        }
+        else {
+            log.warning "No SV callers enabled."
+        }
 
     emit:
         multiqc_report      = "data_analysis_results.multiqc_report"
-        html_index          = REPORT_GENERATION.out.html_index
-        html_merged         = REPORT_GENERATION.out.html_merged
-        html_survivor       = REPORT_GENERATION.out.html_survivor
+        // html_index          = REPORT_GENERATION.out.html_index
+        // html_merged         = REPORT_GENERATION.out.html_merged
+        // html_survivor       = REPORT_GENERATION.out.html_survivor
 }
 
 /*
@@ -127,8 +136,8 @@ workflow {
         taxonomy_id              = Channel.value(params.taxonomy_id)
         outdir                   = Channel.value(params.outdir)
         sequence_dir             = Channel.value(params.sequence_dir)
-        reference_genome         = Channel.value(params.genome_file)
-        sequence_dir_abs         = params.sequence_dir ? Channel.value(file(params.sequence_dir).toAbsolutePath()) : Channel.value('')
+        reference_genome         = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
+        sequence_dir_abs         = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
 
         //
         // SUBWORKFLOW: Run initialisation tasks
@@ -148,7 +157,6 @@ workflow {
             taxonomy_id,
             outdir,
             sequence_dir_abs,
-            sequence_dir,
             reference_genome
         )
 

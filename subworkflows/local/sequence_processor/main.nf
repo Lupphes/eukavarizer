@@ -63,10 +63,20 @@ workflow SEQUENCE_PROCESSOR {
             sequences_abs_dir
         )
 
-        raw_fastqs  = BIODBCORE_ENA.out.fastq_files
-        raw_bam     = BIODBCORE_ENA.out.bam_files
-        raw_cram    = BIODBCORE_ENA.out.cram_files
+        raw_fastqs = (sequences_abs_dir != [] ?
+            Channel
+                .fromPath("${params.sequence_dir}/**/*.fastq.gz")
+            : BIODBCORE_ENA.out.fastq_files).collect().flatten()
 
+        raw_bam = (sequences_abs_dir != [] ?
+            Channel
+                .fromPath("${params.sequence_dir}/**/*.bam")
+            : BIODBCORE_ENA.out.bam_files).collect().flatten()
+
+        raw_cram = (sequences_abs_dir != [] ?
+            Channel
+                .fromPath("${params.sequence_dir}/**/*.cram")
+            : BIODBCORE_ENA.out.cram_files).collect().flatten()
 
         // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
         // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
@@ -97,24 +107,22 @@ workflow SEQUENCE_PROCESSOR {
 
         grouped_bam = raw_bam
             .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file.toString()) }
-            .groupTuple()
+            .map { file -> tuple([id: file.getParent().getName()], file) }
+
 
         grouped_cram = raw_cram
             .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file.toString()) }
-            .groupTuple()
-
+            .map { file -> tuple([id: file.getParent().getName()], file) }
 
         BAM_SAMTOOLS_COLLATEFASTQ(
             grouped_bam,
-            reference_genome_bgzipped,
+            reference_genome_bgzipped.collect(),
             false
         )
 
         CRAM_SAMTOOLS_COLLATEFASTQ(
             grouped_cram,
-            reference_genome_bgzipped,
+            reference_genome_bgzipped.collect(),
             false
         )
 
@@ -174,7 +182,7 @@ workflow SEQUENCE_PROCESSOR {
 
         MINIMAP2_ALIGN(
             minimap2_bam,
-            reference_genome_unzipped,
+            reference_genome_unzipped.collect(),
             true,
             [],
             false,
@@ -183,26 +191,25 @@ workflow SEQUENCE_PROCESSOR {
 
         BWA_MEM(
             bwa_bam,
-            reference_genome_bwa_index,
-            reference_genome_unzipped,
+            reference_genome_bwa_index.collect(),
+            reference_genome_unzipped.collect(),
             true
         )
 
-        mixed_bam_inputs = MINIMAP2_ALIGN.out.bam
-            .mix(BWA_MEM.out.bam)
+        mixed_bam_inputs = BWA_MEM.out.bam
+            .mix(MINIMAP2_ALIGN.out.bam)
             .map { meta, bam ->
                 tuple(meta + [id: "${meta.id}_sas"], bam)
             }
 
         SAMTOOLS_SORT(
             mixed_bam_inputs,
-            reference_genome_unzipped
+            reference_genome_unzipped.collect()
         )
 
         SAMTOOLS_INDEX(
             SAMTOOLS_SORT.out.bam
         )
-
 
     emit:
         fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files

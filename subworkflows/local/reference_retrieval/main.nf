@@ -47,14 +47,14 @@ workflow REFERENCE_RETRIEVAL {
             .collect()
             .map { jsonList ->
                 def jsonMap = jsonList.collectEntries { [it.key, it.value] }
-                return tuple(jsonMap['genome_size'] as Integer, jsonMap['genome_size_ungapped'] as Integer, file(jsonMap['genome_file']))
+                return tuple(jsonMap['genome_size'] as Integer, jsonMap['genome_size_ungapped'] as Integer, file(jsonMap['reference_genome']))
             }
 
         reference_genome_ungapped_size = biodbcore_json_result.map { it[1] }
-
+        reference_genome_input = (reference_genome != [] ? reference_genome : BIODBCORE_REFSEQ.out.reference_genome).collect().flatten()
 
         GUNZIP(
-            BIODBCORE_REFSEQ.out.reference_genome.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
+            reference_genome_input.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
         )
 
         BWA_INDEX(
@@ -77,7 +77,7 @@ workflow REFERENCE_RETRIEVAL {
 
 
     emit:
-        reference_genome                        = BIODBCORE_REFSEQ.out.reference_genome
+        reference_genome                        = reference_genome_input
         reference_genome_ungapped_size          = reference_genome_ungapped_size
         reference_genome_unzipped               = GUNZIP.out.gunzip
         reference_genome_bgzipped               = TABIX_BGZIP.out.output

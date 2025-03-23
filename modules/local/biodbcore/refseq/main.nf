@@ -3,32 +3,31 @@ process BIODBCORE_REFSEQ {
     conda "${moduleDir}/environment.yml"
 
     input:
-        val(taxonomy_id)
-        val(outdir)
-        val(genome_file)
+        val  taxonomy_id
+        val  outdir
+        path reference_genome
 
     output:
-        path "$taxonomy_id/refseq_results.json", emit: json
-        path "$taxonomy_id/refseq/*.fna.gz", emit: reference_genome
+        path "refseq_results.json", emit: json
+        path "*.{fna.gz,fa.gz}", emit: reference_genome, optional: true
         path "assembly_summary_refseq.parquet", emit: refseq_parquet, optional: true
         path "assembly_summary_refseq.txt", emit: refseq_summary, optional: true
 
     script:
-    """
-    if [ -s "${genome_file}" ]; then
-        echo "Reference genome already exists at: $genome_file for taxonomy ID: $taxonomy_id"
+        if (reference_genome) {
+        """
+            echo "Reference genome already exists at: $reference_genome for taxonomy ID: $taxonomy_id"
 
-        mkdir -p "$taxonomy_id/refseq"
-        cp "${genome_file}" "$taxonomy_id/refseq/"
+            biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir . --reference_genome $reference_genome
 
-        biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir . --genome_file $genome_file
+            cat 'refseq_results.json'
+        """
+        } else {
+        """
+            echo "Downloading reference genome for taxonomy ID: $taxonomy_id"
 
-    else
-        echo "Downloading reference genome for taxonomy ID: $taxonomy_id"
-
-        biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir .
-    fi
-
-    cat     './$taxonomy_id/refseq_results.json'
-    """
+            biodbcore --mode refseq --taxonomy_id $taxonomy_id --outdir .
+            cat 'refseq_results.json'
+        """
+        }
 }

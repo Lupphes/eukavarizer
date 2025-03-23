@@ -32,7 +32,7 @@
                     "help_text": "Specify a local directory with input sequence files.",
                     "fa_icon": "fas fa-folder"
                 },
-                "genome_file": {
+                "reference_genome": {
                     "type": "string",
                     "format": "file-path",
                     "description": "Path to the local reference genome file",

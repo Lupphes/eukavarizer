@@ -49,7 +49,7 @@ workflow SV_UNIFICATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        survivor_meta = Channel.of([id: "survivor_merge"])
+        survivor_meta = Channel.value([id: "survivor_merge"])
         survivor_input = survivor_meta.combine(vcf_list.toList())
 
         SURVIVOR_MERGE(
@@ -83,7 +83,7 @@ workflow SV_UNIFICATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        bfcmerge_meta = Channel.of([id: "bfcmerge_merge"])
+        bfcmerge_meta = Channel.value([id: "bfcmerge_merge"])
         bcfmerge_input = bfcmerge_meta.combine(vcfgz_list.toList()).combine(tbi_list.toList())
 
         BCFTOOLS_MERGE(

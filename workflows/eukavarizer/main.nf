@@ -28,6 +28,7 @@ workflow EUKAVARIZER {
         reference_genome_bwa_index          // REFERENCE_RETRIEVAL.out.reference_genome_bwa_index       [ch_bwa_index]
         reference_genome_bgzipped_faidx     // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx  [ch_fasta_index_gz]
         reference_genome_unzipped           // REFERENCE_RETRIEVAL.out.reference_genome_unzipped        [ch_fasta_file]
+        reference_genome_bgzipped_index
 
     main:
         bam_inputs = fastq_bam
@@ -48,8 +49,8 @@ workflow EUKAVARIZER {
             SV_CALLING_DELLY(
                 fastq_bam,
                 fastq_bam_indexes,
-                reference_genome_bgzipped,
-                reference_genome_faidx
+                reference_genome_bgzipped.collect(),
+                reference_genome_faidx.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_DELLY.out.svync_vcf)
@@ -65,8 +66,8 @@ workflow EUKAVARIZER {
         if (params.manta_flag) {
             SV_CALLING_MANTA(
                 bam_inputs,
-                reference_genome_bgzipped,
-                reference_genome_bgzipped_faidx
+                reference_genome_bgzipped.collect(),
+                reference_genome_bgzipped_faidx.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.svync_small_vcf)
@@ -92,9 +93,9 @@ workflow EUKAVARIZER {
         if (params.gridss_flag) {
             SV_CALLING_GRIDSS(
                 bam_inputs,
-                reference_genome_unzipped,
-                reference_genome_faidx,
-                reference_genome_bwa_index
+                reference_genome_unzipped.collect(),
+                reference_genome_faidx.collect(),
+                reference_genome_bwa_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_GRIDSS.out.svync_vcf)
@@ -110,8 +111,8 @@ workflow EUKAVARIZER {
         if (params.dysgu_flag) {
             SV_CALLING_DYSGU(
                 bam_inputs,
-                reference_genome_unzipped,
-                reference_genome_faidx
+                reference_genome_unzipped.collect(),
+                reference_genome_faidx.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_DYSGU.out.svync_vcf)
@@ -127,8 +128,8 @@ workflow EUKAVARIZER {
         if (params.tiddit_flag) {
             SV_CALLING_TIDDIT(
                 bam_inputs,
-                reference_genome_bgzipped,
-                reference_genome_bwa_index
+                reference_genome_bgzipped.collect(),
+                reference_genome_bwa_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_TIDDIT.out.svync_vcf)
@@ -144,9 +145,9 @@ workflow EUKAVARIZER {
         if (params.svaba_flag) {
             SV_CALLING_SVABA(
                 bam_inputs,
-                reference_genome_unzipped,
-                reference_genome_faidx,
-                reference_genome_bwa_index
+                reference_genome_unzipped.collect(),
+                reference_genome_faidx.collect(),
+                reference_genome_bwa_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_SVABA.out.svync_vcf)
@@ -163,7 +164,7 @@ workflow EUKAVARIZER {
         if (params.sniffles_flag) {
             SV_CALLING_SNIFFLES(
                 bam_inputs,
-                reference_genome_bgzipped
+                reference_genome_bgzipped.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_SNIFFLES.out.svync_vcf)
@@ -180,7 +181,7 @@ workflow EUKAVARIZER {
         if (params.cutesv_flag) {
             SV_CALLING_CUTESV(
                 bam_inputs,
-                reference_genome_bgzipped
+                reference_genome_bgzipped.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_CUTESV.out.svync_vcf)

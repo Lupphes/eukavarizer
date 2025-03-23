@@ -27,7 +27,7 @@ input:
     format: "directory-path"
     required: true
 
-  - name: "genome_file"
+  - name: "reference_genome"
     description: "Optional existing genome file to avoid re-downloading."
     type: "file"
     format: "file-path"
@@ -39,7 +39,7 @@ output:
     type: "file"
     pattern: "^.*refseq_results.json$"
 
-  - name: "genome_file"
+  - name: "reference_genome"
     description: "Downloaded genome file (if applicable)."
     type: "file"
     pattern: "^.*\\.fna.gz$"
