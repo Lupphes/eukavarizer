@@ -36,7 +36,7 @@ info:
       TRA: $INFO/POS2
 
   CHR2:
-    value:
+    value: $INFO/CHR2
     number: 1
     type: string
     description: Chromosome for second position
@@ -96,7 +96,7 @@ format:
     type: string
     description: Genotype
 
-  PR:
+  PE:
     value: $FORMAT/DR
     number: 2
     type: integer
@@ -113,3 +113,9 @@ format:
     number: 1
     type: integer
     description: Phase block ID
+
+  ID:
+    value: $FORMAT/ID
+    number: 1
+    type: string
+    description: Individual sample SV ID for multi-sample output

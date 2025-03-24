@@ -1,4 +1,5 @@
 id: cutesv_$INFO/SVTYPE
+
 alt:
   BND: TRA
   DEL: DEL
@@ -56,11 +57,11 @@ info:
     type: integer
     description: Confidence interval around POS
 
-  CILEN:
+  CIEND:
     value: $INFO/CILEN
     number: 2
     type: integer
-    description: Confidence interval around inserted/deleted material
+    description: Confidence interval around END
 
   RE:
     value: $INFO/RE
@@ -84,19 +85,19 @@ info:
     value: $INFO/AF
     number: 1
     type: float
-    description: Allele Frequency
+    description: Allele frequency
 
   PRECISE:
-    value: 1
+    value: 1 if $INFO/PRECISE else 0
     number: 0
     type: flag
-    description: Precise structural variant
+    description: Precise structural variation
 
   IMPRECISE:
-    value: 1
+    value: 1 if $INFO/IMPRECISE else 0
     number: 0
     type: flag
-    description: Imprecise structural variant
+    description: Imprecise structural variation
 
 format:
   GT:
@@ -105,17 +106,17 @@ format:
     type: string
     description: Genotype
 
-  DR:
-    value: $FORMAT/DR
-    number: 1
-    type: integer
-    description: Number of high-quality reference reads
-
-  DV:
+  PE:
     value: $FORMAT/DV
     number: 1
     type: integer
-    description: Number of high-quality variant reads
+    description: Number of high-quality paired-end reads supporting the variant
+
+  SR:
+    value: $FORMAT/DR
+    number: 1
+    type: integer
+    description: Number of high-quality split reads supporting the variant
 
   PL:
     value: $FORMAT/PL

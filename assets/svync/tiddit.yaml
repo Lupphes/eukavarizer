@@ -1,4 +1,5 @@
 id: tiddit_$INFO/SVTYPE
+
 alt:
   BND: TRA
   DUP:TANDEM: DUP
@@ -16,7 +17,7 @@ info:
     value: $INFO/SVLEN
     number: 1
     type: integer
-    description: The length of the structural variant
+    description: Length of the structural variant
     alts:
       DEL: -$INFO/SVLEN
       DUP: $INFO/SVLEN
@@ -40,6 +41,15 @@ info:
     alts:
       TRA: $INFO/REGIONB/1
       BND: $INFO/REGIONB/1
+
+  CHR2:
+    value: $INFO/REGIONB/0
+    number: 1
+    type: string
+    description: Chromosome for second position in translocations
+    alts:
+      TRA: $INFO/REGIONB/0
+      BND: $INFO/REGIONB/0
 
   IMPRECISE:
     value: 1
@@ -77,6 +87,22 @@ info:
     type: integer
     description: Read-pairs and split reads supporting the event
 
+  CIPOS:
+    value: $INFO/REGIONA
+    number: 2
+    type: integer
+    description: Confidence interval around POS
+    alts:
+      DEL: ~$INFO/REGIONA[0],-$INFO/REGIONA[1]
+
+  CIEND:
+    value: $INFO/REGIONB
+    number: 2
+    type: integer
+    description: Confidence interval around END
+    alts:
+      DEL: ~$INFO/REGIONB[0],-$INFO/REGIONB[1]
+
 format:
   GT:
     value: $FORMAT/GT
@@ -95,23 +121,23 @@ format:
       INV: .
       BND: .
 
-  DV:
+  PE:
     value: $FORMAT/DV
-    number: 1
+    number: 2
     type: integer
-    description: Number of paired-ends that support the event
+    description: Number of paired-end reads supporting the variant
 
-  RV:
+  SR:
     value: $FORMAT/RV
-    number: 1
+    number: 2
     type: integer
-    description: Number of split reads that support the event
+    description: Number of split reads supporting the variant
 
   DR:
     value: $FORMAT/DR
     number: 2
     type: integer
-    description: Number of paired-ends supporting the reference allele
+    description: Number of paired-end reads supporting the reference allele
 
   RR:
     value: $FORMAT/RR
@@ -129,3 +155,9 @@ format:
       DUP:INV: .
       INV: .
       BND: .
+
+  LQ:
+    value: $FORMAT/LQ
+    number: 2
+    type: float
+    description: Fraction of low-quality reads

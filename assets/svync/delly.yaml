@@ -1,6 +1,14 @@
 id: delly_$INFO/SVTYPE
+
+# Alternate allele mapping for all SV types
 alt:
   BND: TRA
+  DEL: DEL
+  INS: INS
+  DUP: DUP
+  INV: INV
+
+# INFO fields section
 info:
   CALLER:
     value: delly
@@ -11,7 +19,7 @@ info:
     value: ~sub:$INFO/END,$POS
     number: 1
     type: integer
-    description: The length of the structural variant
+    description: Length of the structural variant
     alts:
       DEL: -~sub:$INFO/END,$POS
       INS: $INFO/SVLEN
@@ -32,7 +40,7 @@ info:
     type: string
     description: Type of structural variant
   CHR2:
-    value:
+    value: $INFO/CHR2
     number: 1
     type: string
     description: Chromosome for second position
@@ -50,19 +58,171 @@ info:
     number: 0
     type: flag
     description: Imprecise structural variation
+  MAPQ:
+    value: $INFO/MAPQ
+    number: 1
+    type: integer
+    description: Median mapping quality of paired-ends
+  SRMAPQ:
+    value: $INFO/SRMAPQ
+    number: 1
+    type: integer
+    description: Median mapping quality of split-reads
+  SR:
+    value: $INFO/SR
+    number: 1
+    type: integer
+    description: Split-read support
+  SRQ:
+    value: $INFO/SRQ
+    number: 1
+    type: float
+    description: Split-read consensus alignment quality
+  CONSENSUS:
+    value: $INFO/CONSENSUS
+    number: 1
+    type: string
+    description: Split-read consensus sequence
+  CONSBP:
+    value: $INFO/CONSBP
+    number: 1
+    type: integer
+    description: Consensus breakpoint position
+  CE:
+    value: $INFO/CE
+    number: 1
+    type: float
+    description: Consensus sequence entropy
+  CT:
+    value: $INFO/CT
+    number: 1
+    type: string
+    description: Paired-end signature induced connection type
+  PRECISE:
+    value: $INFO/PRECISE
+    number: 0
+    type: flag
+    description: Precise structural variation
+  SVMETHOD:
+    value: $INFO/SVMETHOD
+    number: 1
+    type: string
+    description: Type of approach used to detect SV
+  INSLEN:
+    value: $INFO/INSLEN
+    number: 1
+    type: integer
+    description: Predicted length of the insertion
+  HOMLEN:
+    value: $INFO/HOMLEN
+    number: 1
+    type: integer
+    description: Predicted microhomology length using a max. edit distance of 2
+
+# FORMAT fields section
 format:
   GT:
     value: $FORMAT/GT
     number: 1
     type: string
     description: Genotype
-  PE:
-    value: $FORMAT/DR,$FORMAT/DV
-    number: 2
+  GL:
+    value: $FORMAT/GL
+    number: .
+    type: float
+    description: Log10-scaled genotype likelihoods for RR, RA, AA genotypes
+  GQ:
+    value: $FORMAT/GQ
+    number: 1
     type: integer
-    description: Paired-read support for the ref and alt alleles in the order listed
-  SR:
-    value: $FORMAT/RR,$FORMAT/RV
-    number: 2
+    description: Genotype quality
+  FT:
+    value: $FORMAT/FT
+    number: 1
+    type: string
+    description: Per-sample genotype filter
+  RC:
+    value: $FORMAT/RC
+    number: 1
     type: integer
-    description: Split-read support for the ref and alt alleles in the order listed
+    description: Raw high-quality read counts or base counts for the SV
+  RCL:
+    value: $FORMAT/RCL
+    number: 1
+    type: integer
+    description: Raw high-quality read counts for the left control region
+  RCR:
+    value: $FORMAT/RCR
+    number: 1
+    type: integer
+    description: Raw high-quality read counts for the right control region
+  RDCN:
+    value: $FORMAT/RDCN
+    number: 1
+    type: integer
+    description: Read-depth based copy-number estimate for autosomal sites
+  DR:
+    value: $FORMAT/DR
+    number: 1
+    type: integer
+    description: High-quality reference pairs
+  DV:
+    value: $FORMAT/DV
+    number: 1
+    type: integer
+    description: High-quality variant pairs
+  RR:
+    value: $FORMAT/RR
+    number: 1
+    type: integer
+    description: High-quality reference junction reads
+  RV:
+    value: $FORMAT/RV
+    number: 1
+    type: integer
+    description: High-quality variant junction reads
+  ANRP:
+    value: $FORMAT/ANRP
+    number: 1
+    type: integer
+    description: Read pairs at the breakend not supporting the breakpoint
+  ANRPQ:
+    value: $FORMAT/ANRPQ
+    number: 1
+    type: float
+    description: Quality score of read pairs not supporting the breakpoint
+  ANSR:
+    value: $FORMAT/ANSR
+    number: 1
+    type: integer
+    description: Split reads not supporting the breakpoint
+  ANSRQ:
+    value: $FORMAT/ANSRQ
+    number: 1
+    type: float
+    description: Quality score of split reads not supporting the breakpoint
+  BSC:
+    value: $FORMAT/BSC
+    number: 1
+    type: integer
+    description: Soft clips supporting local breakend
+  BSCQ:
+    value: $FORMAT/BSCQ
+    number: 1
+    type: float
+    description: Quality score of soft clips supporting local breakend
+  BUM:
+    value: $FORMAT/BUM
+    number: 1
+    type: integer
+    description: Read pairs with one read unmapped supporting the breakend
+  BUMQ:
+    value: $FORMAT/BUMQ
+    number: 1
+    type: float
+    description: Quality score of read pairs with one read unmapped
+  BVF:
+    value: $FORMAT/BVF
+    number: 1
+    type: integer
+    description: Fragments supporting the variant breakpoint allele

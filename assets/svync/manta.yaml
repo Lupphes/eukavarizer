@@ -1,4 +1,11 @@
 id: manta_$INFO/SVTYPE
+alt:
+  BND: TRA
+  DEL: DEL
+  INS: INS
+  DUP: DUP
+  INV: INV
+
 info:
   CALLER:
     value: manta
@@ -6,47 +13,67 @@ info:
     type: string
     description: The caller used to determine this variant
   SVLEN:
-    value: $INFO/SVLEN
+    value: ~sub:$INFO/END,$POS
     number: 1
     type: integer
-    description: The length of the structural variant
+    description: Length of the structural variant
     alts:
-      INS: ~sum:~len:LEFT_SVINSSEQ,~len:RIGHT_SVINSSEQ
+      DEL: -~sub:$INFO/END,$POS
+      INS: ~sum:~len:$INFO/LEFT_SVINSSEQ,~len:$INFO/RIGHT_SVINSSEQ
+      DUP: $INFO/SVLEN
+      INV: $INFO/SVLEN
       TRA: 1
   CIEND:
     value: $INFO/CIEND
     number: 2
     type: integer
-    description: PE confidence interval around END
+    description: Confidence interval around END position
   CIPOS:
     value: $INFO/CIPOS
     number: 2
     type: integer
-    description: PE confidence interval around POS
+    description: Confidence interval around POS position
   SVTYPE:
     value: $INFO/SVTYPE
     number: 1
     type: string
     description: Type of structural variant
   CHR2:
-    value:
+    value: $INFO/CHR2
     number: 1
     type: string
-    description: Chromosome for second position
-    alts:
-      TRA: $INFO/CHR2
+    description: Chromosome for second position (for TRA events)
+  POS2:
+    value: $INFO/POS2
+    number: 1
+    type: integer
+    description: Position for second chromosome in case of a translocation
   END:
     value: $INFO/END
     number: 1
     type: integer
     description: End position of the structural variant
-    alts:
-      TRA: $INFO/POS2
   IMPRECISE:
     value: $INFO/IMPRECISE
     number: 0
     type: flag
     description: Imprecise structural variation
+  SVINSSEQ:
+    value: $INFO/SVINSSEQ
+    number: 1
+    type: string
+    description: Sequence of insertion
+  LEFT_SVINSSEQ:
+    value: $INFO/LEFT_SVINSSEQ
+    number: 1
+    type: string
+    description: Known left-side insertion sequence
+  RIGHT_SVINSSEQ:
+    value: $INFO/RIGHT_SVINSSEQ
+    number: 1
+    type: string
+    description: Known right-side insertion sequence
+
 format:
   GT:
     value: $FORMAT/GT
@@ -57,9 +84,14 @@ format:
     value: $FORMAT/PR
     number: 2
     type: integer
-    description: Paired-read support for the ref and alt alleles in the order listed
+    description: Paired-read support for ref and alt alleles (in order)
   SR:
     value: $FORMAT/SR
     number: 2
     type: integer
-    description: Split-read support for the ref and alt alleles in the order listed
+    description: Split-read support for ref and alt alleles (in order)
+  GQ:
+    value: $FORMAT/GQ
+    number: 1
+    type: integer
+    description: Genotype quality score
