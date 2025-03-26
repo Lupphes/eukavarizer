@@ -1,44 +1,52 @@
 id: gridss_$INFO/SVTYPE
 
-# Alternate allele mapping for all SV types
 alt:
+  # GRIDSS sets SVTYPE=BND for nearly all breakpoints.
+  # Strictly mapping BND -> TRA can mislabel same-chrom breakpoints as translocations.
+  # If you're sure you only want to unify inter-chr BND calls to TRA, that's fine, but be cautious.
   BND: TRA
   DEL: DEL
   INS: INS
   DUP: DUP
   INV: INV
 
-# INFO fields section
 info:
   CALLER:
     value: gridss
     number: 1
     type: string
     description: The caller used to determine this variant
+
+  # GRIDSS rarely populates SVLEN for BND calls.
+  # If present, it's often an array (Number=.)
   SVLEN:
     value: ~sub:$INFO/END,$POS
     number: 1
     type: integer
-    description: Length of the structural variant
+    description: The length of the structural variant
     alts:
       BND:
       TRA: 0
       DEL: -~sub:$INFO/END,$POS
+
   CIEND:
     value: $INFO/CIRPOS
     number: 2
     type: integer
-    description: PE confidence interval around END
+    description: Confidence interval around END
+
   CIPOS:
     value: $INFO/CIPOS
     number: 2
     type: integer
-    description: PE confidence interval around POS
+    description: Confidence interval around POS
+
   SVTYPE:
     value: $INFO/SVTYPE
     number: 1
     type: string
-    description: Type of structural variant
+    description: Type of structural variant (often BND for all breakpoints)
+
   CHR2:
     value: $INFO/CHR2
     number: 1
@@ -46,187 +54,223 @@ info:
     description: Chromosome for second position
     alts:
       TRA: $INFO/CHR2
+
   END:
     value: $INFO/END
     number: 1
     type: integer
     description: End position of the structural variant
+
   IMPRECISE:
     value: $INFO/IMPRECISE
     number: 0
     type: flag
     description: Imprecise structural variation
+
+  # Assembly support, breakend quality, etc.
   AS:
     value: $INFO/AS
     number: 1
     type: integer
-    description: Count of assemblies supporting breakpoint
+    description: Count of assemblies supporting this breakpoint
+
   BA:
     value: $INFO/BA
     number: 1
     type: integer
     description: Local breakend assembly support count
+
   BQ:
     value: $INFO/BQ
     number: 1
     type: float
     description: Breakend quality score
+
   IC:
     value: $INFO/IC
     number: 1
     type: integer
     description: Count of read indels supporting breakpoint
+
   MQ:
     value: $INFO/MQ
     number: 1
     type: float
     description: Mean mapping quality of supporting reads
+
   SRQ:
     value: $INFO/SRQ
     number: 1
     type: float
-    description: Quality score of split reads supporting breakpoint
+    description: Quality score of split reads supporting the breakpoint
+
   VF:
     value: $INFO/VF
     number: 1
     type: integer
     description: Count of fragments supporting the variant allele
+
   MATEID:
     value: $INFO/MATEID
     number: .
     type: string
-    description: IDs of mate breakends
+    description: ID(s) of mate breakend(s)
+
   EVENT:
     value: $INFO/EVENT
     number: 1
     type: string
-    description: ID of event associated to breakend
+    description: ID of event grouping multiple breakends
+
   BEALN:
     value: $INFO/BEALN
     number: .
     type: string
     description: Potential alignment locations of breakend sequence
+
   HOMLEN:
     value: $INFO/HOMLEN
     number: .
     type: integer
     description: Length of micro-homology at event breakpoints
+
   HOMSEQ:
     value: $INFO/HOMSEQ
     number: .
     type: string
-    description: Sequence of micro-homology at event breakpoints
+    description: Micro-homology sequence at event breakpoints
+
   SB:
     value: $INFO/SB
     number: 1
     type: float
     description: Strand bias of reads supporting the variant
+
   SELF:
     value: $INFO/SELF
     number: 0
     type: flag
-    description: Indicates whether the breakpoint is self-intersecting
+    description: Indicates a breakpoint is self-intersecting
+
   SC:
     value: $INFO/SC
     number: 1
     type: string
-    description: CIGAR encoding for displaying anchoring alignment
+    description: CIGAR for anchoring alignment of evidence
+
   SI:
     value: $INFO/SI
     number: .
     type: integer
     description: Support interval offsets from breakend position
+
   RSI:
     value: $INFO/RSI
     number: .
     type: integer
     description: Support interval offsets of partner breakend
+
   CQ:
     value: $INFO/CQ
     number: 1
     type: float
     description: Breakpoint quality score before evidence reallocation
+
   REFPAIR:
     value: $INFO/REFPAIR
     number: 1
     type: integer
-    description: Count of reference read pairs supporting the reference allele
+    description: Reference read pairs that support the reference allele
 
-# FORMAT fields section
 format:
   GT:
     value: $FORMAT/GT
     number: 1
     type: string
     description: Genotype
+
+  # For GRIDSS, these are “REFPAIR” and “RP” in the FORMAT
   PE:
     value: $FORMAT/REFPAIR,$FORMAT/RP
     number: 2
     type: integer
-    description: Paired-read support for the ref and alt alleles
+    description: Paired-read support for reference and alt alleles
+
+  # For SR, only if $FORMAT/SR is actually defined:
   SR:
     value: .,$FORMAT/SR
     number: 2
     type: integer
     description: Split-read support for the ref and alt alleles
+
   AF:
     value: $FORMAT/AF
     number: A
     type: float
     description: Allele fraction
+
   ANRP:
     value: $FORMAT/ANRP
     number: 1
     type: integer
-    description: Read pairs at the breakend not supporting the breakpoint
+    description: Read pairs not supporting the breakpoint
+
   ANRPQ:
     value: $FORMAT/ANRPQ
     number: 1
     type: float
     description: Quality score of read pairs not supporting the breakpoint
+
   ANSR:
     value: $FORMAT/ANSR
     number: 1
     type: integer
     description: Split reads not supporting the breakpoint
+
   ANSRQ:
     value: $FORMAT/ANSRQ
     number: 1
     type: float
     description: Quality score of split reads not supporting the breakpoint
+
   ASRP:
     value: $FORMAT/ASRP
     number: 1
     type: integer
     description: Read pairs incorporated into a breakpoint assembly
+
   ASSR:
     value: $FORMAT/ASSR
     number: 1
     type: integer
     description: Split reads incorporated into a breakpoint assembly
+
   BSC:
     value: $FORMAT/BSC
     number: 1
     type: integer
     description: Soft clips supporting local breakend
+
   BSCQ:
     value: $FORMAT/BSCQ
     number: 1
     type: float
     description: Quality score of soft clips supporting local breakend
+
   BUM:
     value: $FORMAT/BUM
     number: 1
     type: integer
     description: Read pairs with one read unmapped supporting the breakend
+
   BUMQ:
     value: $FORMAT/BUMQ
     number: 1
     type: float
     description: Quality score of read pairs with one read unmapped
+
   BVF:
     value: $FORMAT/BVF
     number: 1
     type: integer
     description: Fragments supporting the variant breakpoint allele
-

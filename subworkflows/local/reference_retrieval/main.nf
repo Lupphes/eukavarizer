@@ -53,6 +53,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_ungapped_size = biodbcore_json_result.map { it[1] }
         reference_genome_input = (reference_genome != [] ? reference_genome : BIODBCORE_REFSEQ.out.reference_genome).collect().flatten()
 
+        // TODO: Maybe remove the gz
         GUNZIP(
             reference_genome_input.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
         )

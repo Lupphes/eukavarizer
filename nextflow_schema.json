@@ -158,6 +158,14 @@
                     "description": "Assembly quality filter.",
                     "help_text": "Specify an assembly quality category.",
                     "fa_icon": "fas fa-star"
+                },
+                "minimap2_threshold": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 300,
+                    "description": "Threshold value for Minimap2 alignment.",
+                    "help_text": "Set the minimum threshold for Minimap2 alignment.",
+                    "fa_icon": "fas fa-sliders-h"
                 }
             }
         },
@@ -166,48 +174,88 @@
             "type": "object",
             "fa_icon": "fas fa-chart-line",
             "description": "Options for controlling the reporting of structural variants and related metrics.",
+            "properties": {}
+        },
+        "filtering_options": {
+            "title": "Filtering Options",
+            "type": "object",
+            "fa_icon": "fas fa-filter",
+            "description": "Parameters for filtering structural variants.",
             "properties": {
-                "max_distance_breakpoints": {
+                "sur_max_distance_breakpoints": {
                     "type": "integer",
                     "default": 1000,
                     "description": "Maximum distance between breakpoints for reporting purposes.",
                     "help_text": "This parameter sets the maximum allowable distance between breakpoints in reported structural variants. If no value is provided, the default is 1000 base pairs.",
                     "fa_icon": "fas fa-random"
                 },
-                "min_supporting_callers": {
+                "sur_min_supporting_callers": {
                     "type": "integer",
                     "default": 1,
                     "description": "Minimum number of supporting callers for a structural variant to be reported.",
                     "help_text": "Defines how many different callers are required to support a variant before it is included in the final report. The default value is 1.",
                     "fa_icon": "fas fa-users"
                 },
-                "account_for_type": {
+                "sur_account_for_type": {
                     "type": "integer",
                     "default": true,
                     "description": "Whether to account for variant types in the report (e.g., DEL, DUP).",
                     "help_text": "If enabled (default), variant types will be considered during the reporting process. If set to false, type information will be excluded from the report.",
                     "fa_icon": "fas fa-tag"
                 },
-                "account_for_sv_strands": {
+                "sur_account_for_sv_strands": {
                     "type": "integer",
                     "default": false,
                     "description": "Whether to account for structural variant strands in the report.",
                     "help_text": "If enabled, the strands of the structural variants (e.g., forward or reverse) will be taken into account when reporting. Default is false.",
                     "fa_icon": "fas fa-sync-alt"
                 },
-                "estimate_distanced_by_sv_size": {
+                "sur_estimate_distanced_by_sv_size": {
                     "type": "integer",
                     "default": false,
                     "description": "Whether to estimate the distance based on structural variant size.",
                     "help_text": "If enabled, the distance between breakpoints will be estimated based on the size of the structural variant. Default is false.",
                     "fa_icon": "fas fa-calculator"
                 },
-                "min_sv_size": {
+                "sur_min_sv_size": {
                     "type": "integer",
                     "default": 30,
                     "description": "Minimum size of structural variants to report.",
                     "help_text": "Sets the minimum size of structural variants (in base pairs) that will be included in the report. Variants smaller than this value will be excluded from the results. The default size is 30 bp.",
                     "fa_icon": "fas fa-arrows-alt-v"
+                },
+                "sur_min_sv_size_filter": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 50,
+                    "description": "Minimum size of structural variants to retain.",
+                    "help_text": "Set the minimum structural variant size to be reported.",
+                    "fa_icon": "fas fa-arrows-alt-v"
+                },
+                "sur_max_sv_size_filter": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 100000,
+                    "description": "Maximum size of structural variants to retain.",
+                    "help_text": "Set the maximum structural variant size to be reported.",
+                    "fa_icon": "fas fa-arrows-alt-v"
+                },
+                "sur_min_allele_freq_filter": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0,
+                    "default": 0.01,
+                    "description": "Minimum allele frequency for a variant to be reported.",
+                    "help_text": "Set the minimum allele frequency for structural variant filtering.",
+                    "fa_icon": "fas fa-chart-pie"
+                },
+                "sur_min_num_reads_filter": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 3,
+                    "description": "Minimum number of reads required to report a variant.",
+                    "help_text": "Set the minimum number of reads supporting a variant.",
+                    "fa_icon": "fas fa-database"
                 }
             }
         },

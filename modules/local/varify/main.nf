@@ -2,28 +2,31 @@ process VARIFY {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
 
-    // Settings
-    publishDir "$outdir", mode: 'copy'
-
     input:
-        path merged_vcf
-        path other_vcfs
-        path survivor_vcf
-        path survivor_stats
         val taxonomy_id
         val outdir
+        tuple val(meta1), path (survivor_vcf)
+        tuple val(meta2), path (survivor_stats)
+        tuple val(meta3), path (bcfmerge_vcf)
+        tuple val(meta5), path (bcfmerge_stats)
+        tuple val(meta6), path (varify_input)
+        tuple val(meta7), path (reference_genome_bgzipped_index)
 
     output:
-        path "index.html", emit: html_index
-        path "merged_report.html", emit: html_merged
-        path "survivor_report.html", emit: html_survivor
+        path "report.html", emit: report_file
+        path "*.png", emit: report_images
 
     script:
     """
-    varify --merged_vcf ${merged_vcf} \\
-                        \$(for vcf in ${other_vcfs}; do echo "--other_vcfs \$vcf"; done) \\
-                        --survivor_vcf ${survivor_vcf} \\
-                        --survivor_stats ${survivor_stats} \\
-                        --output_dir .
+    varify \\
+        --output-dir . \\
+        --bfc-vcf-file ${bcfmerge_vcf} \\
+        --survivor-vcf-file ${survivor_vcf} \\
+        --fasta-file ${reference_genome_bgzipped_index} \\
+        --bfc-stats-file ${bcfmerge_stats} \\
+        --survivor-stats-file ${survivor_stats} \\
+        --report-file "report.html"
+
     """
 }
+// \$(for vcf in ${vcf_list}; do echo "--sample-vcf-files \$vcf"; done) \\

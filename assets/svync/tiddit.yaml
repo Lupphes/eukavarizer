@@ -17,7 +17,7 @@ info:
     value: $INFO/SVLEN
     number: 1
     type: integer
-    description: Length of the structural variant
+    description: The length of the structural variant
     alts:
       DEL: -$INFO/SVLEN
       DUP: $INFO/SVLEN
@@ -37,7 +37,7 @@ info:
     value: $INFO/END
     number: 1
     type: integer
-    description: End position of the structural variant
+    description: End position
     alts:
       TRA: $INFO/REGIONB/1
       BND: $INFO/REGIONB/1
@@ -51,6 +51,7 @@ info:
       TRA: $INFO/REGIONB/0
       BND: $INFO/REGIONB/0
 
+  # Tiddit typically sets calls as IMPRECISE if they're not pinned exactly
   IMPRECISE:
     value: 1
     number: 0
@@ -87,6 +88,7 @@ info:
     type: integer
     description: Read-pairs and split reads supporting the event
 
+  # Since Tiddit does not use CIPOS/CIEND, we map them to REGIONA, REGIONB
   CIPOS:
     value: $INFO/REGIONA
     number: 2
@@ -121,6 +123,7 @@ format:
       INV: .
       BND: .
 
+  # Tiddit typically lumps variant read pairs into DV, split reads into RV
   PE:
     value: $FORMAT/DV
     number: 2

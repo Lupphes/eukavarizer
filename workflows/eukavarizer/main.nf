@@ -28,7 +28,6 @@ workflow EUKAVARIZER {
         reference_genome_bwa_index          // REFERENCE_RETRIEVAL.out.reference_genome_bwa_index       [ch_bwa_index]
         reference_genome_bgzipped_faidx     // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx  [ch_fasta_index_gz]
         reference_genome_unzipped           // REFERENCE_RETRIEVAL.out.reference_genome_unzipped        [ch_fasta_file]
-        reference_genome_bgzipped_index
 
     main:
         bam_inputs = fastq_bam

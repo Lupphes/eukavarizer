@@ -1,4 +1,5 @@
 id: manta_$INFO/SVTYPE
+
 alt:
   BND: TRA
   DEL: DEL
@@ -12,6 +13,7 @@ info:
     number: 1
     type: string
     description: The caller used to determine this variant
+
   SVLEN:
     value: ~sub:$INFO/END,$POS
     number: 1
@@ -23,51 +25,61 @@ info:
       DUP: $INFO/SVLEN
       INV: $INFO/SVLEN
       TRA: 1
+
   CIEND:
     value: $INFO/CIEND
     number: 2
     type: integer
-    description: Confidence interval around END position
+    description: Confidence interval around END
+
   CIPOS:
     value: $INFO/CIPOS
     number: 2
     type: integer
-    description: Confidence interval around POS position
+    description: Confidence interval around POS
+
   SVTYPE:
     value: $INFO/SVTYPE
     number: 1
     type: string
     description: Type of structural variant
+
   CHR2:
     value: $INFO/CHR2
     number: 1
     type: string
-    description: Chromosome for second position (for TRA events)
+    description: Chromosome for second position (for translocations)
+
   POS2:
     value: $INFO/POS2
     number: 1
     type: integer
-    description: Position for second chromosome in case of a translocation
+    description: Position for the second chromosome in case of a translocation
+
   END:
     value: $INFO/END
     number: 1
     type: integer
     description: End position of the structural variant
+
   IMPRECISE:
     value: $INFO/IMPRECISE
     number: 0
     type: flag
     description: Imprecise structural variation
+
   SVINSSEQ:
     value: $INFO/SVINSSEQ
     number: 1
     type: string
-    description: Sequence of insertion
+    description: Sequence of inserted bases (for INS)
+
   LEFT_SVINSSEQ:
     value: $INFO/LEFT_SVINSSEQ
     number: 1
     type: string
     description: Known left-side insertion sequence
+
   RIGHT_SVINSSEQ:
     value: $INFO/RIGHT_SVINSSEQ
     number: 1
@@ -80,18 +92,23 @@ format:
     number: 1
     type: string
     description: Genotype
+
+  # Manta defines PR as (refCount, altCount) for spanning paired-read support
   PE:
     value: $FORMAT/PR
     number: 2
     type: integer
-    description: Paired-read support for ref and alt alleles (in order)
+    description: Paired-read support for ref and alt alleles in the order listed
+
+  # Manta defines SR as (refCount, altCount) for split-read support
   SR:
     value: $FORMAT/SR
     number: 2
     type: integer
-    description: Split-read support for ref and alt alleles (in order)
+    description: Split-read support for ref and alt alleles in the order listed
+
   GQ:
     value: $FORMAT/GQ
     number: 1
     type: integer
-    description: Genotype quality score
+    description: Genotype quality

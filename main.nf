@@ -30,22 +30,20 @@ include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eu
 // Sequence Processor Parameters
 params.minimap2_threshold               = params.minimap2_threshold ?: 300
 
-// Eukavarizer Pipeline Parameters
-params.gridss_flag                      = true //TODO: Tech Debt: Gridss is always enabled
+// Default SURVIVOR filter parameters (when no profile is set)
+params.sur_max_distance_breakpoints         = params.sur_max_distance_breakpoints       ?: 2000  // Allow a larger gap between breakpoints, useful for large SVs
+params.sur_min_supporting_callers           = params.sur_min_supporting_callers         ?: 1     // Require at least 1 supporting caller
+params.sur_account_for_type                 = params.sur_account_for_type               ?: 1     // Consider all types of SVs (deletions, duplications, etc.)
+params.sur_account_for_sv_strands           = params.sur_account_for_sv_strands         ?: 0     // Don't account for strands (optional, can be adjusted based on needs)
+params.sur_estimate_distanced_by_sv_size    = params.sur_estimate_distanced_by_sv_size  ?: 0     // Don't estimate distance based on SV size
+params.sur_min_sv_size                      = params.sur_min_sv_size                    ?: 50    // Minimum SV size of 50 bp (small enough for small variants)
 
-// Report Generation Parameters
-params.max_distance_breakpoints         = params.max_distance_breakpoints ?: 1000
-params.min_supporting_callers           = params.min_supporting_callers ?: 1
-params.account_for_type                 = params.account_for_type ?: 1
-params.account_for_sv_strands           = params.account_for_sv_strands ?: 0
-params.estimate_distanced_by_sv_size    = params.estimate_distanced_by_sv_size ?: 0
-params.min_sv_size                      = params.min_sv_size ?: 30
+params.sur_min_sv_size_filter               = params.sur_min_sv_size_filter             ?: 100   // Filter out very small variants (set to 100 bp)
+params.sur_max_sv_size_filter               = params.sur_max_sv_size_filter             ?: 50000 // Maximum SV size allowed in the final output (50 kbp as a reasonable upper limit)
+params.sur_min_allele_freq_filter           = params.sur_min_allele_freq_filter         ?: 0.05  // Set to 5% allele frequency for minimum threshold
+params.sur_min_num_reads_filter             = params.sur_min_num_reads_filter           ?: 3     // Minimum 3 supporting reads (default for most datasets)
 
-// Survivor Filter Parameters
-params.min_sv_size_filter               = params.min_sv_size_filter ?: 50
-params.max_sv_size_filter               = params.max_sv_size_filter ?: 100000
-params.min_allele_freq_filter           = params.min_allele_freq_filter ?: 0.01
-params.min_num_reads_filter             = params.min_num_reads_filter ?: 3
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,23 +88,26 @@ workflow NFCORE_EUKAVARIZER {
                 REFERENCE_RETRIEVAL.out.reference_genome_faidx,
                 REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
                 REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
-                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
-                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_index
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped
             )
 
             SV_UNIFICATION (
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.vcfgz_list,
-                EUKAVARIZER.out.tbi_list
+                EUKAVARIZER.out.tbi_list,
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
             )
 
             REPORT_GENERATION(
                 taxonomy_id,
                 outdir,
-                EUKAVARIZER.out.vcf_list,
                 SV_UNIFICATION.out.survivor_vcf,
                 SV_UNIFICATION.out.survivor_stats,
-                SV_UNIFICATION.out.bcfmerge_vcf
+                SV_UNIFICATION.out.bcfmerge_vcf,
+                SV_UNIFICATION.out.bcfmerge_stats,
+                EUKAVARIZER.out.vcf_list,
+                EUKAVARIZER.out.tbi_list,
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
             )
 
         }
@@ -115,10 +116,8 @@ workflow NFCORE_EUKAVARIZER {
         }
 
     emit:
-        multiqc_report      = "data_analysis_results.multiqc_report"
-        // html_index          = REPORT_GENERATION.out.html_index
-        // html_merged         = REPORT_GENERATION.out.html_merged
-        // html_survivor       = REPORT_GENERATION.out.html_survivor
+        multiqc_report      = "SEQUENCE_PROCESSOR.out.multiqc_report"
+        report_file         = REPORT_GENERATION.out.report_file
 }
 
 /*
@@ -135,9 +134,8 @@ workflow {
         //
         taxonomy_id              = Channel.value(params.taxonomy_id)
         outdir                   = Channel.value(params.outdir)
-        sequence_dir             = Channel.value(params.sequence_dir)
         reference_genome         = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
-        sequence_dir_abs         = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
+        sequence_dir         = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
 
         //
         // SUBWORKFLOW: Run initialisation tasks
@@ -156,7 +154,7 @@ workflow {
         NFCORE_EUKAVARIZER (
             taxonomy_id,
             outdir,
-            sequence_dir_abs,
+            sequence_dir,
             reference_genome
         )
 

@@ -16,31 +16,45 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { VARIFY            } from '../../../modules/local/varify/main'
+include { VARIFY } from '../../../modules/local/varify/main'
 
 workflow REPORT_GENERATION {
 
     take:
-        ch_taxonomy_id              // Sample taxonomy ID
-        ch_outdir                   // Output directory for the reports
-        vcf_list                    // List of individual VCF files
-        survivor_vcf                // Merged VCF file from SURVIVOR
-        survivor_stats              // SURVIVOR stats table
-        bcfmerge_vcf                // Final merged VCF file from BCFtools
+        taxonomy_id
+        outdir
+        survivor_vcf
+        survivor_stats
+        bcfmerge_vcf
+        bcfmerge_stats
+        vcf_list
+        tbi_list
+        reference_genome
 
     main:
-        // Run VARIFY to generate reports from the VCF files
+
+        vcf_list = vcf_list.filter { it }
+            .map { it[1] }
+            .toList()
+
+        tbi_list = tbi_list.filter { it }
+            .map { it[1] }
+            .toList()
+
+        varify_meta = Channel.value([id: "varify_merge"])
+        varify_input = varify_meta.combine(tbi_list.toList())
+
         VARIFY(
-            bcfmerge_vcf.map { it[1] },                              // Merged VCF file
-            vcf_list.filter { it }.map { it[1] }.toList().flatten(), // Individual VCF files
-            survivor_vcf.map { it[1] },                              // SURVIVOR merged VCF file
-            survivor_stats.map { it[1] },                            // SURVIVOR stats table
-            ch_taxonomy_id,
-            ch_outdir                                                 // Output directory
+            taxonomy_id,
+            outdir,
+            survivor_vcf,
+            survivor_stats,
+            bcfmerge_vcf,
+            bcfmerge_stats,
+            varify_input,
+            reference_genome
         )
 
     emit:
-        html_index      = VARIFY.out.html_index      // Summary report
-        html_merged     = VARIFY.out.html_merged     // Merged VCF report
-        html_survivor   = VARIFY.out.html_survivor   // SURVIVOR analysis report
+        report_file = VARIFY.out.report_file
 }

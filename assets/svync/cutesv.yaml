@@ -33,6 +33,8 @@ info:
     type: string
     description: Type of structural variant
 
+  # CuteSV uses BND for translocations, storing the second chromosome/pos in the ALT.
+  # Some versions also store CHR2 in INFO if the user runs with certain flags. Keep if in the header:
   CHR2:
     value: $INFO/CHR2
     number: 1
@@ -57,11 +59,13 @@ info:
     type: integer
     description: Confidence interval around POS
 
+  # CuteSV typically calls this 'CILEN' for inserted/deleted intervals.
+  # It's fine to map that to CIEND, but note it's not truly "confidence around END" for all variants.
   CIEND:
     value: $INFO/CILEN
     number: 2
     type: integer
-    description: Confidence interval around END
+    description: Confidence interval around END (CuteSV calls it CILEN)
 
   RE:
     value: $INFO/RE
@@ -73,13 +77,13 @@ info:
     value: $INFO/STRAND
     number: .
     type: string
-    description: Strand orientation
+    description: Strand orientation of the breakpoints
 
   RNAMES:
     value: $INFO/RNAMES
     number: .
     type: string
-    description: Supporting read names
+    description: Comma-separated names of supporting reads
 
   AF:
     value: $INFO/AF
@@ -87,14 +91,16 @@ info:
     type: float
     description: Allele frequency
 
+  # CuteSV typically sets either PRECISE or IMPRECISE, not both.
+  # If the config tries to turn them into 0/1 simultaneously, that is OK for a derived flag logic.
   PRECISE:
-    value: 1 if $INFO/PRECISE else 0
+    value: $INFO/PRECISE
     number: 0
     type: flag
     description: Precise structural variation
 
   IMPRECISE:
-    value: 1 if $INFO/IMPRECISE else 0
+    value: $INFO/IMPRECISE
     number: 0
     type: flag
     description: Imprecise structural variation
@@ -106,17 +112,19 @@ format:
     type: string
     description: Genotype
 
+  # In CuteSV, DR = reference read count, DV = variant read count
+  # If you label them as PE/SR, ensure the descriptions match actual usage
   PE:
     value: $FORMAT/DV
     number: 1
     type: integer
-    description: Number of high-quality paired-end reads supporting the variant
+    description: Number of variant-supporting reads (CuteSV lumps all alt reads in DV)
 
   SR:
     value: $FORMAT/DR
     number: 1
     type: integer
-    description: Number of high-quality split reads supporting the variant
+    description: Number of reference-supporting reads
 
   PL:
     value: $FORMAT/PL

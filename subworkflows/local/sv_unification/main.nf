@@ -29,6 +29,7 @@ workflow SV_UNIFICATION {
         vcf_list
         vcfgz_list
         tbi_list
+        reference_genome_bgzipped
 
     main:
         vcf_list = vcf_list.filter { it }
@@ -54,20 +55,20 @@ workflow SV_UNIFICATION {
 
         SURVIVOR_MERGE(
             survivor_input,
-            params.max_distance_breakpoints,
-            params.min_supporting_callers,
-            params.account_for_type,
-            params.account_for_sv_strands,
-            params.estimate_distanced_by_sv_size,
-            params.min_sv_size
+            params.sur_max_distance_breakpoints,
+            params.sur_min_supporting_callers,
+            params.sur_account_for_type,
+            params.sur_account_for_sv_strands,
+            params.sur_estimate_distanced_by_sv_size,
+            params.sur_min_sv_size
         )
 
         SURVIVOR_FILTER(
             SURVIVOR_MERGE.out.vcf.map { meta, vcf -> tuple(meta, vcf, []) },
-            params.min_sv_size_filter,
-            params.max_sv_size_filter,
-            params.min_allele_freq_filter,
-            params.min_num_reads_filter
+            params.sur_min_sv_size_filter,
+            params.sur_max_sv_size_filter,
+            params.sur_min_allele_freq_filter,
+            params.sur_min_num_reads_filter
         )
 
         SURVIVOR_STATS(
@@ -113,12 +114,13 @@ workflow SV_UNIFICATION {
             [[], []],
             [[], []],
             [[], []],
-            [[], []]
+            reference_genome_bgzipped
         )
 
     emit:
         survivor_vcf = SURVIVOR_FILTER.out.vcf
         survivor_stats = SURVIVOR_STATS.out.stats
-        bcfmerge_vcf = BCFTOOLS_MERGE.out.vcf
+        bcfmerge_vcf = BCFTOOLS_FILTER.out.vcf
+        bcfmerge_tbi = BCFTOOLS_FILTER.out.tbi
         bcfmerge_stats = BCFTOOLS_STATS.out.stats
 }

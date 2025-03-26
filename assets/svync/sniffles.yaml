@@ -1,7 +1,8 @@
 id: sniffles_$INFO/SVTYPE
 
 alt:
-  BND: TRA  # Unify BND and TRA for consistency
+  # Some versions of Sniffles might label duplications simply as "DUP"
+  BND: TRA
   DUP: DUP:TANDEM
 
 info:
@@ -17,7 +18,7 @@ info:
     type: integer
     description: Length of structural variation
     alts:
-      INS: $INFO/SUPPORT_LONG  # Use Sniffles-specific SUPPORT_LONG for insertions
+      INS: $INFO/SUPPORT_LONG   # Use Sniffles-specific SUPPORT_LONG if present for insertion length
       TRA: 1
       DEL: $INFO/SVLEN
 
@@ -43,6 +44,7 @@ info:
     alts:
       TRA: $INFO/CHR2
 
+  # Sniffles typically uses CIPOS/CIEND as standard or STDEV_POS/STDEV_LEN
   CIPOS:
     value: $INFO/STDEV_POS
     number: 2
@@ -96,17 +98,19 @@ format:
     type: string
     description: Genotype
 
+  # In Sniffles v1/v2, DR = reference read count, DV = variant read count.
+  # The names "PE"/"SR" can be misleading for a long-read caller, but we keep them for consistency.
   PE:
     value: $FORMAT/DR
     number: 2
     type: integer
-    description: Number of reference reads
+    description: Number of reference-supporting reads (Sniffles lumps them in DR)
 
   SR:
     value: $FORMAT/DV
     number: 2
     type: integer
-    description: Number of variant reads
+    description: Number of variant-supporting reads
 
   PS:
     value: $FORMAT/PS
