@@ -27,24 +27,6 @@ include { REPORT_GENERATION         } from './subworkflows/local/report_generati
 include { PIPELINE_INITIALISATION   } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
 
-// Sequence Processor Parameters
-params.minimap2_threshold               = params.minimap2_threshold ?: 300
-
-// Default SURVIVOR filter parameters (when no profile is set)
-params.sur_max_distance_breakpoints         = params.sur_max_distance_breakpoints       ?: 2000  // Allow a larger gap between breakpoints, useful for large SVs
-params.sur_min_supporting_callers           = params.sur_min_supporting_callers         ?: 1     // Require at least 1 supporting caller
-params.sur_account_for_type                 = params.sur_account_for_type               ?: 1     // Consider all types of SVs (deletions, duplications, etc.)
-params.sur_account_for_sv_strands           = params.sur_account_for_sv_strands         ?: 0     // Don't account for strands (optional, can be adjusted based on needs)
-params.sur_estimate_distanced_by_sv_size    = params.sur_estimate_distanced_by_sv_size  ?: 0     // Don't estimate distance based on SV size
-params.sur_min_sv_size                      = params.sur_min_sv_size                    ?: 50    // Minimum SV size of 50 bp (small enough for small variants)
-
-params.sur_min_sv_size_filter               = params.sur_min_sv_size_filter             ?: 100   // Filter out very small variants (set to 100 bp)
-params.sur_max_sv_size_filter               = params.sur_max_sv_size_filter             ?: 50000 // Maximum SV size allowed in the final output (50 kbp as a reasonable upper limit)
-params.sur_min_allele_freq_filter           = params.sur_min_allele_freq_filter         ?: 0.05  // Set to 5% allele frequency for minimum threshold
-params.sur_min_num_reads_filter             = params.sur_min_num_reads_filter           ?: 3     // Minimum 3 supporting reads (default for most datasets)
-
-
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
