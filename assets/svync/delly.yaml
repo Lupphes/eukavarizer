@@ -21,7 +21,7 @@ info:
     description: The length of the structural variant
     alts:
       DEL: -~sub:$INFO/END,$POS
-      INS: $INFO/SVLEN  # Delly outputs this in the SVLEN field or we can read from INSLEN
+      INS: $INFO/SVLEN # Delly outputs this in the SVLEN field or we can read from INSLEN
       TRA: 1
 
   CIEND:

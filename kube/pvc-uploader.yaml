@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pvc-uploader
-  namespace: sloup-ns
+  namespace: <NAMESPACE>
 spec:
   containers:
     - name: uploader
       image: busybox
-      command: [ "sleep", "3600" ]
+      command: ["sleep", "3600"]
       volumeMounts:
         - name: storage
           mountPath: /mnt/launch

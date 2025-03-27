@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Config
+clusters:
+  - name: "kuba-cluster"
+    cluster:
+      server: "https://rancher.cloud.e-infra.cz/k8s/clusters/<SERVER>"
+
+users:
+  - name: "kuba-cluster"
+    user:
+      token: "<TOKEN>"
+
+contexts:
+  - name: "kuba-cluster"
+    context:
+      user: "kuba-cluster"
+      cluster: "kuba-cluster"
+
+current-context: "kuba-cluster"

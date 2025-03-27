@@ -18,7 +18,7 @@ info:
     type: integer
     description: Length of structural variation
     alts:
-      INS: $INFO/SUPPORT_LONG   # Use Sniffles-specific SUPPORT_LONG if present for insertion length
+      INS: $INFO/SUPPORT_LONG # Use Sniffles-specific SUPPORT_LONG if present for insertion length
       TRA: 1
       DEL: $INFO/SVLEN
 
