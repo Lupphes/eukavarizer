@@ -1,6 +1,7 @@
 process BIODBCORE_REFSEQ {
     tag "$taxonomy_id"
-    conda "${moduleDir}/environment.yml"
+    // conda "${moduleDir}/environment.yml"
+    container "docker.io/luppo/biodbcore:latest"
 
     input:
         val  taxonomy_id
