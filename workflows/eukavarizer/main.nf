@@ -180,7 +180,7 @@ workflow EUKAVARIZER {
         if (params.cutesv_flag) {
             SV_CALLING_CUTESV(
                 bam_inputs,
-                reference_genome_bgzipped.collect()
+                reference_genome_unzipped.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_CUTESV.out.svync_vcf)
