@@ -1,7 +1,7 @@
 process VARIFY {
     tag "$taxonomy_id"
-    // conda "${moduleDir}/environment.yml"
-    container "docker.io/luppo/varify:latest"
+    conda "${moduleDir}/environment.yml"
+    container "luppo/varify:latest"
 
     input:
         val taxonomy_id
