@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python=3.12
-  - luppo::biodbcore=0.1.1
+  - python=3.10
+  - luppo::biodbcore=0.1.3

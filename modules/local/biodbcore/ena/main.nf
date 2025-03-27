@@ -1,7 +1,7 @@
 process BIODBCORE_ENA {
     tag "$taxonomy_id"
     conda "${moduleDir}/environment.yml"
-    // container "docker.io/luppo/biodbcore:latest"
+    container "luppo/biodbcore:latest"
 
     input:
         val taxonomy_id
@@ -17,9 +17,9 @@ process BIODBCORE_ENA {
 
     output:
         path "ena_results.json", emit: ena_results
-        path "$taxonomy_id/sequences/*/*.fastq.gz", emit: fastq_files, optional: true
-        path "$taxonomy_id/sequences/*/*.bam", emit: bam_files, optional: true
-        path "$taxonomy_id/sequences/*/*.cram", emit: cram_files, optional: true
+        path "*/*.fastq.gz", emit: fastq_files, optional: true
+        path "*/*.bam", emit: bam_files, optional: true
+        path "*/*.cram", emit: cram_files, optional: true
 
     script:
     """
