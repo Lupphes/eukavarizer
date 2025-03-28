@@ -11,7 +11,8 @@
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
 
-echo "=== Job $PBS_JOBID started on `hostname` at `date` ==="
+echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a $DATADIR/logs/eukavarizer_${PBS_JOBID}.log
+
 echo "Working in scratch: $SCRATCH"
 
 # Load necessary modules
@@ -51,4 +52,4 @@ echo ">>> Running second Nextflow command"
 echo "Cleaning up scratch..."
 clean_scratch
 
-echo "=== Job $PBS_JOBID completed at `date` ==="
+echo "=== Job $PBS_JOBID completed at $(date) ===" | tee -a $DATADIR/logs/eukavarizer_${PBS_JOBID}.log
