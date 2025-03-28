@@ -6,7 +6,7 @@
     1. **BIODBCORE_ENA** – Downloads sequencing data from ENA.
     2. **SAMTOOLS_COLLATEFASTQ** – Converts BAM/CRAM to paired and unpaired FASTQ files.
     3. **QUALITY_CONTROL** – Filters and quality checks the FASTQ files.
-    4. **BWA_MEM** – Aligns reads to a reference genome.
+    4. **BWAMEM2_MEM** – Aligns reads to a reference genome.
     5. **SAMTOOLS_SORT** – Sorts the BAM files.
     6. **SAMTOOLS_INDEX** – Indexes the sorted BAM files.
 
@@ -26,7 +26,7 @@ include { QUALITY_CONTROL       } from '../../../subworkflows/local/quality_cont
 
 include { SEQKIT_SIZE           } from '../../../modules/local/seqkit/size/main'
 include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
-include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
+include { BWAMEM2_MEM           } from '../../../modules/nf-core/bwamem2/mem/main'
 
 include { SAMTOOLS_SORT         } from '../../../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
@@ -189,14 +189,14 @@ workflow SEQUENCE_PROCESSOR {
             true
         )
 
-        BWA_MEM(
+        BWAMEM2_MEM(
             bwa_bam,
             reference_genome_bwa_index.collect(),
             reference_genome_unzipped.collect(),
             true
         )
 
-        mixed_bam_inputs = BWA_MEM.out.bam
+        mixed_bam_inputs = BWAMEM2_MEM.out.bam
             .mix(MINIMAP2_ALIGN.out.bam)
             .map { meta, bam ->
                 tuple(meta + [id: "${meta.id}_sas"], bam)
@@ -215,6 +215,7 @@ workflow SEQUENCE_PROCESSOR {
         fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files
         fastq_bam                   = SAMTOOLS_SORT.out.bam                 // Sorted BAM files (.bam)
         fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai                // BAM index files (.bai)
+        multiqc_report              = QUALITY_CONTROL.out.multiqc_report   // Path to MultiQC report
 }
 
 /*

@@ -54,7 +54,46 @@
                 }
             }
         },
-        "seq_retrieval_options": {
+        "reference_genome_options": {
+            "title": "Reference genome options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Reference genome related files and options required for the workflow.",
+            "properties": {
+                "genome": {
+                    "type": "string",
+                    "description": "Name of iGenomes reference.",
+                    "fa_icon": "fas fa-book",
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                },
+                "fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "description": "Path to FASTA genome file.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "fa_icon": "far fa-file-code"
+                },
+                "igenomes_ignore": {
+                    "type": "boolean",
+                    "description": "Do not load the iGenomes reference config.",
+                    "fa_icon": "fas fa-ban",
+                    "hidden": true,
+                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "igenomes_base": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The base path to the igenomes reference files",
+                    "fa_icon": "fas fa-ban",
+                    "hidden": true,
+                    "default": "s3://ngi-igenomes/igenomes/"
+                }
+            }
+        },
+        "sequence_retrieval_options": {
             "title": "Sequencing Retrieval Options",
             "type": "object",
             "fa_icon": "fas fa-database",
@@ -217,12 +256,55 @@
                 }
             }
         },
-        "reporting_options": {
-            "title": "Reporting options",
+        "sv_caller_arguments": {
+            "title": "Structural Variant Caller Arguments",
             "type": "object",
-            "fa_icon": "fas fa-chart-line",
-            "description": "Options for controlling the reporting of structural variants and related metrics.",
-            "properties": {}
+            "description": "Additional arguments to pass to SV callers.",
+            "fa_icon": "fas fa-terminal",
+            "properties": {
+                "delly_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Delly.",
+                    "default": "--svtype ALL --map-qual 1 --mad-cutoff 9 --maxreadsep 100 --minrefsep 25 --minclip 25 --min-clique-size 2 --qual-tra 20",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Delly structural variant caller."
+                },
+                "gridss_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to GRIDSS.",
+                    "default": "--steps all --maxcoverage 50000",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for GRIDSS structural variant caller."
+                },
+                "tiddit_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Tiddit.",
+                    "default": "-q 10 -p 2 -r 3 -z 50 --max_coverage 4 -n 2",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Tiddit structural variant caller."
+                },
+                "manta_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Manta.",
+                    "default": "--generateEvidenceBam",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Manta structural variant caller."
+                },
+                "sniffles_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Sniffles.",
+                    "default": "--mapq 20 --minsvlen 50 --min-alignment-length 1000 --long-ins-length 2500 --long-del-length 50000 --long-del-coverage 0.66 --long-dup-length 50000 --long-dup-coverage 1.33 --qc-strand True",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Sniffles structural variant caller."
+                },
+                "cutesv_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to CuteSV.",
+                    "default": "--max_cluster_bias_INS 100 --diff_ratio_merging_INS 0.3 --max_cluster_bias_DEL 100 --diff_ratio_merging_DEL 0.3 --report_readid --sample cutesv_report_sample",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for CuteSV structural variant caller."
+                }
+            }
         },
         "filtering_options": {
             "title": "Filtering Options",
@@ -230,6 +312,13 @@
             "fa_icon": "fas fa-filter",
             "description": "Parameters for filtering structural variants.",
             "properties": {
+                "bcftools_filter_args": {
+                    "type": "string",
+                    "description": "Arguments to pass to bcftools filter.",
+                    "default": "--include 'QUAL>30 && GT!=\"0/0\" && FILTER==\"PASS\"' -Oz",
+                    "fa_icon": "fas fa-filter",
+                    "help_text": "Custom filter expression for bcftools used in SV filtering."
+                },
                 "sur_max_distance_breakpoints": {
                     "type": "integer",
                     "default": 1000,
@@ -307,44 +396,12 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome options",
+        "reporting_options": {
+            "title": "Reporting options",
             "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
-            "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "exists": true,
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
-                },
-                "igenomes_ignore": {
-                    "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "The base path to the igenomes reference files",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "default": "s3://ngi-igenomes/igenomes/"
-                }
-            }
+            "fa_icon": "fas fa-chart-line",
+            "description": "Options for controlling the reporting of structural variants and related metrics.",
+            "properties": {}
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -559,20 +616,12 @@
         }
     },
     "allOf": [
-        {
-            "$ref": "#/$defs/seq_retrieval_options"
-        },
-        {
-            "$ref": "#/$defs/input_output_options"
-        },
-        {
-            "$ref": "#/$defs/reference_genome_options"
-        },
-        {
-            "$ref": "#/$defs/institutional_config_options"
-        },
-        {
-            "$ref": "#/$defs/generic_options"
-        }
+        { "$ref": "#/$defs/input_output_options" },
+        { "$ref": "#/$defs/reference_genome_options" },
+        { "$ref": "#/$defs/sequence_retrieval_options" },
+        { "$ref": "#/$defs/sv_caller_arguments" },
+        { "$ref": "#/$defs/filtering_options" },
+        { "$ref": "#/$defs/institutional_config_options" },
+        { "$ref": "#/$defs/generic_options" }
     ]
 }

@@ -15,10 +15,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SVABA             } from '../../../modules/nf-core/svaba/main'
-include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
-include { SVYNC             } from '../../../modules/nf-core/svync/main'
-include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
+include { SVABA as SVABA_BWA    } from '../../../modules/nf-core/svaba/main'
+include { SVABA as SVABA_MAP    } from '../../../modules/nf-core/svaba/main'
+include { SAMPLE_REHEADER       } from '../../../modules/local/sample_regen/main.nf'
+include { SVYNC                 } from '../../../modules/nf-core/svync/main'
+include { GUNZIP                } from '../../../modules/nf-core/gunzip/main'
 
 workflow SV_CALLING_SVABA {
     take:
@@ -26,17 +27,21 @@ workflow SV_CALLING_SVABA {
         reference_genome_unzipped
         reference_genome_faidx
         reference_genome_bwa_index
+        reference_genome_minimap_index
 
     main:
         name_svaba = "svaba"
 
-        first = bam_inputs
+        bwa_bam_inputs   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp <= params.minimap2_threshold }
+        minimap2_bams   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp > params.minimap2_threshold }
+
+        first_bwa = bwa_bam_inputs
             .map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
             }
 
-        SVABA(
-            first,
+        SVABA_BWA(
+            first_bwa,
             reference_genome_unzipped,
             reference_genome_faidx,
             reference_genome_bwa_index,
@@ -45,9 +50,26 @@ workflow SV_CALLING_SVABA {
             [[],[]],
         )
 
+        first_map = minimap2_bams
+            .map { meta, bam, bai ->
+                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
+            }
+
+        SVABA_MAP(
+            first_map,
+            reference_genome_unzipped,
+            reference_genome_faidx,
+            reference_genome_minimap_index,
+            [[],[]],
+            [[],[]],
+            [[],[]],
+        )
+
+        svaba_result = SVABA_BWA.out.germ_sv.mix(SVABA_MAP.out.germ_sv)
+
         SAMPLE_REHEADER(
-            SVABA.out.germ_sv,
-            SVABA.out.germ_sv.map { meta, _vcf -> "${meta.id}_${name_svaba}" }
+            svaba_result,
+            svaba_result.map { meta, _vcf -> "${meta.id}_${name_svaba}" }
         )
 
         SVYNC(

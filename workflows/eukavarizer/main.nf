@@ -21,13 +21,14 @@ include { SV_CALLING_CUTESV     } from '../../subworkflows/local/sv_calling_cute
 workflow EUKAVARIZER {
 
     take:
-        fastq_bam                           // SEQUENCE_PROCESSOR.out.bam_files                         [ch_bam_files]
-        fastq_bam_indexes                   // SEQUENCE_PROCESSOR.out.bam_indexes                       [ch_bam_indexes]
-        reference_genome_bgzipped           // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,       [ch_genome_file]
-        reference_genome_faidx              // REFERENCE_RETRIEVAL.out.reference_genome_faidx           [ch_fasta_index]
-        reference_genome_bwa_index          // REFERENCE_RETRIEVAL.out.reference_genome_bwa_index       [ch_bwa_index]
-        reference_genome_bgzipped_faidx     // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx  [ch_fasta_index_gz]
-        reference_genome_unzipped           // REFERENCE_RETRIEVAL.out.reference_genome_unzipped        [ch_fasta_file]
+        fastq_bam                           // SEQUENCE_PROCESSOR.out.bam_files
+        fastq_bam_indexes                   // SEQUENCE_PROCESSOR.out.bam_indexes
+        reference_genome_bgzipped           // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
+        reference_genome_faidx              // REFERENCE_RETRIEVAL.out.reference_genome_faidx
+        reference_genome_bwa_index          // REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
+        reference_genome_bgzipped_faidx     // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx
+        reference_genome_unzipped           // REFERENCE_RETRIEVAL.out.reference_genome_unzipped
+        reference_genome_minimap_index      // REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
 
     main:
         bam_inputs = fastq_bam
@@ -94,7 +95,8 @@ workflow EUKAVARIZER {
                 bam_inputs,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect(),
-                reference_genome_bwa_index.collect()
+                reference_genome_bwa_index.collect(),
+                reference_genome_minimap_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_GRIDSS.out.svync_vcf)
@@ -128,7 +130,8 @@ workflow EUKAVARIZER {
             SV_CALLING_TIDDIT(
                 bam_inputs,
                 reference_genome_bgzipped.collect(),
-                reference_genome_bwa_index.collect()
+                reference_genome_bwa_index.collect(),
+                reference_genome_minimap_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_TIDDIT.out.svync_vcf)
@@ -146,7 +149,8 @@ workflow EUKAVARIZER {
                 bam_inputs,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect(),
-                reference_genome_bwa_index.collect()
+                reference_genome_bwa_index.collect(),
+                reference_genome_minimap_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_SVABA.out.svync_vcf)

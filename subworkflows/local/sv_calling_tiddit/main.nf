@@ -15,10 +15,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { TIDDIT_SV         } from '../../../modules/nf-core/tiddit/sv/main'
-include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
-include { SVYNC             } from '../../../modules/nf-core/svync/main'
-include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
+include { TIDDIT_SV as TIDDIT_MAP   } from '../../../modules/nf-core/tiddit/sv/main'
+include { TIDDIT_SV as TIDDIT_BWA   } from '../../../modules/nf-core/tiddit/sv/main'
+include { SAMPLE_REHEADER           } from '../../../modules/local/sample_regen/main.nf'
+include { SVYNC                     } from '../../../modules/nf-core/svync/main'
+include { GUNZIP                    } from '../../../modules/nf-core/gunzip/main'
 
 
 workflow SV_CALLING_TIDDIT {
@@ -26,12 +27,16 @@ workflow SV_CALLING_TIDDIT {
         bam_inputs
         reference_genome_bgzipped
         reference_genome_bwa_index
+        reference_genome_minimap_index
 
     main:
         name_tiddit = "tiddit"
 
-        TIDDIT_SV(
-            bam_inputs.map { meta, bam, bai ->
+        bwa_bam_inputs   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp <= params.minimap2_threshold }
+        minimap2_bams   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp > params.minimap2_threshold }
+
+        TIDDIT_BWA(
+            bwa_bam_inputs.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
             },
             reference_genome_bgzipped,
@@ -40,9 +45,21 @@ workflow SV_CALLING_TIDDIT {
             }
         )
 
+        TIDDIT_MAP(
+            minimap2_bams.map { meta, bam, bai ->
+                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
+            },
+            reference_genome_bgzipped,
+            reference_genome_minimap_index.map { meta, bwa ->
+                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bwa)
+            }
+        )
+
+        tiddit_result = TIDDIT_BWA.out.vcf.mix(TIDDIT_MAP.out.vcf)
+
         SAMPLE_REHEADER(
-            TIDDIT_SV.out.vcf,
-            TIDDIT_SV.out.vcf.map { meta, _vcf -> "${meta.id}_${name_tiddit}" }
+            tiddit_result,
+            tiddit_result.map { meta, _vcf -> "${meta.id}_${name_tiddit}" }
         )
 
         SVYNC(

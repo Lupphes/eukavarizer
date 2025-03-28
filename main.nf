@@ -70,35 +70,40 @@ workflow NFCORE_EUKAVARIZER {
                 REFERENCE_RETRIEVAL.out.reference_genome_faidx,
                 REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
                 REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
-                REFERENCE_RETRIEVAL.out.reference_genome_unzipped
-            )
-
-            SV_UNIFICATION (
-                EUKAVARIZER.out.vcf_list,
-                EUKAVARIZER.out.vcfgz_list,
-                EUKAVARIZER.out.tbi_list,
-                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
-            )
-
-            REPORT_GENERATION(
-                taxonomy_id,
-                outdir,
-                SV_UNIFICATION.out.survivor_vcf,
-                SV_UNIFICATION.out.survivor_stats,
-                SV_UNIFICATION.out.bcfmerge_vcf,
-                SV_UNIFICATION.out.bcfmerge_stats,
-                EUKAVARIZER.out.vcf_list,
-                EUKAVARIZER.out.tbi_list,
                 REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+                REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
             )
+            if (EUKAVARIZER.out.vcf_list.ifEmpty(false)) {
 
+                SV_UNIFICATION (
+                    EUKAVARIZER.out.vcf_list,
+                    EUKAVARIZER.out.vcfgz_list,
+                    EUKAVARIZER.out.tbi_list,
+                    REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
+                )
+
+                REPORT_GENERATION(
+                    taxonomy_id,
+                    outdir,
+                    SV_UNIFICATION.out.survivor_vcf,
+                    SV_UNIFICATION.out.survivor_stats,
+                    SV_UNIFICATION.out.bcfmerge_vcf,
+                    SV_UNIFICATION.out.bcfmerge_stats,
+                    EUKAVARIZER.out.vcf_list,
+                    EUKAVARIZER.out.tbi_list,
+                    REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+                )
+            }
+            else {
+                log.warning "No VCF generated. Exiting..."
+            }
         }
         else {
-            log.warning "No SV callers enabled."
+            log.warning "No SV callers enabled. Exiting..."
         }
 
     emit:
-        multiqc_report      = "SEQUENCE_PROCESSOR.out.multiqc_report"
+        multiqc_report      = SEQUENCE_PROCESSOR.out.multiqc_report
         report_file         = REPORT_GENERATION.out.report_file
 }
 
@@ -114,9 +119,9 @@ workflow {
         //
         // Input channels for the workflow
         //
-        taxonomy_id              = Channel.value(params.taxonomy_id)
-        outdir                   = Channel.value(params.outdir)
-        reference_genome         = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
+        taxonomy_id          = Channel.value(params.taxonomy_id)
+        outdir               = Channel.value(params.outdir)
+        reference_genome     = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
         sequence_dir         = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
 
         //

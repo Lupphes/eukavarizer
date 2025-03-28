@@ -14,4 +14,5 @@ export CONDA_PKGS_DIRS=./.conda_pkgs
 export CONDA_ENVS_PATH=./.conda_envs
 
 cd eukavarizer
-./../nextflow run main.nf -profile docker,mix_medium,qc_off -resume
+./../nextflow run main.nf -profile mamba,mix_medium,qc_off -resume
+./../nextflow run main.nf -profile mamba,mix_medium,qc_off --taxonomy_id 9606 --reference_genome "/storage/brno2/home/luppo/data/9606/ref/hg38.fa.gz" --sequence_dir "/storage/brno2/home/luppo/data/9606/gib" --outdir /storage/brno2/home/luppo/out

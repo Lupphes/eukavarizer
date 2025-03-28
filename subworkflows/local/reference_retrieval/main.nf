@@ -5,10 +5,11 @@
     This workflow retrieves and processes reference genomes:
     1. **BIODBCORE_REFSEQ** – Downloads reference genome from RefSeq.
     2. **GUNZIP** – Decompresses the reference genome.
-    3. **BWA_INDEX** – Creates BWA index for the reference genome.
-    4. **TABIX_BGZIP** – Compresses the reference genome with bgzip.
-    5. **SAMTOOLS_FAIDX** – Creates a FASTA index for the uncompressed genome.
-    6. **SAMTOOLS_BGZIP_FAIDX** – Creates a FASTA index for the bgzipped genome.
+    3. **BWAMEM2_INDEX** – Creates BWA2 index for the reference genome.
+    4. **MINIMAP2_INDEX** – Creates MINIMAP2 index for the reference genome.
+    5. **TABIX_BGZIP** – Compresses the reference genome with bgzip.
+    6. **SAMTOOLS_FAIDX** – Creates a FASTA index for the uncompressed genome.
+    7. **SAMTOOLS_BGZIP_FAIDX** – Creates a FASTA index for the bgzipped genome.
 
     Outputs:
     - `reference_genome` – Original reference genome file.
@@ -22,7 +23,8 @@
 include { BIODBCORE_REFSEQ      } from '../../../modules/local/biodbcore/refseq/main'
 
 include { GUNZIP                } from '../../../modules/nf-core/gunzip/main'
-include { BWA_INDEX             } from '../../../modules/nf-core/bwa/index/main'
+include { BWAMEM2_INDEX         } from '../../../modules/nf-core/bwamem2/index/main'
+include { MINIMAP2_INDEX        } from '../../../modules/nf-core/minimap2/index/main'
 include { TABIX_BGZIP           } from '../../../modules/nf-core/tabix/bgzip/main'
 include { SAMTOOLS_FAIDX        } from '../../../modules/nf-core/samtools/faidx/main'
 include { SAMTOOLS_FAIDX as SAMTOOLS_BGZIP_FAIDX  } from '../../../modules/nf-core/samtools/faidx/main'
@@ -58,7 +60,11 @@ workflow REFERENCE_RETRIEVAL {
             reference_genome_input.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
         )
 
-        BWA_INDEX(
+        BWAMEM2_INDEX(
+            GUNZIP.out.gunzip
+        )
+
+        MINIMAP2_INDEX(
             GUNZIP.out.gunzip
         )
 
@@ -82,7 +88,8 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_ungapped_size          = reference_genome_ungapped_size
         reference_genome_unzipped               = GUNZIP.out.gunzip
         reference_genome_bgzipped               = TABIX_BGZIP.out.output
-        reference_genome_bwa_index              = BWA_INDEX.out.index
+        reference_genome_bwa_index              = BWAMEM2_INDEX.out.index
+        reference_genome_minimap_index          = MINIMAP2_INDEX.out.index
         reference_genome_bgzipped_index         = TABIX_BGZIP.out.gzi
         reference_genome_bgzipped_faidx         = SAMTOOLS_BGZIP_FAIDX.out.fai
         reference_genome_faidx                  = SAMTOOLS_FAIDX.out.fai
