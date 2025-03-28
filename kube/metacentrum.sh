@@ -1,7 +1,7 @@
 qsub -I -l select=1:ncpus=32:mem=128gb:scratch_local=200gb -l walltime=24:00:00
 cd $SCRATCHDIR
 
-cp -r /mnt/storage-brno2/home/luppo/eukavarizer/ $SCRATCHDIR
+git clone https://github.com/Lupphes/eukavarizer.git
 
 module add openjdk/17
 curl -s https://get.nextflow.io | bash

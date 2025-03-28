@@ -6,7 +6,7 @@
     1. **BIODBCORE_ENA** – Downloads sequencing data from ENA.
     2. **SAMTOOLS_COLLATEFASTQ** – Converts BAM/CRAM to paired and unpaired FASTQ files.
     3. **QUALITY_CONTROL** – Filters and quality checks the FASTQ files.
-    4. **BWAMEM2_MEM** – Aligns reads to a reference genome.
+    4. **BWAMEM2_MEM** or **BWA_MEM** – Aligns reads to a reference genome.
     5. **SAMTOOLS_SORT** – Sorts the BAM files.
     6. **SAMTOOLS_INDEX** – Indexes the sorted BAM files.
 
@@ -19,6 +19,7 @@
 
 include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
+include { SRATOOLS_FASTERQDUMP } from '../../../modules/nf-core/sratools/fasterqdump/main'
 include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ    } from '../../../modules/nf-core/samtools/collatefastq/main'
 include { SAMTOOLS_COLLATEFASTQ as CRAM_SAMTOOLS_COLLATEFASTQ   } from '../../../modules/nf-core/samtools/collatefastq/main'
 
@@ -27,6 +28,7 @@ include { QUALITY_CONTROL       } from '../../../subworkflows/local/quality_cont
 include { SEQKIT_SIZE           } from '../../../modules/local/seqkit/size/main'
 include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
 include { BWAMEM2_MEM           } from '../../../modules/nf-core/bwamem2/mem/main'
+include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
 
 include { SAMTOOLS_SORT         } from '../../../modules/nf-core/samtools/sort/main'
 include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
@@ -68,6 +70,11 @@ workflow SEQUENCE_PROCESSOR {
                 .fromPath("${params.sequence_dir}/**/*.fastq.gz")
             : BIODBCORE_ENA.out.fastq_files).collect().flatten()
 
+        raw_sra = (sequences_abs_dir != [] ?
+            Channel
+                .fromPath("${params.sequence_dir}/**/*.sra")
+            : BIODBCORE_ENA.out.sra_files).collect().flatten()
+
         raw_bam = (sequences_abs_dir != [] ?
             Channel
                 .fromPath("${params.sequence_dir}/**/*.bam")
@@ -77,6 +84,12 @@ workflow SEQUENCE_PROCESSOR {
             Channel
                 .fromPath("${params.sequence_dir}/**/*.cram")
             : BIODBCORE_ENA.out.cram_files).collect().flatten()
+
+        SRATOOLS_FASTERQDUMP(
+            raw_sra,
+            [],
+            []
+        )
 
         // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
         // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
@@ -189,14 +202,11 @@ workflow SEQUENCE_PROCESSOR {
             true
         )
 
-        BWAMEM2_MEM(
-            bwa_bam,
-            reference_genome_bwa_index.collect(),
-            reference_genome_unzipped.collect(),
-            true
-        )
+        indexed_bed = params.bwamem2 ?
+            BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true) :
+            BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true)
 
-        mixed_bam_inputs = BWAMEM2_MEM.out.bam
+        mixed_bam_inputs = indexed_bed.bam
             .mix(MINIMAP2_ALIGN.out.bam)
             .map { meta, bam ->
                 tuple(meta + [id: "${meta.id}_sas"], bam)
