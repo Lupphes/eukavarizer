@@ -5,51 +5,56 @@
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_${PBS_JOBID}.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job.log
 
-# Define working directories
+# Exit on errors, undefined vars, and failed pipes
+set -euo pipefail
+
+# Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
+LOGFILE="$DATADIR/logs/eukavarizer_${PBS_JOBID}.log"
 
-echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a $DATADIR/logs/eukavarizer_${PBS_JOBID}.log
+echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
+echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
-echo "Working in scratch: $SCRATCH"
-
-# Load necessary modules
+# Load required modules
 module add openjdk/17
 module add mambaforge
 
-# Move to scratch
-cd $SCRATCH || { echo "Failed to enter scratch dir"; exit 1; }
+# Move to scratch space
+cd "$SCRATCH"
 
-# Copy project files
-cp -r $DATADIR/eukavarizer . || { echo "Failed to copy eukavarizer project"; exit 2; }
+# Clone the eukavarizer repo
+echo ">>> Cloning repository..." | tee -a "$LOGFILE"
+git clone https://github.com/Lupphes/eukavarizer.git | tee -a "$LOGFILE"
 
 # Download Nextflow
-curl -s https://get.nextflow.io | bash || { echo "Failed to download Nextflow"; exit 3; }
+echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
+curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
-# Create local conda directories
+# Prepare Conda envs in scratch
 mkdir -p ./.conda_pkgs ./.conda_envs
 export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
 export CONDA_ENVS_PATH=$SCRATCH/.conda_envs
 
-# Enter the pipeline directory
-cd eukavarizer || { echo "Failed to enter eukavarizer dir"; exit 4; }
+# Enter pipeline directory
+cd eukavarizer
 
-# First Nextflow run (resume cache)
-echo ">>> Running first Nextflow command"
-../nextflow run main.nf -profile mamba,mix_medium,qc_off -resume || { echo "Initial NF run failed"; exit 5; }
+# First dry-run to build cache
+echo ">>> Running first Nextflow command (cache warm-up)" | tee -a "$LOGFILE"
+../nextflow run main.nf -profile mamba,mix_medium,qc_off -resume | tee -a "$LOGFILE"
 
-# Second Nextflow run with actual inputs
-echo ">>> Running second Nextflow command"
+# Actual pipeline run with inputs
+echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
   --taxonomy_id 9606 \
   --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
   --sequence_dir "$DATADIR/data/9606/gib" \
-  --outdir "$DATADIR/out" || { echo "Second NF run failed"; exit 6; }
+  --outdir "$DATADIR/out" | tee -a "$LOGFILE"
 
-# Clean up scratch
-echo "Cleaning up scratch..."
+# Clean scratch
+echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch
 
-echo "=== Job $PBS_JOBID completed at $(date) ===" | tee -a $DATADIR/logs/eukavarizer_${PBS_JOBID}.log
+echo "=== Job $PBS_JOBID completed at $(date) ===" | tee -a "$LOGFILE"
