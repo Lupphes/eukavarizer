@@ -253,14 +253,21 @@
                     "description": "Threshold value for Minimap2 alignment.",
                     "help_text": "Set the minimum threshold for Minimap2 alignment.",
                     "fa_icon": "fas fa-sliders-h"
+                },
+                "bwamem2": {
+                    "type": "boolean",
+                    "description": "Use BWA-MEM2 instead of BWA for reference indexing and alignment.",
+                    "default": false,
+                    "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. ⚠️ Not recommended unless you know your aligner compatibility and performance needs.",
+                    "fa_icon": "fas fa-exclamation-circle"
                 }
             }
         },
         "sv_caller_arguments": {
             "title": "Structural Variant Caller Arguments",
             "type": "object",
-            "description": "Additional arguments to pass to SV callers.",
             "fa_icon": "fas fa-terminal",
+            "description": "Additional arguments to pass to SV callers.",
             "properties": {
                 "delly_args": {
                     "type": "string",

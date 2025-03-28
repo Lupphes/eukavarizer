@@ -85,12 +85,6 @@ workflow SEQUENCE_PROCESSOR {
                 .fromPath("${params.sequence_dir}/**/*.cram")
             : BIODBCORE_ENA.out.cram_files).collect().flatten()
 
-        SRATOOLS_FASTERQDUMP(
-            raw_sra,
-            [],
-            []
-        )
-
         // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
         // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
         grouped_fastqs = raw_fastqs
@@ -122,10 +116,19 @@ workflow SEQUENCE_PROCESSOR {
             .flatMap { file -> file instanceof List ? file : [file] }
             .map { file -> tuple([id: file.getParent().getName()], file) }
 
-
         grouped_cram = raw_cram
             .flatMap { file -> file instanceof List ? file : [file] }
             .map { file -> tuple([id: file.getParent().getName()], file) }
+
+        grouped_sra = raw_sra
+            .flatMap { file -> file instanceof List ? file : [file] }
+            .map { file -> tuple([id: file.getParent().getName()], file) }
+
+        SRATOOLS_FASTERQDUMP(
+            grouped_sra,
+            [],
+            []
+        )
 
         BAM_SAMTOOLS_COLLATEFASTQ(
             grouped_bam,
@@ -167,11 +170,21 @@ workflow SEQUENCE_PROCESSOR {
                 [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs : []]
             }
 
+        // Process SRA parsed reads (paired + unpaired)
+        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
+        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
+        fqdump_reads = SRATOOLS_FASTERQDUMP.out.reads
+        .map { meta, fastqs ->
+            def single_end = fastqs.size() == 1
+            [[id: "${meta.id}", single_end: single_end], fastqs.sort()]
+        }
+
         collected_fastqs = grouped_fastqs
             .mix(bam_paired)
             .mix(bam_unpaired)
             .mix(cram_paired)
             .mix(cram_unpaired)
+            .mix(fqdump_reads)
 
         QUALITY_CONTROL(
             collected_fastqs
