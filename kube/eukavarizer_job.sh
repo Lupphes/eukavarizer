@@ -2,9 +2,9 @@
 #PBS -N eukavarizer_job
 #PBS -l select=1:ncpus=32:mem=256gb:scratch_local=400gb
 #PBS -l walltime=24:00:00
-#PBS -m abe                           # Send mail on abort (a), begin (b), and end (e)
-#PBS -M ondrej.sloup@protonmail.com         # Replace with your email address
-#PBS -j oe                           # Join stdout and stderr into one file
+#PBS -m abe
+#PBS -M ondrej.sloup@protonmail.com
+#PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_${PBS_JOBID}.log
 
 # Define working directories
