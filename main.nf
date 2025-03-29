@@ -43,6 +43,12 @@ workflow NFCORE_EUKAVARIZER {
 
     main:
 
+        sv_callers_enabled = params.gridss_flag || params.delly_flag || params.manta_flag ||
+                                params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
+                                params.dysgu_flag || params.svaba_flag
+
+        log.info "🧬 SV callers enabled: ${sv_callers_enabled}"
+
         REFERENCE_RETRIEVAL(
             taxonomy_id,
             outdir,
@@ -95,12 +101,13 @@ workflow NFCORE_EUKAVARIZER {
 
         }
         else {
-            log.warning "No SV callers enabled. Exiting..."
+            log.warn "⚠️ No SV callers enabled. Skipping variant calling and report generation."
+
         }
 
     emit:
         multiqc_report      = SEQUENCE_PROCESSOR.out.multiqc_report
-        report_file         = REPORT_GENERATION.out.report_file
+        report_file         = sv_callers_enabled ? REPORT_GENERATION.out.report_file : Channel.empty()
 }
 
 /*

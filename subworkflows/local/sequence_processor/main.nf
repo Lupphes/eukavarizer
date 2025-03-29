@@ -19,6 +19,8 @@
 
 include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
+include { GZIP                  } from '../../../modules/local/gzip/main'
+
 include { SRATOOLS_FASTERQDUMP } from '../../../modules/nf-core/sratools/fasterqdump/main'
 include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ    } from '../../../modules/nf-core/samtools/collatefastq/main'
 include { SAMTOOLS_COLLATEFASTQ as CRAM_SAMTOOLS_COLLATEFASTQ   } from '../../../modules/nf-core/samtools/collatefastq/main'
@@ -65,10 +67,22 @@ workflow SEQUENCE_PROCESSOR {
             sequences_abs_dir
         )
 
-        raw_fastqs = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.fastq.gz")
-            : BIODBCORE_ENA.out.fastq_files).collect().flatten()
+        if (sequences_abs_dir != []) {
+            // Separate gzipped and uncompressed files
+            fastqs_gz = Channel.fromPath("${params.sequence_dir}/**/*.fastq.gz")
+            fastqs_unzipped = Channel.fromPath("${params.sequence_dir}/**/*.fastq")
+
+            // Zip the uncompressed ones
+            fastqs_zipped = GZIP(
+                fastqs_unzipped.map { file -> tuple([id: file.simpleName], file) }
+            ).gzip.map { _meta, file -> file }
+
+
+            // Merge zipped and pre-zipped fastq files
+            raw_fastqs = fastqs_gz.mix(fastqs_zipped)
+        } else {
+            raw_fastqs = BIODBCORE_ENA.out.fastq_files
+        }
 
         raw_sra = (sequences_abs_dir != [] ?
             Channel

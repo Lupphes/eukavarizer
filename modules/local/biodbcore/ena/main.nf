@@ -19,16 +19,21 @@ process BIODBCORE_ENA {
 
     output:
         path "ena_results.json", emit: ena_results
-        path "*/*.fastq.gz", emit: fastq_files, optional: true
-        path "*/*.bam", emit: bam_files, optional: true
-        path "*/*.cram", emit: cram_files, optional: true
-        path "*/*.sra", emit: sra_files, optional: true
+        path "**/*.fastq.gz", emit: fastq_files, optional: true
+        path "**/*.bam", emit: bam_files, optional: true
+        path "**/*.cram", emit: cram_files, optional: true
+        path "**/*.sra", emit: sra_files, optional: true
 
     script:
     """
     echo "Checking for existing sequencing data at: $sequence_dir"
 
-    if [ -d "$sequence_dir" ] && find -L "$sequence_dir" -type f -name "*.fastq.gz" | grep -q .; then
+    if [ -d "$sequence_dir" ] && find -L "$sequence_dir" -type f \\( \
+        -name "*.fastq.gz" -o \
+        -name "*.bam" -o \
+        -name "*.cram" -o \
+        -name "*.sra" \\) | grep -q .; then
+
         echo "Using local sequencing data from: $sequence_dir for taxonomy ID: $taxonomy_id"
 
         biodbcore --mode ena \

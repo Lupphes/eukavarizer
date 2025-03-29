@@ -260,6 +260,38 @@
                     "default": false,
                     "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. ⚠️ Not recommended unless you know your aligner compatibility and performance needs.",
                     "fa_icon": "fas fa-exclamation-circle"
+                },
+                "bbduk_trimq": {
+                    "type": "integer",
+                    "default": 10,
+                    "minimum": 0,
+                    "description": "Quality threshold for trimming in BBDuk.",
+                    "help_text": "Trim bases from the ends of reads if below this Phred quality score. Passed to `trimq` argument in BBDuk.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "bbduk_qtrim": {
+                    "type": "string",
+                    "default": "r",
+                    "enum": ["r", "l", "rl", "lr", "none"],
+                    "description": "Which end(s) to quality trim in BBDuk.",
+                    "help_text": "`r`=right, `l`=left, `rl` or `lr`=both. `none`=no quality trimming. Passed to `qtrim`.",
+                    "fa_icon": "fas fa-arrows-alt-h"
+                },
+                "seqtk_size": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0.0,
+                    "maximum": 1.0,
+                    "description": "Fraction of reads to randomly sample using seqtk.",
+                    "help_text": "Determines what proportion of reads are retained by `seqtk sample` (e.g., 0.1 = 10%).",
+                    "fa_icon": "fas fa-percentage"
+                },
+                "seqtk_seed": {
+                    "type": "integer",
+                    "default": 42,
+                    "description": "Random seed for reproducible seqtk sampling.",
+                    "help_text": "This seed ensures that the same reads are sampled when re-running `seqtk sample` with the same input.",
+                    "fa_icon": "fas fa-random"
                 }
             }
         },

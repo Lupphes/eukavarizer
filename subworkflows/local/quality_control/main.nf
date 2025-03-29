@@ -63,7 +63,7 @@ workflow QUALITY_CONTROL {
         )
 
         SEQTK_SAMPLE(
-            BBMAP_BBDUK.out.reads.map { meta, fastq -> tuple(meta, fastq, 0.1) }
+            BBMAP_BBDUK.out.reads.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
         )
 
         AFTER_FASTQC_MULTIQC_ANALYSIS(

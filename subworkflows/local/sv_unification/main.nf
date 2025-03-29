@@ -32,17 +32,18 @@ workflow SV_UNIFICATION {
         reference_genome_bgzipped
 
     main:
-        vcf_list = vcf_list.filter { it }
+        vcf_list_cleaned = vcf_list
+            .filter { it != null }
             .map { it[1] }
-            .toList()
 
-        vcfgz_list = vcfgz_list.filter { it }
+        vcfgz_list_cleaned = vcfgz_list
+            .filter { it != null }
             .map { it[1] }
-            .toList()
 
-        tbi_list = tbi_list.filter { it }
+        tbi_list_cleaned = tbi_list
+            .filter { it != null }
             .map { it[1] }
-            .toList()
+
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,8 +51,11 @@ workflow SV_UNIFICATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        survivor_meta = Channel.value([id: "survivor_merge"])
-        survivor_input = survivor_meta.combine(vcf_list.toList())
+        survivor_input = vcf_list_cleaned
+            .collect().unique()
+            .map { vcf_files ->
+                tuple([id: "survivor_merge"], vcf_files)
+            }
 
         SURVIVOR_MERGE(
             survivor_input,
@@ -84,8 +88,12 @@ workflow SV_UNIFICATION {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
 
-        bfcmerge_meta = Channel.value([id: "bfcmerge_merge"])
-        bcfmerge_input = bfcmerge_meta.combine(vcfgz_list.toList()).combine(tbi_list.toList())
+        bcfmerge_input = vcfgz_list_cleaned.collect().unique().collect(flat: false)
+            .combine(tbi_list_cleaned.collect().unique().collect(flat: false))
+            .filter { vcfgz_files, tbi_files -> vcfgz_files && tbi_files }
+            .map { vcfgz_files, tbi_files ->
+                tuple([id: "bfcmerge_merge"], vcfgz_files, tbi_files)
+            }
 
         BCFTOOLS_MERGE(
             bcfmerge_input,

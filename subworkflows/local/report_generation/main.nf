@@ -32,17 +32,16 @@ workflow REPORT_GENERATION {
         reference_genome
 
     main:
-
-        vcf_list = vcf_list.filter { it }
+        vcf_list_cleaned = vcf_list
+            .filter { it != null }
             .map { it[1] }
-            .toList()
 
-        tbi_list = tbi_list.filter { it }
+        tbi_list_cleaned = tbi_list
+            .filter { it != null }
             .map { it[1] }
-            .toList()
 
         varify_meta = Channel.value([id: "varify_merge"])
-        varify_input = varify_meta.combine(tbi_list.toList())
+        varify_input = varify_meta.combine(vcf_list_cleaned)
 
         VARIFY(
             taxonomy_id,
