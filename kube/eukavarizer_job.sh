@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job
-#PBS -l select=1:ncpus=32:mem=256gb:scratch_local=400gb
+#PBS -l select=1:ncpus=32:mem=512gb:scratch_local=400gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
