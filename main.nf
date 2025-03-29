@@ -73,30 +73,26 @@ workflow NFCORE_EUKAVARIZER {
                 REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
                 REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
             )
-            if (EUKAVARIZER.out.vcf_list.ifEmpty(false)) {
 
-                SV_UNIFICATION (
-                    EUKAVARIZER.out.vcf_list,
-                    EUKAVARIZER.out.vcfgz_list,
-                    EUKAVARIZER.out.tbi_list,
-                    REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
-                )
+            SV_UNIFICATION (
+                EUKAVARIZER.out.vcf_list,
+                EUKAVARIZER.out.vcfgz_list,
+                EUKAVARIZER.out.tbi_list,
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
+            )
 
-                REPORT_GENERATION(
-                    taxonomy_id,
-                    outdir,
-                    SV_UNIFICATION.out.survivor_vcf,
-                    SV_UNIFICATION.out.survivor_stats,
-                    SV_UNIFICATION.out.bcfmerge_vcf,
-                    SV_UNIFICATION.out.bcfmerge_stats,
-                    EUKAVARIZER.out.vcf_list,
-                    EUKAVARIZER.out.tbi_list,
-                    REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
-                )
-            }
-            else {
-                log.warning "No VCF generated. Exiting..."
-            }
+            REPORT_GENERATION(
+                taxonomy_id,
+                outdir,
+                SV_UNIFICATION.out.survivor_vcf,
+                SV_UNIFICATION.out.survivor_stats,
+                SV_UNIFICATION.out.bcfmerge_vcf,
+                SV_UNIFICATION.out.bcfmerge_stats,
+                EUKAVARIZER.out.vcf_list,
+                EUKAVARIZER.out.tbi_list,
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+            )
+
         }
         else {
             log.warning "No SV callers enabled. Exiting..."

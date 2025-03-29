@@ -1,5 +1,7 @@
 process VARIFY {
     tag "$taxonomy_id"
+    label 'process_low'
+
     conda "${moduleDir}/environment.yml"
     container "luppo/varify:latest"
 
@@ -10,7 +12,7 @@ process VARIFY {
         tuple val(meta2), path (survivor_stats)
         tuple val(meta3), path (bcfmerge_vcf)
         tuple val(meta5), path (bcfmerge_stats)
-        tuple val(meta6), path (varify_input)
+        tuple val(meta6), path (vcf_list_cleaned)
         tuple val(meta7), path (reference_genome_bgzipped_index)
 
     output:

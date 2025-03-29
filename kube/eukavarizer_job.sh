@@ -13,7 +13,7 @@ set -euo pipefail
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/logs/eukavarizer_${PBS_JOBID}.log"
+LOGFILE="$DATADIR/logs/eukavarizer_job_sad.log"
 
 echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
@@ -36,7 +36,11 @@ curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 # Prepare Conda envs in scratch
 mkdir -p ./.conda_pkgs ./.conda_envs
 export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
-export CONDA_ENVS_PATH=$SCRATCH/.conda_envs
+export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
+export NXF_LOG_LEVEL=DEBUG
+export NXF_TRACE=true
+export NXF_WORK=/storage/brno2/home/luppo/work
+export NXF_LOG_FILE=/storage/brno2/home/luppo/logs/.nextflow.log
 
 # Enter pipeline directory
 cd eukavarizer
@@ -50,8 +54,11 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
   --taxonomy_id 9606 \
   --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
-  --sequence_dir "$DATADIR/data/9606/gib" \
-  --outdir "$DATADIR/out" | tee -a "$LOGFILE"
+  --sequence_dir "$DATADIR/eukavarizer/src/out/" \
+  --outdir "$DATADIR/out_big" | tee -a "$LOGFILE"
+
+echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
+find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"

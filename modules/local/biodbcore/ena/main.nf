@@ -1,5 +1,7 @@
 process BIODBCORE_ENA {
     tag "$taxonomy_id"
+    label 'process_low'
+
     conda "${moduleDir}/environment.yml"
     container "luppo/biodbcore:latest"
 
