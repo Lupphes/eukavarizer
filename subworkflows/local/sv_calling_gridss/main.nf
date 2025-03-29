@@ -33,8 +33,13 @@ workflow SV_CALLING_GRIDSS {
     main:
         name_gridss = "gridss"
 
-        bwa_bam_inputs   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp <= params.minimap2_threshold }
-        minimap2_bams   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp > params.minimap2_threshold }
+        bwa_bam_inputs = bam_inputs.filter { meta, _bam, _bai ->
+            !params.minimap2_flag || meta.median_bp <= params.minimap2_threshold
+        }
+
+        minimap2_bams = bam_inputs.filter { meta, _bam, _bai ->
+            params.minimap2_flag && meta.median_bp > params.minimap2_threshold
+        }
 
         GRIDSS_BWA(
             bwa_bam_inputs.map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },

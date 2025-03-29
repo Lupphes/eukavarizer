@@ -34,9 +34,10 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p ./.conda_pkgs ./.conda_envs
+mkdir -p ./.conda_pkgs ./.conda_envs ./.conda_dir
 export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
 export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
+export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=/storage/brno2/home/luppo/work
@@ -54,7 +55,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
   --taxonomy_id 9606 \
   --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
-  --sequence_dir "$DATADIR/data/9606/final" \
+  --sequence_dir "$DATADIR/eukavarizer/data/9606/final" \
   --outdir "$DATADIR/out_big" | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"

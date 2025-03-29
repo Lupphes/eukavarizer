@@ -32,8 +32,13 @@ workflow SV_CALLING_SVABA {
     main:
         name_svaba = "svaba"
 
-        bwa_bam_inputs   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp <= params.minimap2_threshold }
-        minimap2_bams   = bam_inputs.filter { meta, _bam, _bai -> meta.median_bp > params.minimap2_threshold }
+        bwa_bam_inputs = bam_inputs.filter { meta, _bam, _bai ->
+            !params.minimap2_flag || meta.median_bp <= params.minimap2_threshold
+        }
+
+        minimap2_bams = bam_inputs.filter { meta, _bam, _bai ->
+            params.minimap2_flag && meta.median_bp > params.minimap2_threshold
+        }
 
         first_bwa = bwa_bam_inputs
             .map { meta, bam, bai ->

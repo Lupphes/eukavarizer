@@ -55,7 +55,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
   --taxonomy_id 9606 \
   --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
-  --sequence_dir "$DATADIR/eukavarizer/data/9606/gib" \
+  --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
   --outdir "$DATADIR/out_big" | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"

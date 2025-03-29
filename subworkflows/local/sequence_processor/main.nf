@@ -215,10 +215,17 @@ workflow SEQUENCE_PROCESSOR {
         }
 
         minimap2_bam = aligned_bam
-            .filter { meta, _fastq -> meta.median_bp > params.minimap2_threshold }
+            .filter { meta, _fastq ->
+                params.minimap2_flag && (meta.median_bp > params.minimap2_threshold)
+            }
 
         bwa_bam = aligned_bam
-            .filter { meta, _fastq -> meta.median_bp <= params.minimap2_threshold }
+            .filter { meta, _fastq ->
+                !params.minimap2_flag || (meta.median_bp <= params.minimap2_threshold)
+            }
+
+        minimap2_bam.view { "${it[0].id} ${it[1]}" }
+        reference_genome_unzipped.collect().view { "${it[0].id} ${it[1]}" }
 
         MINIMAP2_ALIGN(
             minimap2_bam,

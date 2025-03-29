@@ -246,6 +246,13 @@
                     "help_text": "Specify an assembly quality category.",
                     "fa_icon": "fas fa-star"
                 },
+                "minimap2_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Minimap2 for read mapping.",
+                    "default": false,
+                    "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
+                    "fa_icon": "fas fa-directions"
+                },
                 "minimap2_threshold": {
                     "type": "integer",
                     "minimum": 0,
@@ -311,7 +318,7 @@
                 "gridss_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to GRIDSS.",
-                    "default": "--steps all --maxcoverage 50000",
+                    "default": "--maxcoverage 50000",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for GRIDSS structural variant caller."
                 },
