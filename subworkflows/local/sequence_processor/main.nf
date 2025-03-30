@@ -200,12 +200,8 @@ workflow SEQUENCE_PROCESSOR {
             .mix(cram_unpaired)
             .mix(fqdump_reads)
 
-        QUALITY_CONTROL(
-            collected_fastqs
-        )
-
         SEQKIT_SIZE(
-            QUALITY_CONTROL.out.fastq_filtered
+            collected_fastqs
         )
 
         // Add median_bp to the metadata
@@ -214,14 +210,18 @@ workflow SEQUENCE_PROCESSOR {
             tuple(meta + [median_bp: length], fastq)
         }
 
-        minimap2_bam = aligned_bam
+        QUALITY_CONTROL(
+            aligned_bam
+        )
+
+        minimap2_bam = QUALITY_CONTROL.out.fastq_filtered
             .filter { meta, _fastq ->
-                params.minimap2_flag && (meta.median_bp > params.minimap2_threshold)
+                params.minimap2_flag && (meta.median_bp > params.long_read_threshold)
             }
 
-        bwa_bam = aligned_bam
+        bwa_bam = QUALITY_CONTROL.out.fastq_filtered
             .filter { meta, _fastq ->
-                !params.minimap2_flag || (meta.median_bp <= params.minimap2_threshold)
+                !params.minimap2_flag || (meta.median_bp <= params.long_read_threshold)
             }
 
         MINIMAP2_ALIGN(

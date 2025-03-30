@@ -1,11 +1,11 @@
 #!/bin/bash
-#PBS -N eukavarizer_job
+#PBS -N eukavarizer_job_final
 #PBS -l select=1:ncpus=64:mem=512gb:scratch_local=400gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_final.log
 
 # Exit on errors, undefined vars, and failed pipes
 set -euo pipefail
@@ -13,7 +13,7 @@ set -euo pipefail
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/final_job/logs/eukavarizer_job_sad.log"
+LOGFILE="$DATADIR/final_job/logs/eukavarizer_job_final_sad.log"
 
 echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
@@ -21,6 +21,12 @@ echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 # Load required modules
 module add openjdk/17
 module add mambaforge
+
+# Configure mamba channels
+echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
+mamba config --add channels luppo
+mamba config --add channels bioconda
+mamba config --add channels conda-forge
 
 # Move to scratch space
 cd "$SCRATCH"
@@ -41,7 +47,7 @@ export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/final_job/work
-export NXF_LOG_FILE=$DATADIR/final_job/logs/.nextflow.log
+export NXF_LOG_FILE=$DATADIR/final_job/logs/.nextflow_final.log
 
 # Enter pipeline directory
 cd eukavarizer

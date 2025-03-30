@@ -50,6 +50,10 @@ workflow QUALITY_CONTROL {
 
         BBMAP_BBDUK(
             FASTP.out.reads
+                // Don't use on long reads
+                .filter { meta, _fastq ->
+                    meta.median_bp < params.long_read_threshold
+                }
                 .filter { it ->
                     if (it[1] instanceof List) {
                         // Paired-end: check both files

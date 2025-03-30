@@ -1,11 +1,11 @@
 #!/bin/bash
-#PBS -N eukavarizer_job_short
-#PBS -l select=1:ncpus=64:mem=512gb:scratch_local=400gb
+#PBS -N eukavarizer_job_nano
+#PBS -l select=1:ncpus=16:mem=128gb:scratch_local=100gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_nano.log
 
 # Exit on errors, undefined vars, and failed pipes
 set -euo pipefail
@@ -13,7 +13,7 @@ set -euo pipefail
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/short_job/logs/eukavarizer_job_short_sad.log"
+LOGFILE="$DATADIR/nano_job/logs/eukavarizer_job_nano_sad.log"
 
 echo "=== Job $PBS_JOBID started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
@@ -46,19 +46,19 @@ export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
 export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK=$DATADIR/short_job/work
-export NXF_LOG_FILE=$DATADIR/short_job/logs/.nextflow_short.log
+export NXF_WORK=$DATADIR/nano_job/work
+export NXF_LOG_FILE=$DATADIR/nano_job/logs/.nextflow_nano.log
 
 # Enter pipeline directory
 cd eukavarizer
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,short_full,qc_on \
+../nextflow run main.nf -profile mamba,long_full,qc_on \
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
-    --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
-    --outdir "$DATADIR/short_job/out" | tee -a "$LOGFILE"
+    --sequence_dir "$DATADIR/eukavarizer/data/9606/nano" \
+    --outdir "$DATADIR/nano_job/out" | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true

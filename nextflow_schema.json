@@ -253,13 +253,13 @@
                     "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
                     "fa_icon": "fas fa-directions"
                 },
-                "minimap2_threshold": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "default": 300,
-                    "description": "Threshold value for Minimap2 alignment.",
-                    "help_text": "Set the minimum threshold for Minimap2 alignment.",
-                    "fa_icon": "fas fa-sliders-h"
+                "long_read_threshold": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 300,
+                "description": "Threshold (in bp) above which reads are considered long reads.",
+                "help_text": "Used to separate long and short reads. Affects trimming (e.g. disables BBDuk) and mapper choice (e.g. minimap2 vs BWA).",
+                "fa_icon": "fas fa-ruler"
                 },
                 "bwamem2": {
                     "type": "boolean",

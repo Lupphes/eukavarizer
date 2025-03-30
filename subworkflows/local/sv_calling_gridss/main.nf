@@ -33,13 +33,18 @@ workflow SV_CALLING_GRIDSS {
         name_gridss = "gridss"
 
         GRIDSS_GRIDSS(
-            bam_inputs.map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },
+            bam_inputs
+                // Don't use on long reads as GRIDSS does not support MINIMAP2 or PacBio/Nanopore raw reads
+                .filter { meta, _bam, _bai ->
+                    meta.median_bp < params.long_read_threshold
+                }
+                .map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },
             reference_genome_unzipped,
             reference_genome_faidx,
+            // reference_genome_minimap_index -> GRIDSS does not support MINIMAP2
             reference_genome_bwa_index
         )
 
-        // reference_genome_minimap_index GRIDSS does not support MINIMAP2
         gridss_result = GRIDSS_GRIDSS.out.vcf
 
         SAMPLE_REHEADER(
