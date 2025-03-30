@@ -66,8 +66,14 @@ workflow QUALITY_CONTROL {
             []
         )
 
+        // Readd the filtered long reads
+        bbduk_combined_result = BBMAP_BBDUK.out.reads.mix(
+            FASTP.out.reads.filter { meta, _fastq ->
+                meta.median_bp >= params.long_read_threshold
+            })
+
         SEQTK_SAMPLE(
-            BBMAP_BBDUK.out.reads.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
+            bbduk_combined_result.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
         )
 
         AFTER_FASTQC_MULTIQC_ANALYSIS(
