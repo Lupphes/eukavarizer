@@ -48,7 +48,7 @@ cd eukavarizer
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,mix_medium,qc_off \
+../nextflow run main.nf -profile mamba,short_full,qc_on \
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
