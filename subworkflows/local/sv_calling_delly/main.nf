@@ -45,7 +45,7 @@ workflow SV_CALLING_DELLY {
 
         SAMPLE_REHEADER(
             DELLY_CALL.out.bcf, // vcf
-            DELLY_CALL.out.bcf.map { meta, _bfc -> "${meta.id}" }
+            DELLY_CALL.out.bcf.map { meta, _bcf -> "${meta.id}" }
         )
 
         SVYNC(

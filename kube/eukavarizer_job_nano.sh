@@ -57,7 +57,7 @@ cd eukavarizer
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,long_full,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/nano" \
     --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 | tee -a "$LOGFILE"
 

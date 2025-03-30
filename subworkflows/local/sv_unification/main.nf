@@ -92,7 +92,7 @@ workflow SV_UNIFICATION {
             .combine(tbi_list_cleaned.collect().unique().collect(flat: false))
             .filter { vcfgz_files, tbi_files -> vcfgz_files && tbi_files }
             .map { vcfgz_files, tbi_files ->
-                tuple([id: "bfcmerge_merge"], vcfgz_files, tbi_files)
+                tuple([id: "bcftools_merge"], vcfgz_files, tbi_files)
             }
 
         BCFTOOLS_MERGE(
@@ -102,22 +102,22 @@ workflow SV_UNIFICATION {
             [[], []]
         )
 
-        vcf_index_bfcmerge = BCFTOOLS_MERGE.out.vcf
+        vcf_index_bcfmerge = BCFTOOLS_MERGE.out.vcf
             .map { meta, vfc ->
                 tuple(meta, vfc, [])
             }
 
         BCFTOOLS_FILTER(
-            vcf_index_bfcmerge
+            vcf_index_bcfmerge
         )
 
-        vcf_index_bfcmerge_filtered = BCFTOOLS_FILTER.out.vcf
+        vcf_index_bcfmerge_filtered = BCFTOOLS_FILTER.out.vcf
             .map { meta, vfc ->
                 tuple(meta, vfc, [])
             }
 
         BCFTOOLS_STATS(
-            vcf_index_bfcmerge_filtered,
+            vcf_index_bcfmerge_filtered,
             [[], []],
             [[], []],
             [[], []],
