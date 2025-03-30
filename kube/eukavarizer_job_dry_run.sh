@@ -14,9 +14,9 @@ set -euo pipefail
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
 LOGFILE="$DATADIR/dry_run_job/logs/eukavarizer_job_dry_run_sad.log"
-
-echo "=== Job Eukavarizer JOB_DRY_RUN started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 mkdir -p "$(dirname "$LOGFILE")"
+
+echo "=== Job EUKAVARIZER_JOB_DRY_RUN started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
 # Load required modules
