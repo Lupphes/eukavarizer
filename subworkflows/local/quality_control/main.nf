@@ -72,18 +72,23 @@ workflow QUALITY_CONTROL {
                 meta.median_bp >= params.long_read_threshold
             })
 
-        SEQTK_SAMPLE(
-            bbduk_combined_result.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
-        )
+        if (params.seqtk_flag) {
+            SEQTK_SAMPLE(
+                bbduk_combined_result.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
+            )
+            seqtk_combined_result = SEQTK_SAMPLE.out.reads
+        } else{
+            seqtk_combined_result = bbduk_combined_result
+        }
 
         AFTER_FASTQC_MULTIQC_ANALYSIS(
-            SEQTK_SAMPLE.out.reads
+            seqtk_combined_result
         )
 
     emit:
         fastqc_report   = params.fastqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.fastqc_report.toList() : null      // Path to FastQC reports, or null if FastQC is not run
         multiqc_report  = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.multiqc_report.toList() : null    // Path to MultiQC report, or null if MultiQC is not run
-        fastq_filtered  = SEQTK_SAMPLE.out.reads                                                                    // Processed FASTQ files
+        fastq_filtered  = seqtk_combined_result                                                                    // Processed FASTQ files
         versions        = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.versions : null                   // Path to versions.yml (this is always generated)
 
 }

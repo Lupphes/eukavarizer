@@ -284,6 +284,12 @@
                     "help_text": "`r`=right, `l`=left, `rl` or `lr`=both. `none`=no quality trimming. Passed to `qtrim`.",
                     "fa_icon": "fas fa-arrows-alt-h"
                 },
+                "seqtk_flag": {
+                "type": "boolean",
+                "description": "Enable or disable seqtk sampling.",
+                "help_text": "Set this flag to true to enable `seqtk sample` to randomly subsample reads from FASTQ files. It uses `seqtk_size` and `seqtk_seed` to control sampling.",
+                "fa_icon": "fas fa-random"
+                },
                 "seqtk_size": {
                     "type": "number",
                     "default": 0.1,
