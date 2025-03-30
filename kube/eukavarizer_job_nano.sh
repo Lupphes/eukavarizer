@@ -55,11 +55,11 @@ cd eukavarizer
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,long_full,qc_on \
+../nextflow run main.nf -profile mamba,long_full,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/data/9606/ref/hg38.fa.gz" \
+    --reference_genome "$DATADIR/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/nano" \
-    --outdir "$DATADIR/nano_job/out" | tee -a "$LOGFILE"
+    --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
