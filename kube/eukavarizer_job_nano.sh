@@ -25,9 +25,9 @@ module add mambaforge
 
 # Configure mamba channels
 echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-mamba config --add channels luppo
-mamba config --add channels bioconda
-mamba config --add channels conda-forge
+conda config --add channels luppo
+conda config --add channels bioconda
+conda config --add channels conda-forge
 
 # Move to scratch space
 cd "$SCRATCH"
