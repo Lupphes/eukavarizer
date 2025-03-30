@@ -16,11 +16,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { GRIDSS_GRIDSS as GRIDSS_MAP   } from '../../../modules/nf-core/gridss/gridss/main'
-include { GRIDSS_GRIDSS as GRIDSS_BWA   } from '../../../modules/nf-core/gridss/gridss/main'
-include { SAMPLE_REHEADER               } from '../../../modules/local/sample_regen/main.nf'
-include { SVYNC                         } from '../../../modules/nf-core/svync/main'
-include { GUNZIP                        } from '../../../modules/nf-core/gunzip/main'
+include { GRIDSS_GRIDSS     } from '../../../modules/nf-core/gridss/gridss/main'
+include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
+include { SVYNC             } from '../../../modules/nf-core/svync/main'
+include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
 
 workflow SV_CALLING_GRIDSS {
     take:
@@ -33,29 +32,15 @@ workflow SV_CALLING_GRIDSS {
     main:
         name_gridss = "gridss"
 
-        bwa_bam_inputs = bam_inputs.filter { meta, _bam, _bai ->
-            !params.minimap2_flag || meta.median_bp <= params.minimap2_threshold
-        }
-
-        minimap2_bams = bam_inputs.filter { meta, _bam, _bai ->
-            params.minimap2_flag && meta.median_bp > params.minimap2_threshold
-        }
-
-        GRIDSS_BWA(
-            bwa_bam_inputs.map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },
+        GRIDSS_GRIDSS(
+            bam_inputs.map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },
             reference_genome_unzipped,
             reference_genome_faidx,
             reference_genome_bwa_index
         )
 
-        GRIDSS_MAP(
-            minimap2_bams.map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}_${name_gridss}"], bam) },
-            reference_genome_unzipped,
-            reference_genome_faidx,
-            reference_genome_minimap_index
-        )
-
-        gridss_result = GRIDSS_BWA.out.vcf.mix(GRIDSS_MAP.out.vcf)
+        // reference_genome_minimap_index GRIDSS does not support MINIMAP2
+        gridss_result = GRIDSS_GRIDSS.out.vcf
 
         SAMPLE_REHEADER(
             gridss_result,

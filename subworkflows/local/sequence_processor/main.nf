@@ -224,9 +224,6 @@ workflow SEQUENCE_PROCESSOR {
                 !params.minimap2_flag || (meta.median_bp <= params.minimap2_threshold)
             }
 
-        minimap2_bam.view { "${it[0].id} ${it[1]}" }
-        reference_genome_unzipped.collect().view { "${it[0].id} ${it[1]}" }
-
         MINIMAP2_ALIGN(
             minimap2_bam,
             reference_genome_unzipped.collect(),
