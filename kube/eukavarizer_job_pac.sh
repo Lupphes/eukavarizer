@@ -1,11 +1,11 @@
 #!/bin/bash
-#PBS -N eukavarizer_job_nano
-#PBS -l select=1:ncpus=32:mem=512gb:scratch_local=800gb
+#PBS -N eukavarizer_job_pac
+#PBS -l select=1:ncpus=64:mem=512gb:scratch_local=1000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_nano.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_pac.log
 
 # Exit on errors, undefined vars, and failed pipes
 set -euo pipefail
@@ -13,10 +13,10 @@ set -euo pipefail
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/nano_job/logs/eukavarizer_job_nano_sad.log"
+LOGFILE="$DATADIR/pac_job/logs/eukavarizer_job_pac_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
-echo "=== Job EUKAVARIZER_JOB_NANO started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
+echo "=== Job EUKAVARIZER_JOB_PAC started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
 # Load required modules
@@ -47,8 +47,8 @@ export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
 export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK=$DATADIR/nano_job/work
-export NXF_LOG_FILE=$DATADIR/nano_job/logs/.nextflow_nano.log
+export NXF_WORK=$DATADIR/pac_job/work
+export NXF_LOG_FILE=$DATADIR/pac_job/logs/.nextflow_pac.log
 
 # Enter pipeline directory
 cd eukavarizer
@@ -58,8 +58,8 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,long_full,qc_off \
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
-    --sequence_dir "$DATADIR/eukavarizer/data/9606/nano" \
-    --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 --minimap2_flag true --seqtk_flag false | tee -a "$LOGFILE"
+    --sequence_dir "$DATADIR/eukavarizer/data/9606/pac" \
+    --outdir "$DATADIR/pac_job/out" --seqtk_size 1.0 --minimap2_flag true --seqtk_flag false | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
