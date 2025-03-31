@@ -55,9 +55,9 @@ cd eukavarizer
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,short_full,qc_on \
+../nextflow run main.nf -profile mamba,short_full,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/hg002v1.1.fasta.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
     --outdir "$DATADIR/short_job/out" | tee -a "$LOGFILE"
 

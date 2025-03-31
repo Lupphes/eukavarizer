@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_pac
-#PBS -l select=1:ncpus=64:mem=512gb:scratch_local=1000gb
+#PBS -l select=1:ncpus=64:mem=768gb:scratch_local=1000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
@@ -57,9 +57,9 @@ cd eukavarizer
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,long_full,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/hg002v1.1.fasta.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/pac" \
-    --outdir "$DATADIR/pac_job/out" --seqtk_size 1.0 --minimap2_flag true --seqtk_flag false | tee -a "$LOGFILE"
+    --outdir "$DATADIR/pac_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
