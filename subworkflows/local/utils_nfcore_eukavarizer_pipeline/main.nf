@@ -25,11 +25,13 @@ include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipelin
 workflow PIPELINE_INITIALISATION {
 
     take:
-    version                 // boolean: Display version and exit
-    validate_params         // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs         // boolean: Do not use coloured log outputs
-    nextflow_cli_args       // array: List of positional nextflow CLI args
-    outdir                  // string: The output directory where the results will be saved
+    version           // boolean: Display version and exit
+    validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
+    monochrome_logs   // boolean: Do not use coloured log outputs
+    nextflow_cli_args //   array: List of positional nextflow CLI args
+    outdir            //  string: The output directory where the results will be saved
+    // input             //  string: Path to input samplesheet
+
 
     main:
 
@@ -61,7 +63,38 @@ workflow PIPELINE_INITIALISATION {
         nextflow_cli_args
     )
 
+    //
+    // Create channel from input file provided through params.input
+    //
+    // Not using currently samplesheet
+
+    // if (params.input) {
+    //     Channel
+    //         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+    //         .map {
+    //             meta, fastq_1, fastq_2 ->
+    //                 if (!fastq_2) {
+    //                     return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
+    //                 } else {
+    //                     return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
+    //                 }
+    //         }
+    //         .groupTuple()
+    //         .map { samplesheet ->
+    //             validateInputSamplesheet(samplesheet)
+    //         }
+    //         .map {
+    //             meta, fastqs ->
+    //                 return [ meta, fastqs.flatten() ]
+    //         }
+    //         .set { ch_samplesheet }
+    // } else {
+    //     log.info "No samplesheet provided — will search for input FASTQs automatically"
+    //     Channel.empty().set { ch_samplesheet }
+    // }
+
     emit:
+    // samplesheet = ch_samplesheet
     versions    = ch_versions
 }
 
@@ -118,7 +151,6 @@ workflow PIPELINE_COMPLETION {
     FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
 //
 // Validate channels from input samplesheet
 //
@@ -138,27 +170,66 @@ def validateInputSamplesheet(input) {
 // Generate methods description for MultiQC
 //
 def toolCitationText() {
-    // TODO nf-core: Optionally add in-text citation tools to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
-            "Tools used in the workflow included:",
-            "FastQC (Andrews 2010),",
-            "MultiQC (Ewels et al. 2016)",
-            "."
-        ].join(' ').trim()
+        "Tools used in the workflow included:",
+        "FastQC (Andrews 2010),",
+        "MultiQC (Ewels et al. 2016),",
+        "BWA (Li and Durbin 2009),",
+        "BWA-MEM2 (Vasimuddin et al. 2019),",
+        "Minimap2 (Li 2018),",
+        "Samtools (Li et al. 2009),",
+        "BCFtools (Danecek et al. 2021),",
+        "Fastp (Chen et al. 2018),",
+        "fastplong (Chen 2023),",
+        "BBDuk (Bushnell 2014),",
+        "Seqtk (Li 2012),",
+        "DELLY (Rausch et al. 2012),",
+        "GRIDSS (Cameron et al. 2017),",
+        "TIDDIT (Eisfeldt et al. 2017),",
+        "DYSGU (Cawte et al. 2022),",
+        "Sniffles (Sedlazeck et al. 2018),",
+        "CuteSV (Jiang et al. 2020),",
+        "SVABA (Wala et al. 2018),",
+        "Manta (Chen et al. 2016),",
+        "SURVIVOR (Jeffares et al. 2017),",
+        "SVYnc (Nieuwkoop et al. 2023),",
+        "Varify (Sloup et al. 2024),",
+        "SRATools (Leinonen et al. 2011),",
+        "BioDbCore (Sloup 2023),",
+        "Coreutils/Gunzip (GNU Project)"
+    ].join(' ').trim()
 
     return citation_text
 }
 
 def toolBibliographyText() {
-    // TODO nf-core: Optionally add bibliographic entries to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
     def reference_text = [
-            "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
-            "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
-        ].join(' ').trim()
+        "<li>Andrews S. (2010) FastQC. https://www.bioinformatics.babraham.ac.uk/projects/fastqc/</li>",
+        "<li>Ewels P. et al. (2016) MultiQC. Bioinformatics, 32(19), 3047–3048. https://doi.org/10.1093/bioinformatics/btw354</li>",
+        "<li>Li H., Durbin R. (2009) BWA. Bioinformatics, 25(14), 1754–1760. https://doi.org/10.1093/bioinformatics/btp324</li>",
+        "<li>Vasimuddin M. et al. (2019) BWA-MEM2. arXiv:1907.12931</li>",
+        "<li>Li H. (2018) Minimap2. Bioinformatics, 34(18), 3094–3100. https://doi.org/10.1093/bioinformatics/bty191</li>",
+        "<li>Li H. et al. (2009) SAMtools. Bioinformatics, 25(16), 2078–2079. https://doi.org/10.1093/bioinformatics/btp352</li>",
+        "<li>Danecek P. et al. (2021) BCFtools. GigaScience, 10(2), giab008. https://doi.org/10.1093/gigascience/giab008</li>",
+        "<li>Chen S., Zhou Y., Chen Y., Gu J. (2018) fastp. Bioinformatics, 34(17), i884–i890. https://doi.org/10.1093/bioinformatics/bty560</li>",
+        "<li>Chen S. (2023) Ultrafast one-pass FASTQ data preprocessing using fastp. iMeta 2: e107. https://doi.org/10.1002/imt2.107</li>",
+        "<li>Bushnell B. (2014) BBMap. https://sourceforge.net/projects/bbmap/</li>",
+        "<li>Li H. (2012) seqtk. https://github.com/lh3/seqtk</li>",
+        "<li>Rausch T. et al. (2012) DELLY. Bioinformatics, 28(18), i333–i339. https://doi.org/10.1093/bioinformatics/bts378</li>",
+        "<li>Cameron DL. et al. (2017) GRIDSS. Genome Research, 27(12), 2050–2060. https://doi.org/10.1101/gr.222109.117</li>",
+        "<li>Eisfeldt J. et al. (2017) TIDDIT. F1000Research, 6:664. https://doi.org/10.12688/f1000research.11501.1</li>",
+        "<li>Cawte N. et al. (2022) Dysgu. Bioinformatics, 38(9), 2465–2471. https://doi.org/10.1093/bioinformatics/btac144</li>",
+        "<li>Sedlazeck FJ. et al. (2018) Sniffles. Nature Methods, 15, 461–468. https://doi.org/10.1038/s41592-018-0001-7</li>",
+        "<li>Jiang T. et al. (2020) CuteSV. Genome Biology, 21:189. https://doi.org/10.1186/s13059-020-02107-y</li>",
+        "<li>Wala JA. et al. (2018) SvABA. Genome Research, 28(4), 581–591. https://doi.org/10.1101/gr.221028.117</li>",
+        "<li>Chen X. et al. (2016) Manta. Bioinformatics, 32(8), 1220–1222. https://doi.org/10.1093/bioinformatics/btv710</li>",
+        "<li>Jeffares DC. et al. (2017) SURVIVOR. Nat Commun, 8, 14061. https://doi.org/10.1038/ncomms14061</li>",
+        "<li>Nicolas Vannieuwkerke (2024) SVYNC. https://github.com/nvnieuwk/svync</li>",
+        "<li>Sloup O. et al. (2024) Varify. https://github.com/Lupphes/Varify</li>",
+        "<li>Leinonen R. et al. (2011) The Sequence Read Archive. Nucleic Acids Res., 39(Database issue): D19–D21. https://doi.org/10.1093/nar/gkq1019</li>",
+        "<li>Sloup O. (2023) BioDbCore: ENA/RefSeq retrieval module. https://github.com/luppo/biodbcore</li>",
+        "<li>GNU Project. coreutils (including gunzip). https://www.gnu.org/software/coreutils/</li>"
+    ].join(' ').trim()
 
     return reference_text
 }
@@ -183,14 +254,8 @@ def methodsDescriptionText(mqc_methods_yaml) {
     } else meta["doi_text"] = ""
     meta["nodoi_text"] = meta.manifest_map.doi ? "" : "<li>If available, make sure to update the text to include the Zenodo DOI of version of the pipeline used. </li>"
 
-    // Tool references
-    meta["tool_citations"] = ""
-    meta["tool_bibliography"] = ""
-
-    // TODO nf-core: Only uncomment below if logic in toolCitationText/toolBibliographyText has been filled!
-    // meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
-    // meta["tool_bibliography"] = toolBibliographyText()
-
+    meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
+    meta["tool_bibliography"] = toolBibliographyText()
 
     def methods_text = mqc_methods_yaml.text
 

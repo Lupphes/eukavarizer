@@ -28,20 +28,9 @@ process SAMTOOLS_SORT {
                     args.contains("--output-fmt cram") ? "cram" :
                     "bam"
     def reference = fasta ? "--reference ${fasta}" : ""
+    if ("$bam" == "${prefix}.bam") error "Input and output names are the same, use \"task.ext.prefix\" to disambiguate!"
 
-    // Debugging outputs before running samtools
     """
-    echo "DEBUG: SAMTOOLS_SORT Process"
-    echo "DEBUG: Input BAM -> ${bam}"
-    echo "DEBUG: Computed Prefix -> ${prefix}"
-    echo "DEBUG: Expected Output -> ${prefix}.${extension}"
-
-    # Check if input and output filenames match
-    if [ "${bam}" == "${prefix}.bam" ]; then
-        echo "ERROR: Input and output BAM filenames are identical!"
-        exit 1
-    fi
-
     samtools cat \\
         ${bam} \\
     | \\
@@ -58,7 +47,6 @@ process SAMTOOLS_SORT {
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
-
 
     stub:
     def args = task.ext.args ?: ''

@@ -72,12 +72,14 @@ workflow REFERENCE_RETRIEVAL {
 
         SAMTOOLS_BGZIP_FAIDX(
             TABIX_BGZIP.out.output,
-            [[], []]
+            [[], []],
+            false
         )
 
         SAMTOOLS_FAIDX(
             GUNZIP.out.gunzip,
-            [[], []]
+            [[], []],
+            false
         )
 
 

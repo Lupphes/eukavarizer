@@ -29,20 +29,16 @@ workflow SV_CALLING_DYSGU {
     main:
         name_dysgu = "dysgu"
 
-        first = bam_inputs
+        DYSGU(
+            bam_inputs
             .map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_dysgu}"], bam, bai)
-            }
-
-        second = reference_genome_unzipped
+            },
+            reference_genome_unzipped
             .join(reference_genome_faidx, by: 0)
             .map { meta, fasta, fai ->
                 tuple(meta + [id: "${meta.id}_${name_dysgu}"], fasta, fai)
-            }
-
-        DYSGU(
-            first,
-            second,
+            }.collect(),
         )
 
         SAMPLE_REHEADER(

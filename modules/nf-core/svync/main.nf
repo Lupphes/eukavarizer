@@ -27,16 +27,10 @@ process SVYNC {
     if ("$vcf" == "${prefix}.vcf.gz") error "Input and output names are the same, set prefix in module configuration to disambiguate!"
 
     """
-
-    echo "DEBUG"
-    echo "vcf: $vcf"
-    echo "tbi: $tbi"
-    echo "config: $config"
-    echo "prefix: $prefix"
     svync \\
         $args \\
         --config $config \\
-        --input ${vcf} \\
+        --input $vcf \\
         | bgzip --threads $task.cpus $args2 > ${prefix}.vcf.gz \\
         && tabix $args3 ${prefix}.vcf.gz
 
