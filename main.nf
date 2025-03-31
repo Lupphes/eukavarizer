@@ -96,7 +96,7 @@ workflow NFCORE_EUKAVARIZER {
                 SV_UNIFICATION.out.bcfmerge_stats,
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.tbi_list,
-                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped
             )
 
         }
@@ -122,10 +122,11 @@ workflow {
         //
         // Input channels for the workflow
         //
-        taxonomy_id          = Channel.value(params.taxonomy_id)
-        outdir               = Channel.value(params.outdir)
-        reference_genome     = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
-        sequence_dir         = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
+        taxonomy_id             = Channel.value(params.taxonomy_id)
+        outdir                  = Channel.value(params.outdir)
+        reference_genome        = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
+        sequence_dir            = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
+        // input                   = params.input ? Channel.fromPath(params.input, type: 'file', checkIfExists: true) : []
 
         //
         // SUBWORKFLOW: Run initialisation tasks
@@ -136,6 +137,7 @@ workflow {
             params.monochrome_logs,
             args,
             outdir
+            // input
         )
 
         //

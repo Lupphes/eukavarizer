@@ -9,7 +9,7 @@ template:
   name: eukavarizer
   description: Structural Variance for Eukaryotic Genomes
   author: Ondřej Sloup
-  version: 1.0.0dev
+  version: 1.1.0dev
   force: true
   outdir: .
   skip_features: []

@@ -1,5 +1,12 @@
 reports:
+  report.html:
+    display: "Eukavarizer Structural Variant Report"
+    type: html
+
   multiqc_report.html:
-    display: "MultiQC HTML report"
-  samplesheet.csv:
-    display: "Auto-created samplesheet with collated metadata and FASTQ paths"
+    display: "MultiQC Report"
+    type: html
+
+  plots/:
+    display: "Report Figures (PNG/HTML)"
+    type: directory
