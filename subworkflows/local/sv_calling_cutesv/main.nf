@@ -9,9 +9,13 @@
     4. **GUNZIP** – Decompresses the final VCF file.
 
     Outputs:
-    - `vcf` – Reheaded VCF file
-    - `svync_vcf` – Synchronized VCF file
-    - `svync_vcfgz` – Gzipped synchronized VCF file
+    - `vcf`           – Reheaded VCF file.
+    - `vcfgz`         – Gzipped reheaded VCF file.
+    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
+    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
+    - `svync_vcf`     – Decompressed synchronized VCF file.
+    - `svync_vcfgz`   – Gzipped synchronized VCF file.
+    - `svync_tbi`     – Tabix index for the synchronized VCF.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

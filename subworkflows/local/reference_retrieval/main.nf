@@ -3,20 +3,23 @@
     REFERENCE_RETRIEVAL WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     This workflow retrieves and processes reference genomes:
-    1. **BIODBCORE_REFSEQ** – Downloads reference genome from RefSeq.
-    2. **GUNZIP** – Decompresses the reference genome.
-    3. **BWAMEM2_INDEX** or **BWA_INDEX** – Creates BWA2 index for the reference genome.
-    4. **MINIMAP2_INDEX** – Creates MINIMAP2 index for the reference genome.
-    5. **TABIX_BGZIP** – Compresses the reference genome with bgzip.
+    1. **BIODBCORE_REFSEQ** – Downloads the reference genome from RefSeq.
+    2. **GUNZIP** – Decompresses the reference genome file.
+    3. **BWAMEM2_INDEX** or **BWA_INDEX** – Generates BWA or BWA-MEM2 index.
+    4. **MINIMAP2_INDEX** – Generates a MINIMAP2 index.
+    5. **TABIX_BGZIP** – Compresses the genome using bgzip.
     6. **SAMTOOLS_FAIDX** – Creates a FASTA index for the uncompressed genome.
     7. **SAMTOOLS_BGZIP_FAIDX** – Creates a FASTA index for the bgzipped genome.
 
     Outputs:
-    - `reference_genome` – Original reference genome file.
-    - `reference_genome_unzipped` – Unzipped reference genome.
-    - `reference_genome_bgzipped` – Bgzipped reference genome.
-    - `reference_genome_bwa_index` – BWA index.
-    - `reference_genome_faidx` – FASTA index for the uncompressed genome.
+    - `reference_genome` – Original reference genome file (input or downloaded).
+    - `reference_genome_unzipped` – Uncompressed FASTA file.
+    - `reference_genome_bgzipped` – bgzipped FASTA file.
+    - `reference_genome_bwa_index` – BWA or BWA-MEM2 index files.
+    - `reference_genome_minimap_index` – Minimap2 index files.
+    - `reference_genome_bgzipped_index` – bgzip `.gzi` index file.
+    - `reference_genome_faidx` – FASTA index for uncompressed FASTA.
+    - `reference_genome_bgzipped_faidx` – FASTA index for bgzipped FASTA.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

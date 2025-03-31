@@ -9,9 +9,29 @@
     4. **GUNZIP** – Decompresses the final VCF files.
 
     Outputs:
-    - `small_vcf` – Small indel calls
-    - `candidate_vcf` – Candidate SV calls
-    - `diploid_vcf` – Diploid SV calls
+    - `small_vcf`              – Reheaded VCF file for small indels.
+    - `small_vcfgz`            – Gzipped VCF for small indels.
+    - `small_tbi`              – Tabix index for small VCF.
+    - `small_csi`              – CSI index for small VCF (if generated).
+    - `svync_small_vcf`        – Decompressed synchronized small VCF.
+    - `svync_small_vcfgz`      – Gzipped synchronized small VCF.
+    - `svync_small_tbi`        – Tabix index for synchronized small VCF.
+
+    - `candidate_vcf`          – Reheaded VCF file for candidate SVs.
+    - `candidate_vcfgz`        – Gzipped VCF for candidate SVs.
+    - `candidate_tbi`          – Tabix index for candidate VCF.
+    - `candidate_csi`          – CSI index for candidate VCF (if generated).
+    - `svync_candidate_vcf`    – Decompressed synchronized candidate VCF.
+    - `svync_candidate_vcfgz`  – Gzipped synchronized candidate VCF.
+    - `svync_candidate_tbi`    – Tabix index for synchronized candidate VCF.
+
+    - `diploid_vcf`            – Reheaded VCF file for diploid SVs.
+    - `diploid_vcfgz`          – Gzipped VCF for diploid SVs.
+    - `diploid_tbi`            – Tabix index for diploid VCF.
+    - `diploid_csi`            – CSI index for diploid VCF (if generated).
+    - `svync_diploid_vcf`      – Decompressed synchronized diploid VCF.
+    - `svync_diploid_vcfgz`    – Gzipped synchronized diploid VCF.
+    - `svync_diploid_tbi`      – Tabix index for synchronized diploid VCF.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

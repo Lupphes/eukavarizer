@@ -11,9 +11,10 @@
     6. **SAMTOOLS_INDEX** – Indexes the sorted BAM files.
 
     Outputs:
-    - `fastq_filtered` – Filtered FASTQ files
-    - `fastq_bam` – Sorted BAM files
-    - `fastq_bam_indexes` – BAM index files
+    - `fastq_filtered`     – Filtered FASTQ files.
+    - `fastq_bam`          – Sorted BAM files (.bam).
+    - `fastq_bam_indexes`  – BAM index files (.bai).
+    - `multiqc_report`     – MultiQC report file from quality control.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

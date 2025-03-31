@@ -7,12 +7,14 @@
     generates structured HTML reports.
 
     The VARIFY module is used to process the VCF files and generate three reports:
-    - **html_index**: Summary of the results and key metrics.
-    - **html_merged**: Detailed report of the merged structural variant calls.
-    - **html_survivor**: Summary of the SURVIVOR-based variant analysis.
+    - **html_index** – Summary of the results and key metrics.
+    - **html_merged** – Detailed report of the merged structural variant calls.
+    - **html_survivor** – Summary of the SURVIVOR-based variant analysis.
 
-    The reports provide a comprehensive overview of the structural variant calling results,
-    allowing for easy interpretation and validation of the analysis.
+    Outputs:
+    - `report_file`     – Main report (`report.html`).
+    - `report_images`   – PNG images (figures and plots).
+    - `report_html`     – Additional HTML report files from the plots directory.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

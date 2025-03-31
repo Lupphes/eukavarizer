@@ -6,6 +6,15 @@
     - DELLY, MANTA, GRIDSS, Dysgu, TIDDIT – for short reads
     - Sniffles, CuteSV – for long reads
     - SVABA – for both short and long reads (currently not supported)
+
+    The outputs of this workflow include all synchronized and filtered VCFs along with
+    their associated index files and metadata.
+
+    Outputs:
+    - `vcf_list`     – List of synchronized VCF files (decompressed).
+    - `vcfgz_list`   – List of synchronized and compressed VCF files (.vcf.gz).
+    - `tbi_list`     – List of Tabix index files (.tbi) corresponding to the compressed VCFs.
+    - `meta_list`    – List of metadata maps for each variant call, used for downstream merging.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

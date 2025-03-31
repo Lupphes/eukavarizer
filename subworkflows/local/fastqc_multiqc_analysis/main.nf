@@ -4,12 +4,12 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     This workflow runs quality control and summarises the results:
     1. **FASTQC** – Runs FastQC on raw FASTQ files (if enabled).
-    2. **MULTIQC** – Compiles reports from FastQC and other sources (if enabled).
+    2. **MULTIQC** – Aggregates reports from FastQC and other sources (if enabled).
 
     Outputs:
     - `fastqc_report` – FastQC report (if enabled).
     - `multiqc_report` – MultiQC report (if enabled).
-    - `versions` – Collected software versions.
+    - `versions` – Collected software versions for reproducibility.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

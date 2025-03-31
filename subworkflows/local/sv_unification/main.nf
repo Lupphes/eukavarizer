@@ -9,9 +9,11 @@
     3. **BCFTOOLS_MERGE** – Combines compressed VCF files into a unified output.
 
     Outputs:
-    - `survivor_vcf` – Unified VCF from SURVIVOR_MERGE
-    - `survivor_stats` – Summary statistics
-    - `bcfmerge_vcf` – Unified VCF from BCFTOOLS_MERGE
+    - `survivor_vcf`     – Filtered and merged VCF from SURVIVOR.
+    - `survivor_stats`   – Summary statistics from SURVIVOR.
+    - `bcfmerge_vcf`     – Filtered merged VCF from BCFTOOLS.
+    - `bcfmerge_tbi`     – Tabix index for the BCFTOOLS merged VCF.
+    - `bcfmerge_stats`   – Summary statistics from BCFTOOLS.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

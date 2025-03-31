@@ -4,9 +4,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     This workflow performs quality control on raw FASTQ files:
     1. **PRE_FASTQC_MULTIQC_ANALYSIS** – Runs initial FastQC and MultiQC analysis.
-    2. **FASTP** – Trims and filters reads for quality.
+    2. **FASTP / FASTPLONG** – Trims and filters short reads using FASTP,
+        and trims/filters long reads using FASTPLONG.
     3. **BBMAP_BBDUK** – Removes adapter and contaminant sequences.
-    4. **SEQTK_SAMPLE** – Subsamples reads to reduce data size for testing.
+    4. **SEQTK_SAMPLE** – Subsamples reads to reduce data size for testing (if enabled).
     5. **AFTER_FASTQC_MULTIQC_ANALYSIS** – Runs final FastQC and MultiQC analysis.
 
     Outputs:

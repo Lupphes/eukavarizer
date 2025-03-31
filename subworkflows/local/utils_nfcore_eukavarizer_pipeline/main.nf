@@ -5,10 +5,16 @@
     PIPELINE_INITIALISATION:
     - Sets up the pipeline by validating input parameters and configuration.
     - Prints the pipeline version and configuration information.
+    - Optionally parses the samplesheet and validates input formats.
 
     PIPELINE_COMPLETION:
     - Handles the pipeline's completion tasks.
-    - Sends completion emails, generates summaries, and handles errors or failures.
+    - Sends completion emails (HTML/plaintext) and generates summary logs.
+    - Sends IM notifications if configured.
+    - Catches and logs any pipeline errors.
+
+    Outputs:
+    - `versions` – Software version summary (currently empty channel placeholder).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -25,12 +31,12 @@ include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipelin
 workflow PIPELINE_INITIALISATION {
 
     take:
-    version           // boolean: Display version and exit
-    validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs   // boolean: Do not use coloured log outputs
-    nextflow_cli_args //   array: List of positional nextflow CLI args
-    outdir            //  string: The output directory where the results will be saved
-    // input             //  string: Path to input samplesheet
+    version             // boolean: Display version and exit
+    validate_params     // boolean: Boolean whether to validate parameters against the schema at runtime
+    monochrome_logs     // boolean: Do not use coloured log outputs
+    nextflow_cli_args   // array: List of positional nextflow CLI args
+    outdir              // string: The output directory where the results will be saved
+    // input            // string: Path to input samplesheet
 
 
     main:
