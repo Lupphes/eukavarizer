@@ -1,26 +1,15 @@
 id: sniffles_$INFO/SVTYPE
 
 alt:
-  # Some versions of Sniffles might label duplications simply as "DUP"
   BND: TRA
   DUP: DUP:TANDEM
 
 info:
   CALLER:
-    value: sniffles
+    value: sniffles2
     number: 1
     type: string
-    description: The caller used to determine this variant
-
-  SVLEN:
-    value: $INFO/SVLEN
-    number: 1
-    type: integer
-    description: Length of structural variation
-    alts:
-      INS: $INFO/SUPPORT_LONG # Use Sniffles-specific SUPPORT_LONG if present for insertion length
-      TRA: 1
-      DEL: $INFO/SVLEN
+    description: Variant caller used (Sniffles2)
 
   SVTYPE:
     value: $INFO/SVTYPE
@@ -28,68 +17,82 @@ info:
     type: string
     description: Type of structural variant
 
+  SVLEN:
+    value: $INFO/SVLEN
+    number: 1
+    type: integer
+    description: Length of structural variation
+    alts:
+      INS: $INFO/SUPPORT_LONG
+      TRA: 1
+
   END:
     value: $INFO/END
     number: 1
     type: integer
-    description: End position of the structural variant
-    alts:
-      TRA: $INFO/POS2
+    description: End position
 
   CHR2:
-    value: $INFO/CHR2
+    value:
     number: 1
     type: string
-    description: Chromosome for second position
+    description: Second chromosome for breakend
     alts:
       TRA: $INFO/CHR2
 
-  # Sniffles typically uses CIPOS/CIEND as standard or STDEV_POS/STDEV_LEN
   CIPOS:
     value: $INFO/STDEV_POS
-    number: 2
-    type: integer
-    description: Confidence interval around POS
-    alts:
-      DEL: ~$INFO/STDEV_POS,-$INFO/STDEV_POS
+    number: 1
+    type: float
+    description: Standard deviation around POS
 
   CIEND:
     value: $INFO/STDEV_LEN
-    number: 2
-    type: integer
-    description: Confidence interval around END
-    alts:
-      DEL: ~$INFO/STDEV_LEN,-$INFO/STDEV_LEN
+    number: 1
+    type: float
+    description: Standard deviation around END
 
   SUPPORT:
     value: $INFO/SUPPORT
     number: 1
     type: integer
-    description: Number of reads supporting the structural variation
+    description: Number of supporting reads
 
-  VAF:
-    value: $INFO/VAF
+  AF:
+    value: $INFO/AF
     number: 1
     type: float
-    description: Variant allele frequency
+    description: Allele frequency
 
   IMPRECISE:
     value: $INFO/IMPRECISE
     number: 0
     type: flag
-    description: Imprecise structural variation
+    description: Imprecise variant
 
   PRECISE:
     value: $INFO/PRECISE
     number: 0
     type: flag
-    description: Precise structural variation
+    description: Precise variant
 
   MOSAIC:
     value: $INFO/MOSAIC
     number: 0
     type: flag
-    description: Mosaic structural variation
+    description: Mosaic variant
+
+  COVERAGE:
+    value: $INFO/COVERAGE
+    number: .
+    type: float
+    description: Coverage near the SV (5-element array)
+
+  STRAND:
+    value: $INFO/STRAND
+    number: 1
+    type: string
+    description: Strand orientation of the breakpoints
 
 format:
   GT:
@@ -98,28 +101,20 @@ format:
     type: string
     description: Genotype
 
-  # In Sniffles v1/v2, DR = reference read count, DV = variant read count.
-  # The names "PE"/"SR" can be misleading for a long-read caller, but we keep them for consistency.
-  PE:
+  PR:
     value: $FORMAT/DR
-    number: 2
+    number: 1
     type: integer
-    description: Number of reference-supporting reads (Sniffles lumps them in DR)
+    description: Reference reads (Sniffles lumps all ref read counts in DR)
 
   SR:
     value: $FORMAT/DV
-    number: 2
-    type: integer
-    description: Number of variant-supporting reads
-
-  PS:
-    value: $FORMAT/PS
     number: 1
     type: integer
-    description: Phase block ID
+    description: Variant reads (Sniffles lumps all alt read counts in DV)
 
-  ID:
-    value: $FORMAT/ID
+  GQ:
+    value: $FORMAT/GQ
     number: 1
-    type: string
-    description: Individual sample SV ID for multi-sample output
+    type: integer
+    description: Genotype quality

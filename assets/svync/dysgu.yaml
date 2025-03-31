@@ -1,0 +1,173 @@
+id: dysgu_$INFO/SVTYPE
+
+# alt: unify Dysgu’s <TRA>, <DEL>, <INS>, <DUP>, <INV> with standard naming
+alt:
+  BND: TRA
+  DEL: DEL
+  DUP: DUP
+  INV: INV
+  INS: INS
+  TRA: TRA
+
+info:
+  CALLER:
+    value: dysgu
+    number: 1
+    type: string
+    description: The caller used to determine this variant
+
+  SVTYPE:
+    value: $INFO/SVTYPE
+    number: 1
+    type: string
+    description: Type of structural variant
+
+  SVLEN:
+    value: $INFO/SVLEN
+    number: 1
+    type: integer
+    description: Length of the structural variant
+    alts:
+      DEL: -$INFO/SVLEN
+      INS: $INFO/SVLEN
+      DUP: $INFO/SVLEN
+      INV: $INFO/SVLEN
+      BND: 0
+      TRA: 0
+
+  END:
+    value: $INFO/END
+    number: 1
+    type: integer
+    description: End position of the variant described in this record
+
+  CHR2:
+    value: $INFO/CHR2
+    number: 1
+    type: string
+    description: Chromosome for second breakend in translocations
+    alts:
+      TRA: $INFO/CHR2
+      BND: $INFO/CHR2
+
+  # For translocations, Dysgu also stores the partner coordinate in CHR2_POS
+  POS2:
+    value: $INFO/CHR2_POS
+    number: 1
+    type: integer
+    description: Position on second chromosome for translocations
+    alts:
+      TRA: $INFO/CHR2_POS
+      BND: $INFO/CHR2_POS
+
+  # Dysgu calls it CIPOS95, which is the size of the 95% confidence interval, not an actual [start,end] array.
+  CIPOS:
+    value: $INFO/CIPOS95
+    number: 1
+    type: integer
+    description: 95% confidence interval size around POS
+
+  CIEND:
+    value: $INFO/CIEND95
+    number: 1
+    type: integer
+    description: 95% confidence interval size around END
+
+  # Some read support fields in INFO for the entire call (all samples)
+  SU:
+    value: $INFO/SU
+    number: 1
+    type: integer
+    description: Total pieces of evidence supporting the variant
+
+  PE:
+    value: $INFO/PE
+    number: 1
+    type: integer
+    description: Number of paired-end reads supporting the variant
+
+  SR:
+    value: $INFO/SR
+    number: 1
+    type: integer
+    description: Number of supplementary reads supporting the variant
+
+  SC:
+    value: $INFO/SC
+    number: 1
+    type: integer
+    description: Number of soft-clip reads supporting the variant
+
+  BND:
+    value: $INFO/BND
+    number: 1
+    type: integer
+    description: Number of break-end alignments supporting the variant
+
+  # If you want to store Dysgu’s “SVMETHOD=DYSGUv1.x”, keep it:
+  SVMETHOD:
+    value: $INFO/SVMETHOD
+    number: 1
+    type: string
+    description: Method used to detect SV
+
+  # Additional fields if needed, e.g. RT, GRP, etc.
+  # GRP:
+  #   value: $INFO/GRP
+  #   number: 1
+  #   type: integer
+  #   description: Group id for complex SVs
+
+  # Others: WR, SC, etc. can be added similarly
+
+format:
+  # Dysgu provides GT, GQ, plus many advanced fields
+  GT:
+    value: $FORMAT/GT
+    number: 1
+    type: string
+    description: Genotype (0/1,1/1, etc.)
+
+  GQ:
+    value: $FORMAT/GQ
+    number: 1
+    type: float
+    description: Genotype quality (phred-scaled)
+
+  # "PE" / "SR" in FORMAT is # of paired/split supporting reads *for that sample*
+  PE_FORMAT:
+    value: $FORMAT/PE
+    number: 1
+    type: integer
+    description: Paired-end reads supporting variant (sample-level)
+
+  SR_FORMAT:
+    value: $FORMAT/SR
+    number: 1
+    type: integer
+    description: Supplementary alignments supporting variant (sample-level)
+
+  SC_FORMAT:
+    value: $FORMAT/SC
+    number: 1
+    type: integer
+    description: Soft-clipped alignments supporting variant (sample-level)
+
+  BND_FORMAT:
+    value: $FORMAT/BND
+    number: 1
+    type: integer
+    description: Break-end alignments supporting variant (sample-level)
+
+  # Add as needed (MAPQP, MAPQS, NMP, NMS, NP, etc.)
+  MAPQP:
+    value: $FORMAT/MAPQP
+    number: 1
+    type: float
+    description: Mean MAPQ of primary alignments supporting the variant
+
+  MAPQS:
+    value: $FORMAT/MAPQS
+    number: 1
+    type: float
+    description: Mean MAPQ of supplementary alignments supporting the variant
