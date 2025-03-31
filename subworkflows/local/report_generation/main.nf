@@ -51,7 +51,8 @@ workflow REPORT_GENERATION {
             bcfmerge_vcf,
             bcfmerge_stats,
             varify_input,
-            reference_genome
+            reference_genome,
+            workflow.profile
         )
 
     emit:

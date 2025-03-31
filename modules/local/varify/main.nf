@@ -14,22 +14,23 @@ process VARIFY {
         tuple val(meta5), path (bcfmerge_stats)
         tuple val(meta6), path (vcf_list_cleaned)
         tuple val(meta7), path (reference_genome_bgzipped_index)
+        val(profile)
 
     output:
         path "report.html", emit: report_file
-        path "*.png", emit: report_images
+        path "plots/*.png", emit: report_images
+        path "plots/*.html", emit: report_html
 
     script:
     """
     varify \\
         --output-dir . \\
-        --bfc-vcf-file ${bcfmerge_vcf} \\
+        --bcf-vcf-file ${bcfmerge_vcf} \\
         --survivor-vcf-file ${survivor_vcf} \\
         --fasta-file ${reference_genome_bgzipped_index} \\
-        --bfc-stats-file ${bcfmerge_stats} \\
+        --bcf-stats-file ${bcfmerge_stats} \\
         --survivor-stats-file ${survivor_stats} \\
-        --report-file "report.html"
-
+        --report-file "report.html" \\
+        --profile ${profile}
     """
 }
-// \$(for vcf in ${vcf_list}; do echo "--sample-vcf-files \$vcf"; done) \\
