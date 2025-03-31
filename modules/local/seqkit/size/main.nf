@@ -20,10 +20,18 @@ process SEQKIT_SIZE {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    # Extract median size using seqkit and awk
-    seqkit seq -s ${reads} | awk '{print length}' | sort -n | awk '{a[NR]=\$1} END {if (NR%2==1) {print a[(NR+1)/2]} else {print (a[NR/2] + a[NR/2+1])/2}}' > median_size.txt
+    # Compute stats once and reuse the file
+    seqkit stats --tabular --all ${reads.collect { "\"${it}\"" }.join(' ')} > stats.txt
 
-    # Record seqkit version info
+    # Extract number of sequences
+    seqs=\$(awk 'NR==2 {print \$4}' stats.txt)
+    if [ "\$seqs" -gt 0 ]; then
+        awk 'NR==2 {printf "%d\\n", \$9}' stats.txt > median_size.txt
+    else
+        echo "0" > median_size.txt
+    fi
+
+    # Save version info
     echo "seqkit: \$(seqkit version 2>&1)" > versions.yml
     """
 }
