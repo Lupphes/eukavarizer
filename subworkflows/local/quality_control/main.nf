@@ -19,14 +19,15 @@
 include { FASTQC_MULTIQC_ANALYSIS as PRE_FASTQC_MULTIQC_ANALYSIS    } from '../../../subworkflows/local/fastqc_multiqc_analysis/main'
 include { FASTQC_MULTIQC_ANALYSIS as AFTER_FASTQC_MULTIQC_ANALYSIS  } from '../../../subworkflows/local/fastqc_multiqc_analysis/main'
 
-include { FASTP         } from '../../../modules/nf-core/fastp/main'
-include { BBMAP_BBDUK   } from '../../../modules/nf-core/bbmap/bbduk/main'
-include { SEQTK_SAMPLE  } from '../../../modules/nf-core/seqtk/sample/main'
+include { FASTP                     } from '../../../modules/nf-core/fastp/main'
+include { FASTPLONG                 } from '../../../modules/local/fastplong/main'
+include { BBMAP_BBDUK               } from '../../../modules/nf-core/bbmap/bbduk/main'
+include { SEQTK_SAMPLE              } from '../../../modules/nf-core/seqtk/sample/main'
 
-include { paramsSummaryMap       } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc   } from '../../nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../..//nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../../local/utils_nfcore_eukavarizer_pipeline'
+include { paramsSummaryMap          } from 'plugin/nf-schema'
+include { paramsSummaryMultiqc      } from '../../nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML    } from '../..//nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText    } from '../../local/utils_nfcore_eukavarizer_pipeline'
 
 workflow QUALITY_CONTROL {
 
@@ -41,15 +42,33 @@ workflow QUALITY_CONTROL {
 
         // FASTP
         FASTP(
-            fastq_files,
+            fastq_files
+            // Don't use on long reads
+            .filter { meta, _fastq ->
+                meta.median_bp < params.long_read_threshold
+            },
             [],
             false,
             false,
             false
         )
 
+        FASTPLONG(
+            fastq_files
+            // Don't use on short reads
+            .filter { meta, _fastq ->
+                meta.median_bp >= params.long_read_threshold
+            },
+            [],
+            false,
+            false
+        )
+
+        // FASTP Short reads & FASTPLONG Long reads
+        fastp_combined_result = FASTP.out.reads.mix(FASTPLONG.out.reads)
+
         BBMAP_BBDUK(
-            FASTP.out.reads
+            fastp_combined_result
                 // Don't use on long reads
                 .filter { meta, _fastq ->
                     meta.median_bp < params.long_read_threshold
@@ -66,9 +85,9 @@ workflow QUALITY_CONTROL {
             []
         )
 
-        // Readd the filtered long reads
+        // Trimmed Illumina reads and filtered long reads
         bbduk_combined_result = BBMAP_BBDUK.out.reads.mix(
-            FASTP.out.reads.filter { meta, _fastq ->
+            fastp_combined_result.filter { meta, _fastq ->
                 meta.median_bp >= params.long_read_threshold
             })
 
