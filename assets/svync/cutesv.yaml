@@ -128,7 +128,7 @@ format:
 
   PL:
     value: $FORMAT/PL
-    number: .
+    number: G
     type: integer
     description: Phred-scaled genotype likelihoods
 

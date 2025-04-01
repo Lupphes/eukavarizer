@@ -147,7 +147,7 @@ format:
 
   GL:
     value: $FORMAT/GL
-    number: .
+    number: G
     type: float
     description: Log10-scaled genotype likelihoods for RR,RA,AA genotypes
 
