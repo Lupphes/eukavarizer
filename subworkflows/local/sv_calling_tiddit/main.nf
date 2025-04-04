@@ -36,16 +36,15 @@ workflow SV_CALLING_TIDDIT {
     main:
         name_tiddit = "tiddit"
 
-        bwa_bam_inputs = bam_inputs.filter { meta, _bam, _bai ->
-            !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
-        }
-
-        minimap2_bams = bam_inputs.filter { meta, _bam, _bai ->
-            params.minimap2_flag && meta.median_bp > params.long_read_threshold
-        }
-
         TIDDIT_BWA(
-            bwa_bam_inputs.map { meta, bam, bai ->
+            bam_inputs
+            // Only keep paired-end reads as MANTA does not support unpaired reads
+            .filter { meta, _bam, _bai ->
+                !meta.single_end
+            }
+            .filter { meta, _bam, _bai ->
+                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+            }.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
             },
             reference_genome_bgzipped,
@@ -55,7 +54,14 @@ workflow SV_CALLING_TIDDIT {
         )
 
         TIDDIT_MAP(
-            minimap2_bams.map { meta, bam, bai ->
+            bam_inputs
+            // Only keep paired-end reads as MANTA does not support unpaired reads
+            .filter { meta, _bam, _bai ->
+                !meta.single_end
+            }
+            .filter { meta, _bam, _bai ->
+                params.minimap2_flag && meta.median_bp > params.long_read_threshold
+            }.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
             },
             reference_genome_bgzipped,
@@ -68,7 +74,8 @@ workflow SV_CALLING_TIDDIT {
 
         SAMPLE_REHEADER(
             tiddit_result,
-            tiddit_result.map { meta, _vcf -> "${meta.id}_${name_tiddit}" }
+            tiddit_result.map { meta, _vcf -> "${meta.id}_${name_tiddit}" },
+            false
         )
 
         SVYNC(

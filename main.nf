@@ -43,6 +43,7 @@ workflow NFCORE_EUKAVARIZER {
 
     main:
 
+        report = Channel.empty()
         sv_callers_enabled = params.gridss_flag || params.delly_flag || params.manta_flag ||
                                 params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
                                 params.dysgu_flag || params.svaba_flag
@@ -87,7 +88,7 @@ workflow NFCORE_EUKAVARIZER {
                 REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
             )
 
-            REPORT_GENERATION(
+            report = REPORT_GENERATION(
                 taxonomy_id,
                 outdir,
                 SV_UNIFICATION.out.survivor_vcf,
@@ -97,7 +98,7 @@ workflow NFCORE_EUKAVARIZER {
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.tbi_list,
                 REFERENCE_RETRIEVAL.out.reference_genome_unzipped
-            )
+            ).report_file
 
         }
         else {
@@ -107,7 +108,7 @@ workflow NFCORE_EUKAVARIZER {
 
     emit:
         multiqc_report      = SEQUENCE_PROCESSOR.out.multiqc_report
-        report_file         = sv_callers_enabled ? REPORT_GENERATION.out.report_file : Channel.empty()
+        report_file         = sv_callers_enabled ? report : Channel.empty()
 }
 
 /*

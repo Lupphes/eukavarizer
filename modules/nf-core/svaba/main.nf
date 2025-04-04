@@ -1,7 +1,7 @@
 
 process SVABA {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_high'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -10,12 +10,12 @@ process SVABA {
 
     input:
     tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai)
-    tuple val(meta2), path(fasta)
-    tuple val(meta6), path(fasta_fai)
+    tuple val(meta1), path(fasta)
+    tuple val(meta2), path(fasta_fai)
     tuple val(meta3), path(bwa_index)
     tuple val(meta4), path(dbsnp)
-    tuple val(meta7), path(dbsnp_tbi)
-    tuple val(meta5), path(regions)
+    tuple val(meta5), path(dbsnp_tbi)
+    tuple val(meta6), path(regions)
 
     output:
     tuple val(meta), path("*.svaba.sv.vcf.gz")                        , emit: sv, optional: true
@@ -44,18 +44,24 @@ process SVABA {
     def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
     regions = regions ? "--region ${regions}" : ""
-    def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
 
     """
-    ${bwa}
+    ref_file=\$(basename "${fasta}")
+    ref_prefix=\${ref_file%.*}
+
+    cp "${fasta}" .
+
+    for ext in amb ann bwt pac sa; do
+        cp "${bwa_index}/\${ref_prefix}.\$ext" "\${ref_file}.\$ext"
+    done
 
     svaba \\
         run \\
         $bamlist \\
         --threads $task.cpus \\
         $dbsnp \\
-        --id-string $meta.id \\
-        --reference-genome $fasta \\
+        --id-string ${prefix} \\
+        --reference-genome \${ref_file} \\
         --g-zip \\
         $regions \\
         $args

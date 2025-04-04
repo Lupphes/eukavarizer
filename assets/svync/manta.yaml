@@ -6,6 +6,7 @@ alt:
   INS: INS
   DUP: DUP
   INV: INV
+  TRA: TRA
 
 info:
   CALLER:
@@ -15,16 +16,19 @@ info:
     description: The caller used to determine this variant
 
   SVLEN:
-    value: ~sub:$INFO/END,$POS
+    value: $INFO/SVLEN
     number: 1
     type: integer
-    description: Length of the structural variant
+    description: Length of structural variation
     alts:
-      DEL: -~sub:$INFO/END,$POS
-      INS: ~sum:~len:$INFO/LEFT_SVINSSEQ,~len:$INFO/RIGHT_SVINSSEQ
+      DEL: $INFO/SVLEN
+      DEL:TANDEM: $INFO/SVLEN
+      INS: ~sum:~len:LEFT_SVINSSEQ,~len:RIGHT_SVINSSEQ
       DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
       INV: $INFO/SVLEN
-      TRA: 1
+      BND: 0
+      TRA: 0
 
   CIEND:
     value: $INFO/CIEND
@@ -61,6 +65,8 @@ info:
     number: 1
     type: integer
     description: End position of the structural variant
+    alts:
+      TRA: $INFO/POS2
 
   IMPRECISE:
     value: $INFO/IMPRECISE
@@ -86,6 +92,24 @@ info:
     type: string
     description: Known right-side insertion sequence
 
+  HOMSEQ:
+    value: $INFO/HOMSEQ
+    number: 1
+    type: string
+    description: Sequence of base pair identical homology at event breakpoints
+
+  HOMLEN:
+    value: $INFO/HOMLEN
+    number: 1
+    type: integer
+    description: Length of base pair identical homology at event breakpoints
+
+  MATEID:
+    value: $INFO/MATEID
+    number: 1
+    type: string
+    description: ID(s) of mate breakend(s)
+
 format:
   GT:
     value: $FORMAT/GT
@@ -93,22 +117,26 @@ format:
     type: string
     description: Genotype
 
-  # Manta defines PR as (refCount, altCount) for spanning paired-read support
   PE:
-    value: $FORMAT/PR
-    number: 2
+    value: $FORMAT/PR/1
+    number: 1
     type: integer
-    description: Paired-read support for ref and alt alleles in the order listed
+    description: Paired-read support for alt alleles in the order listed
 
-  # Manta defines SR as (refCount, altCount) for split-read support
   SR:
-    value: $FORMAT/SR
+    value: .,$FORMAT/SR
     number: 2
     type: integer
-    description: Split-read support for ref and alt alleles in the order listed
+    description: Split-read support for the ref and alt alleles in the order listed
+
+  PL:
+    value: $FORMAT/PL
+    number: G
+    type: float
+    description: Phred-scaled genotype likelihoods
 
   GQ:
     value: $FORMAT/GQ
     number: 1
-    type: integer
+    type: float
     description: Genotype quality

@@ -2,9 +2,11 @@ id: tiddit_$INFO/SVTYPE
 
 alt:
   BND: TRA
-  DUP:TANDEM: DUP
-  DUP:INV: DUP
+  DEL: DEL
+  INS: INS
+  DUP: DUP
   INV: INV
+  TRA: TRA
 
 info:
   CALLER:
@@ -20,12 +22,13 @@ info:
     description: Length of the structural variant
     alts:
       DEL: -$INFO/SVLEN
+      DEL:TANDEM: -$INFO/SVLEN
+      INS: $INFO/SVLEN
       DUP: $INFO/SVLEN
       DUP:TANDEM: $INFO/SVLEN
-      DUP:INV: $INFO/SVLEN
       INV: $INFO/SVLEN
-      TRA: 0
       BND: 0
+      TRA: 0
 
   SVTYPE:
     value: $INFO/SVTYPE
@@ -38,18 +41,18 @@ info:
     number: 1
     type: integer
     description: End position for intrachromosomal variants
-    alts:
-      TRA: $INFO/REGIONB/1
-      BND: $INFO/REGIONB/1
 
-  # We omit CHR2 because Tiddit doesn't store second-chrom info in REGIONB[0].
-  # If you forcibly set CHR2=$INFO/REGIONB/0, you'll interpret "92481" as a chromosome name, leading to errors.
+  CHR2:
+    value: $INFO/CHR2
+    number: 1
+    type: string
+    description: Chromosome of the partner breakpoint
 
   IMPRECISE:
-    value: 1
+    value: $INFO/IMPRECISE
     number: 0
     type: flag
-    description: Imprecise structural variation (Tiddit calls are typically not pinned exactly)
+    description: Imprecise structural variation
 
   REGIONA:
     value: $INFO/REGIONA
@@ -81,18 +84,17 @@ info:
     type: integer
     description: Read-pairs and split reads supporting the event
 
-  # If you only want to store CIPOS/CIEND as the same region, do so without function calls
-  CIPOS:
+  CIPOS_REG:
     value: $INFO/REGIONA
     number: 2
     type: integer
-    description: Confidence interval around POS
+    description: Confidence interval around POS (TIDDIT)
 
-  CIEND:
+  CIEND_REG:
     value: $INFO/REGIONB
     number: 2
     type: integer
-    description: Confidence interval around END
+    description: Confidence interval around END (TIDDIT)
 
 format:
   GT:
@@ -106,53 +108,37 @@ format:
     number: 1
     type: integer
     description: Copy number genotype for imprecise events
-    alts:
-      DUP:TANDEM: .
-      DUP:INV: .
-      INV: .
-      BND: .
 
-  # TIDDIT: DV is "Number of paired-ends that support the event" => single integer
   PE:
     value: $FORMAT/DV
     number: 1
     type: integer
     description: Number of variant-supporting paired-ends
 
-  # TIDDIT: RV is "Number of split reads that support the event" => single integer
   SR:
-    value: $FORMAT/RV
-    number: 1
+    value: .,$FORMAT/RV
+    number: 2
     type: integer
     description: Number of variant-supporting split reads
 
-  # TIDDIT: DR is "Number of paired-ends supporting reference allele (breakpoint A,B)" => 2 integers
-  DR:
-    value: $FORMAT/DR
-    number: 2
-    type: integer
-    description: Paired-end reads supporting reference at each breakpoint
+  # DR:
+  #   value: $FORMAT/DR
+  #   number: 2
+  #   type: integer
+  #   description: Paired-end reads supporting reference at each breakpoint
 
-  # TIDDIT: RR is "Number of reads supporting the reference allele (breakpoint A,B)" => 2 integers
   RR:
     value: $FORMAT/RR
     number: 2
     type: integer
     description: Reads supporting the reference allele at each breakpoint
 
-  # TIDDIT: COV => coverage at A, B, and between => number=3
   COV:
     value: $FORMAT/COV
     number: 3
     type: float
     description: Coverage at region A, region B, and between
-    alts:
-      DUP:TANDEM: .
-      DUP:INV: .
-      INV: .
-      BND: .
 
-  # TIDDIT: LQ => fraction of low-quality reads => number=2
   LQ:
     value: $FORMAT/LQ
     number: 2

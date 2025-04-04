@@ -53,7 +53,8 @@ workflow SV_CALLING_GRIDSS {
 
         SAMPLE_REHEADER(
             gridss_result,
-            gridss_result.map { meta, _vcf -> "${meta.id}_${name_gridss}" }
+            gridss_result.map { meta, _vcf -> "${meta.id}_${name_gridss}" },
+            false
         )
 
         SVYNC(

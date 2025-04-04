@@ -47,7 +47,8 @@ workflow SV_CALLING_SNIFFLES {
 
         SAMPLE_REHEADER(
             SNIFFLES.out.vcf,
-            SNIFFLES.out.vcf.map { meta, _bcf -> "${meta.id}" }
+            SNIFFLES.out.vcf.map { meta, _bcf -> "${meta.id}" },
+            false
         )
 
         SVYNC(

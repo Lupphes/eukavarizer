@@ -75,7 +75,8 @@ workflow EUKAVARIZER {
         if (params.manta_flag) {
             SV_CALLING_MANTA(
                 bam_inputs,
-                reference_genome_bgzipped.collect(),
+                // TODO:Unzipped
+                reference_genome_unzipped.collect(),
                 reference_genome_bgzipped_faidx.collect()
             )
 
@@ -115,7 +116,7 @@ workflow EUKAVARIZER {
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        DYSGU (Not currently supported)
+        DYSGU
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
         if (params.dysgu_flag) {
@@ -138,7 +139,7 @@ workflow EUKAVARIZER {
         if (params.tiddit_flag) {
             SV_CALLING_TIDDIT(
                 bam_inputs,
-                reference_genome_bgzipped.collect(),
+                reference_genome_unzipped.collect(),
                 reference_genome_bwa_index.collect(),
                 reference_genome_minimap_index.collect()
             )

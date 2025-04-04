@@ -47,7 +47,8 @@ workflow SV_CALLING_DYSGU {
 
         SAMPLE_REHEADER(
             DYSGU.out.vcf,
-            DYSGU.out.vcf.map { meta, _vcf -> "${meta.id}_${name_dysgu}" }
+            DYSGU.out.vcf.map { meta, _vcf -> "${meta.id}_${name_dysgu}" },
+            false
         )
 
         SVYNC(

@@ -1,12 +1,11 @@
 id: dysgu_$INFO/SVTYPE
 
-# alt: unify Dysgu’s <TRA>, <DEL>, <INS>, <DUP>, <INV> with standard naming
 alt:
   BND: TRA
   DEL: DEL
+  INS: INS
   DUP: DUP
   INV: INV
-  INS: INS
   TRA: TRA
 
 info:
@@ -29,11 +28,19 @@ info:
     description: Length of the structural variant
     alts:
       DEL: -$INFO/SVLEN
+      DEL:TANDEM: -$INFO/SVLEN
       INS: $INFO/SVLEN
       DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
       INV: $INFO/SVLEN
       BND: 0
       TRA: 0
+
+  IMPRECISE:
+    value: $INFO/IMPRECISE
+    number: 0
+    type: flag
+    description: Imprecise structural variation
 
   END:
     value: $INFO/END
@@ -46,34 +53,26 @@ info:
     number: 1
     type: string
     description: Chromosome for second breakend in translocations
-    alts:
-      TRA: $INFO/CHR2
-      BND: $INFO/CHR2
 
-  # For translocations, Dysgu also stores the partner coordinate in CHR2_POS
   POS2:
     value: $INFO/CHR2_POS
     number: 1
     type: integer
     description: Position on second chromosome for translocations
-    alts:
-      TRA: $INFO/CHR2_POS
-      BND: $INFO/CHR2_POS
 
   # Dysgu calls it CIPOS95, which is the size of the 95% confidence interval, not an actual [start,end] array.
-  CIPOS:
+  CIPOS95:
     value: $INFO/CIPOS95
     number: 1
     type: integer
-    description: 95% confidence interval size around POS
+    description: 95% confidence interval size around POS (Dysgu)
 
-  CIEND:
+  CIEND95:
     value: $INFO/CIEND95
     number: 1
     type: integer
-    description: 95% confidence interval size around END
+    description: 95% confidence interval size around END (Dysgu)
 
-  # Some read support fields in INFO for the entire call (all samples)
   SU:
     value: $INFO/SU
     number: 1
@@ -87,10 +86,10 @@ info:
     description: Number of paired-end reads supporting the variant
 
   SR:
-    value: $INFO/SR
-    number: 1
+    value: .,$INFO/SR
+    number: 2
     type: integer
-    description: Number of supplementary reads supporting the variant
+    description: Number of supplementary reads supporting the variant with null reference ones
 
   SC:
     value: $INFO/SC
@@ -104,24 +103,31 @@ info:
     type: integer
     description: Number of break-end alignments supporting the variant
 
-  # If you want to store Dysgu’s “SVMETHOD=DYSGUv1.x”, keep it:
   SVMETHOD:
     value: $INFO/SVMETHOD
     number: 1
     type: string
     description: Method used to detect SV
 
-  # Additional fields if needed, e.g. RT, GRP, etc.
-  # GRP:
-  #   value: $INFO/GRP
-  #   number: 1
-  #   type: integer
-  #   description: Group id for complex SVs
+  GRP:
+    value: $INFO/GRP
+    number: 1
+    type: integer
+    description: Group ID for complex SVs
 
-  # Others: WR, SC, etc. can be added similarly
+  RT:
+    value: $INFO/RT
+    number: 1
+    type: string
+    description: Type of input reads (e.g. pe, pacbio, nanopore)
+
+  WR:
+    value: $INFO/WR
+    number: 1
+    type: integer
+    description: Within-read SVs
 
 format:
-  # Dysgu provides GT, GQ, plus many advanced fields
   GT:
     value: $FORMAT/GT
     number: 1
@@ -134,14 +140,13 @@ format:
     type: float
     description: Genotype quality (phred-scaled)
 
-  # "PE" / "SR" in FORMAT is # of paired/split supporting reads *for that sample*
-  PE_FORMAT:
+  PE:
     value: $FORMAT/PE
     number: 1
     type: integer
-    description: Paired-end reads supporting variant (sample-level)
+    description: Number of paired-end reads supporting the variant across all samples
 
-  SR_FORMAT:
+  SR:
     value: $FORMAT/SR
     number: 1
     type: integer

@@ -65,9 +65,11 @@ workflow REFERENCE_RETRIEVAL {
 
         bwa_index = (params.bwamem2 ? BWAMEM2_INDEX(GUNZIP.out.gunzip) : BWA_INDEX(GUNZIP.out.gunzip))
 
-        MINIMAP2_INDEX(
-            GUNZIP.out.gunzip
-        )
+        if (!params.minimap2_flag) {
+            minimap_index_ch = MINIMAP2_INDEX(
+                GUNZIP.out.gunzip
+            ).index
+        }
 
         TABIX_BGZIP(
             GUNZIP.out.gunzip
@@ -92,7 +94,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_unzipped               = GUNZIP.out.gunzip
         reference_genome_bgzipped               = TABIX_BGZIP.out.output
         reference_genome_bwa_index              = bwa_index.index
-        reference_genome_minimap_index          = MINIMAP2_INDEX.out.index
+        reference_genome_minimap_index          = params.minimap2_flag ? Channel.empty() : minimap_index_ch
         reference_genome_bgzipped_index         = TABIX_BGZIP.out.gzi
         reference_genome_bgzipped_faidx         = SAMTOOLS_BGZIP_FAIDX.out.fai
         reference_genome_faidx                  = SAMTOOLS_FAIDX.out.fai

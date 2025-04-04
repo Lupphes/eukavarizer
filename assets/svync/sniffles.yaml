@@ -2,7 +2,11 @@ id: sniffles_$INFO/SVTYPE
 
 alt:
   BND: TRA
-  DUP: DUP:TANDEM
+  DEL: DEL
+  INS: INS
+  DUP: DUP
+  INV: INV
+  TRA: TRA
 
 info:
   CALLER:
@@ -23,8 +27,14 @@ info:
     type: integer
     description: Length of structural variation
     alts:
-      INS: $INFO/SUPPORT_LONG
-      TRA: 1
+      DEL: -$INFO/SVLEN
+      DEL:TANDEM: -$INFO/SVLEN
+      INS: $INFO/SVLEN
+      DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
+      INV: $INFO/SVLEN
+      BND: 0
+      TRA: 0
 
   END:
     value: $INFO/END
@@ -33,36 +43,28 @@ info:
     description: End position
 
   CHR2:
-    value:
+    value: $INFO/CHR2
     number: 1
     type: string
     description: Second chromosome for breakend
-    alts:
-      TRA: $INFO/CHR2
 
-  CIPOS:
+  CIPOS_STD:
     value: $INFO/STDEV_POS
     number: 1
     type: float
-    description: Standard deviation around POS
+    description: Standard deviation around POS (Sniffles)
 
-  CIEND:
+  CIEND_STD:
     value: $INFO/STDEV_LEN
     number: 1
     type: float
-    description: Standard deviation around END
+    description: Standard deviation around END (Sniffles)
 
   SUPPORT:
     value: $INFO/SUPPORT
     number: 1
     type: integer
     description: Number of supporting reads
-
-  AF:
-    value: $INFO/AF
-    number: 1
-    type: float
-    description: Allele frequency
 
   IMPRECISE:
     value: $INFO/IMPRECISE
@@ -108,13 +110,13 @@ format:
     description: Reference reads (Sniffles lumps all ref read counts in DR)
 
   SR:
-    value: $FORMAT/DV
-    number: 1
+    value: .,$FORMAT/DV
+    number: 2
     type: integer
     description: Variant reads (Sniffles lumps all alt read counts in DV)
 
   GQ:
     value: $FORMAT/GQ
     number: 1
-    type: integer
+    type: float
     description: Genotype quality

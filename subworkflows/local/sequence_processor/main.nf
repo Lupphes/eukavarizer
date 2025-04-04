@@ -234,30 +234,25 @@ workflow SEQUENCE_PROCESSOR {
             true
         )
 
-        indexed_bed = params.bwamem2 ?
+        sorted_indexed_bed = params.bwamem2 ?
             BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true) :
             BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true)
 
-        mixed_bam_inputs = indexed_bed.bam
+        mixed_bam_inputs = sorted_indexed_bed.bam
             .mix(MINIMAP2_ALIGN.out.bam)
             .map { meta, bam ->
                 tuple(meta + [id: "${meta.id}_sas"], bam)
             }
 
-        SAMTOOLS_SORT(
-            mixed_bam_inputs,
-            reference_genome_unzipped.collect()
-        )
-
         SAMTOOLS_INDEX(
-            SAMTOOLS_SORT.out.bam
+            mixed_bam_inputs
         )
 
     emit:
         fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files
-        fastq_bam                   = SAMTOOLS_SORT.out.bam                 // Sorted BAM files (.bam)
+        fastq_bam                   = mixed_bam_inputs                      // Sorted BAM files (.bam)
         fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai                // BAM index files (.bai)
-        multiqc_report              = QUALITY_CONTROL.out.multiqc_report   // Path to MultiQC report
+        multiqc_report              = QUALITY_CONTROL.out.multiqc_report    // Path to MultiQC report
 }
 
 /*

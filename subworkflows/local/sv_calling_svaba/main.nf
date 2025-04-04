@@ -36,21 +36,12 @@ workflow SV_CALLING_SVABA {
     main:
         name_svaba = "svaba"
 
-        bwa_bam_inputs = bam_inputs.filter { meta, _bam, _bai ->
-            !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
-        }
-
-        minimap2_bams = bam_inputs.filter { meta, _bam, _bai ->
-            params.minimap2_flag && meta.median_bp > params.long_read_threshold
-        }
-
-        first_bwa = bwa_bam_inputs
-            .map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
-            }
-
         SVABA_BWA(
-            first_bwa,
+            bam_inputs.filter { meta, _bam, _bai ->
+                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+            }.map { meta, bam, bai ->
+                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
+            },
             reference_genome_unzipped,
             reference_genome_faidx,
             reference_genome_bwa_index,
@@ -59,13 +50,12 @@ workflow SV_CALLING_SVABA {
             [[],[]],
         )
 
-        first_map = minimap2_bams
-            .map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
-            }
-
         SVABA_MAP(
-            first_map,
+            bam_inputs.filter { meta, _bam, _bai ->
+                params.minimap2_flag && meta.median_bp > params.long_read_threshold
+            }.map { meta, bam, bai ->
+                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
+            },
             reference_genome_unzipped,
             reference_genome_faidx,
             reference_genome_minimap_index,
@@ -74,11 +64,12 @@ workflow SV_CALLING_SVABA {
             [[],[]],
         )
 
-        svaba_result = SVABA_BWA.out.germ_sv.mix(SVABA_MAP.out.germ_sv)
+        svaba_result = SVABA_BWA.out.sv.mix(SVABA_MAP.out.sv)
 
         SAMPLE_REHEADER(
             svaba_result,
-            svaba_result.map { meta, _vcf -> "${meta.id}_${name_svaba}" }
+            svaba_result.map { meta, _vcf -> "${meta.id}_${name_svaba}" },
+            true
         )
 
         SVYNC(

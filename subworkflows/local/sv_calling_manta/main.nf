@@ -52,7 +52,7 @@ include { GUNZIP as DIPLOID_GUNZIP                        } from '../../../modul
 workflow SV_CALLING_MANTA {
     take:
         bam_inputs
-        reference_genome_bgzipped
+        reference_genome_unzipped
         reference_genome_bgzipped_faidx
 
     main:
@@ -61,43 +61,40 @@ workflow SV_CALLING_MANTA {
         name_manta_candidate = "candidate"
         name_manta_diploid = "diploid"
 
-        first = bam_inputs
+        MANTA_GERMLINE(
+            bam_inputs
             // Only keep paired-end reads as MANTA does not support unpaired reads
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
             .map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_manta}"], bam, bai, [], [])
-            }
-
-        second = reference_genome_bgzipped.map { meta, fasta ->
+            },
+            reference_genome_unzipped.map { meta, fasta ->
             tuple(meta + [id: "${meta.id}"], fasta)
-        }
-
-        third = reference_genome_bgzipped_faidx.map { meta, fai ->
-            tuple(meta + [id: "${meta.id}"], fai)
-        }
-
-        MANTA_GERMLINE(
-            first,
-            second,
-            third,
+            },
+            reference_genome_bgzipped_faidx.map { meta, fai ->
+                tuple(meta + [id: "${meta.id}"], fai)
+            },
             []
         )
 
         SMALL_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.candidate_small_indels_vcf,
-            MANTA_GERMLINE.out.candidate_small_indels_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_small}" }
+            MANTA_GERMLINE.out.candidate_small_indels_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_small}" },
+            false
         )
 
         CANDIDATE_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.candidate_sv_vcf,
-            MANTA_GERMLINE.out.candidate_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_candidate}" }
+            MANTA_GERMLINE.out.candidate_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_candidate}" },
+            false
         )
 
         DIPLOID_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.diploid_sv_vcf,
-            MANTA_GERMLINE.out.diploid_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_diploid}" }
+            MANTA_GERMLINE.out.diploid_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_diploid}" },
+            false
         )
 
 

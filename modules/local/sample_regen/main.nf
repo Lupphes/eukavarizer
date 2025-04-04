@@ -10,6 +10,7 @@ process SAMPLE_REHEADER {
     input:
     tuple val(meta), path(vcf)
     val(new_name)
+    val(remove_headers)
 
     output:
     tuple val(meta), path("reheadered_${new_name}.vcf"), emit: vcf, optional: true
@@ -37,11 +38,29 @@ process SAMPLE_REHEADER {
     SAMPLE_COUNT=\$(bcftools query -l "\${VCF_INPUT}" | wc -l)
 
     if [[ "\${SAMPLE_COUNT}" -gt 0 ]]; then
+        if [[ "${remove_headers}" == "true" ]]; then
+            # Strip/filter FILTER headers with empty or malformed descriptions and sanitize
+            bcftools view -h "\${VCF_INPUT}" | awk '
+                /^##FILTER=/ {
+                    match(\$0, /Description="[^"]+"/)
+                    if (RSTART > 0) {
+                        desc = substr(\$0, RSTART + 12, RLENGTH - 13)
+                        # Mask greater-than symbol
+                        gsub(/>/, "\\\\&gt;", desc)
+                        sub(/Description="[^"]+"/, "Description=\\"" desc "\\"")
+                    }
+                }
+                { print }
+            ' > filtered_header.hdr
+        else
+            bcftools view -h "\${VCF_INPUT}" > filtered_header.hdr
+        fi
+
         # Extract original sample names and prepend new_name
         bcftools query -l "\${VCF_INPUT}" | awk -v prefix="[${new_name}]" '{print prefix \$0}' > sample_names_${new_name}.txt
 
         # Create a new header with updated sample names
-        bcftools reheader -s sample_names_${new_name}.txt -o reheadered_${new_name}.vcf.gz "\${VCF_INPUT}"
+        bcftools reheader -h filtered_header.hdr -s sample_names_${new_name}.txt -o reheadered_${new_name}.vcf.gz "\${VCF_INPUT}"
 
         # Index the new VCF (both TBI and CSI)
         tabix -p vcf reheadered_${new_name}.vcf.gz

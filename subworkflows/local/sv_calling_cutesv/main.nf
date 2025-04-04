@@ -43,7 +43,8 @@ workflow SV_CALLING_CUTESV {
 
         SAMPLE_REHEADER(
             CUTESV.out.vcf,
-            CUTESV.out.vcf.map { meta, _vcf -> "${meta.id}_${name_cutesv}" }
+            CUTESV.out.vcf.map { meta, _vcf -> "${meta.id}_${name_cutesv}" },
+            false
         )
 
         SVYNC(

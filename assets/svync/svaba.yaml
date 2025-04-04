@@ -1,0 +1,141 @@
+id: svaba_$INFO/SVTYPE
+
+alt:
+  BND: TRA
+  DEL: DEL
+  INS: INS
+  DUP: DUP
+  INV: INV
+  TRA: TRA
+
+info:
+  CALLER:
+    value: svaba
+    number: 1
+    type: string
+    description: The caller used to determine this variant
+
+  SVTYPE:
+    value: $INFO/SVTYPE
+    number: 1
+    type: string
+    description: Type of structural variant
+
+  END:
+    value: $INFO/END
+    number: 1
+    type: integer
+    description: End position
+
+  HOMSEQ:
+    value: $INFO/HOMSEQ
+    number: 1
+    type: string
+    description: Microhomology sequence
+
+  HOMLEN:
+    value: $INFO/HOMLEN
+    number: 1
+    type: integer
+    description: Microhomology length
+
+  SVLEN:
+    value: $INFO/SPAN
+    number: 1
+    type: integer
+    description: Approximate SV length
+    alts:
+      DEL: -$INFO/SVLEN
+      DEL:TANDEM: -$INFO/SVLEN
+      INS: $INFO/SVLEN
+      DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
+      INV: $INFO/SVLEN
+      BND: 0
+      TRA: 0
+
+  MAPQ:
+    value: $INFO/MAPQ
+    number: 1
+    type: integer
+    description: Mapping quality of contig
+
+  IMPRECISE:
+    value: $INFO/IMPRECISE
+    number: 0
+    type: flag
+    description: Imprecise structural variation
+    defaults:
+      $INFO/IMPRECISE: false
+
+  CHR2:
+    value: $INFO/CHR2
+    number: 1
+    type: string
+
+  SPAN:
+    value: $INFO/SPAN
+    number: 1
+    type: integer
+    description: Span between breakpoints
+
+  MATEID:
+    value: $INFO/MATEID
+    number: 1
+    type: string
+    description: Mate breakpoint ID
+
+format:
+  GT:
+    value: $FORMAT/GT
+    number: 1
+    type: string
+    description: Genotype
+
+  AD:
+    value: $FORMAT/AD
+    number: 1
+    type: integer
+    description: Allele depth reads supporting ALT
+
+  DP:
+    value: $FORMAT/DP
+    number: 1
+    type: integer
+    description: Depth of coverage
+
+  PL:
+    value: $FORMAT/PL
+    number: G
+    type: float
+    description: Normalized likelihoods of genotype
+
+  GQ:
+    value: $FORMAT/GQ
+    number: 1
+    type: float
+    description: Genotype quality (stringified float)
+
+  SR:
+    value: .,$FORMAT/SR
+    number: 2
+    type: integer
+    description: Number of spanning reads of the variant
+
+  # DR:
+  #   value: $FORMAT/DR
+  #   number: 1
+  #   type: integer
+  #   description: Number of discordant reads
+
+  LR:
+    value: $FORMAT/LR
+    number: 1
+    type: float
+    description: Log odds that variant is REF vs ALT
+
+  LO:
+    value: $FORMAT/LO
+    number: 1
+    type: float
+    description: Log odds that variant is real vs artifact

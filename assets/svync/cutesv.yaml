@@ -6,6 +6,7 @@ alt:
   INS: INS
   DUP: DUP
   INV: INV
+  TRA: TRA
 
 info:
   CALLER:
@@ -18,11 +19,13 @@ info:
     value: $INFO/SVLEN
     number: 1
     type: integer
-    description: The length of the structural variant
+    description: Length of the structural variant
     alts:
       DEL: -$INFO/SVLEN
+      DEL:TANDEM: -$INFO/SVLEN
       INS: $INFO/SVLEN
       DUP: $INFO/SVLEN
+      DUP:TANDEM: $INFO/SVLEN
       INV: $INFO/SVLEN
       BND: 0
       TRA: 0
@@ -33,25 +36,17 @@ info:
     type: string
     description: Type of structural variant
 
-  # CuteSV uses BND for translocations, storing the second chromosome/pos in the ALT.
-  # Some versions also store CHR2 in INFO if the user runs with certain flags. Keep if in the header:
   CHR2:
     value: $INFO/CHR2
     number: 1
     type: string
     description: Chromosome for second position
-    alts:
-      TRA: $INFO/CHR2
-      BND: $INFO/CHR2
 
   END:
     value: $INFO/END
     number: 1
     type: integer
     description: End position of the structural variant
-    alts:
-      TRA: $INFO/END
-      BND: $INFO/END
 
   CIPOS:
     value: $INFO/CIPOS
@@ -59,13 +54,12 @@ info:
     type: integer
     description: Confidence interval around POS
 
-  # CuteSV typically calls this 'CILEN' for inserted/deleted intervals.
-  # It's fine to map that to CIEND, but note it's not truly "confidence around END" for all variants.
-  CIEND:
+  # CuteSV typically calls this 'CILEN' for inserted/deleted intervals. It's not truly "confidence around END" for all variants.
+  CILEN:
     value: $INFO/CILEN
     number: 2
     type: integer
-    description: Confidence interval around END (CuteSV calls it CILEN)
+    description: Confidence interval length of the variant (CuteSV-specific)
 
   RE:
     value: $INFO/RE
@@ -75,7 +69,7 @@ info:
 
   STRAND:
     value: $INFO/STRAND
-    number: .
+    number: 1
     type: string
     description: Strand orientation of the breakpoints
 
@@ -87,12 +81,10 @@ info:
 
   AF:
     value: $INFO/AF
-    number: 1
+    number: A
     type: float
     description: Allele frequency
 
-  # CuteSV typically sets either PRECISE or IMPRECISE, not both.
-  # If the config tries to turn them into 0/1 simultaneously, that is OK for a derived flag logic.
   PRECISE:
     value: $INFO/PRECISE
     number: 0
@@ -112,8 +104,6 @@ format:
     type: string
     description: Genotype
 
-  # In CuteSV, DR = reference read count, DV = variant read count
-  # If you label them as PE/SR, ensure the descriptions match actual usage
   PE:
     value: $FORMAT/DV
     number: 1
@@ -121,19 +111,25 @@ format:
     description: Number of variant-supporting reads (CuteSV lumps all alt reads in DV)
 
   SR:
-    value: $FORMAT/DR
-    number: 1
+    value: $FORMAT/DR,.
+    number: 2
     type: integer
-    description: Number of reference-supporting reads
+    description: Number of reference-supporting reads and null of alternative reads (CuteSV lumps all ref reads in DR)
 
-  PL:
-    value: $FORMAT/PL
-    number: G
-    type: integer
-    description: Phred-scaled genotype likelihoods
+  # PL:
+  #   value: $FORMAT/PL
+  #   number: G
+  #   type: float
+  #   description: Phred-scaled genotype likelihoods
 
   GQ:
     value: $FORMAT/GQ
     number: 1
-    type: integer
+    type: float
     description: Genotype quality
+
+  DR:
+    value: $FORMAT/DR
+    number: 1
+    type: integer
+    description: High-quality reference reads
