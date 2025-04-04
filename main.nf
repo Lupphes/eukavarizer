@@ -46,7 +46,7 @@ workflow NFCORE_EUKAVARIZER {
         report = Channel.empty()
         sv_callers_enabled = params.gridss_flag || params.delly_flag || params.manta_flag ||
                                 params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
-                                params.dysgu_flag || params.svaba_flag
+                                params.dysgu_flag || (params.svaba_flag && !params.bwamem2)
 
         log.info "🧬 SV callers enabled: ${sv_callers_enabled}"
 
@@ -66,9 +66,7 @@ workflow NFCORE_EUKAVARIZER {
             REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
         )
 
-        if (params.gridss_flag || params.delly_flag || params.manta_flag ||
-            params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
-            params.dysgu_flag || params.svaba_flag) {
+        if (sv_callers_enabled) {
 
             EUKAVARIZER(
                 SEQUENCE_PROCESSOR.out.fastq_bam,

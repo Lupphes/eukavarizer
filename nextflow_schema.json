@@ -205,6 +205,28 @@
                     "help_text": "Specify sequencing platforms to filter by (e.g., Illumina, PacBio, Nanopore).",
                     "fa_icon": "fas fa-microscope"
                 },
+                "read_type": {
+                    "type": "string",
+                    "enum": ["ont", "pacbio", "mixed"],
+                    "default": "mixed",
+                    "description": "Sequencing read type.",
+                    "help_text": "Choose the read type: 'ont', 'pacbio', or 'mixed'. Affects dysgu and alignment profiles.",
+                    "fa_icon": "fas fa-dna"
+                },
+                "seqkit_sample": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable or disable seqkit sampling instead of seqtk.",
+                    "help_text": "Use seqkit instead of seqtk for sampling FASTQ files.",
+                    "fa_icon": "fas fa-random"
+                },
+                "minimap2_profile": {
+                    "type": "string",
+                    "default": "-ax map-ont",
+                    "description": "Minimap2 alignment profile to use.",
+                    "help_text": "Command-line profile option for minimap2 (e.g. -ax map-ont).",
+                    "fa_icon": "fas fa-sliders-h"
+                },
                 "minimum_coverage": {
                     "type": "integer",
                     "minimum": 0,
@@ -330,6 +352,13 @@
             "fa_icon": "fas fa-terminal",
             "description": "Additional arguments to pass to SV callers.",
             "properties": {
+                "dysgu_profile": {
+                    "type": "string",
+                    "default": "--mode  pe",
+                    "description": "Dysgu profile based on read type.",
+                    "help_text": "Profile to use for Dysgu. Automatically set depending on --read_type.",
+                    "fa_icon": "fas fa-sliders-h"
+                },
                 "delly_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to Delly.",
@@ -371,6 +400,20 @@
                     "default": "--max_cluster_bias_INS 100 --diff_ratio_merging_INS 0.3 --max_cluster_bias_DEL 100 --diff_ratio_merging_DEL 0.3 --report_readid --sample cutesv_report_sample",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for CuteSV structural variant caller."
+                },
+                "dysgu_args": {
+                    "type": "string",
+                    "default": "--min-support 3 --min-size 50 --max-tlen 1000  --max-cov 200 --mode  pe",
+                    "description": "Additional arguments to pass to Dysgu.",
+                    "help_text": "Extra command-line arguments for Dysgu structural variant caller.",
+                    "fa_icon": "fas fa-sliders-h"
+                    },
+                "svaba_args": {
+                    "type": "string",
+                    "default": "--max-reads 50000 --max-reads-mate-region 400",
+                    "description": "Additional arguments to pass to SvABA.",
+                    "help_text": "Extra command-line arguments for SvABA structural variant caller.",
+                    "fa_icon": "fas fa-sliders-h"
                 }
             }
         },

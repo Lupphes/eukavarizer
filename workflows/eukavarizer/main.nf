@@ -151,16 +151,15 @@ workflow EUKAVARIZER {
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        SVABA (Not currently supported)
+        SVABA
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         */
-        if (params.svaba_flag) {
+        if (params.svaba_flag && !params.bwamem2) {
             SV_CALLING_SVABA(
                 bam_inputs,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect(),
-                reference_genome_bwa_index.collect(),
-                reference_genome_minimap_index.collect()
+                reference_genome_bwa_index.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_SVABA.out.svync_vcf)
