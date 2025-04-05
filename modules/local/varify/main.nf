@@ -1,6 +1,7 @@
 process VARIFY {
     tag "$taxonomy_id"
     label 'process_low'
+    cache false
 
     conda "${moduleDir}/environment.yml"
     container "luppo/varify:latest"
