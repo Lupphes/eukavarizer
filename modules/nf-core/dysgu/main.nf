@@ -26,6 +26,7 @@ process DYSGU {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     dysgu run \\
+        ${args} \\
         -p ${task.cpus} \\
         -x \\
         $fasta \\
