@@ -21,8 +21,8 @@ info:
     type: integer
     description: Length of the structural variant
     alts:
-      DEL: -$INFO/SVLEN
-      DEL:TANDEM: -$INFO/SVLEN
+      DEL: $INFO/SVLEN
+      DEL:TANDEM: $INFO/SVLEN
       INS: $INFO/SVLEN
       DUP: $INFO/SVLEN
       DUP:TANDEM: $INFO/SVLEN
