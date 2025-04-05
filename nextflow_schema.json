@@ -388,7 +388,7 @@
                 "sniffles_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to Sniffles.",
-                    "default": "--mapq 20 --minsvlen 50 --min-alignment-length 1000 --long-ins-length 2500 --long-del-length 50000 --long-del-coverage 0.66 --long-dup-length 50000 --long-dup-coverage 1.33 --qc-strand True",
+                    "default": "--mapq 20 --minsvlen 50 --minsupport auto --minsupport-auto-mult 0.1/0.025",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for Sniffles structural variant caller."
                 },
