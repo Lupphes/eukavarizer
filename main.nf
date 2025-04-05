@@ -10,7 +10,7 @@
 ----------------------------------------------------------------------------------------
     This pipeline is designed to process and analyse structural variants (SVs) in
     eukaryotic genomes. It supports multiple SV callers (DELLY, Manta, GRIDSS, Dysgu,
-    TIDDIT, Sniffles, CuteSV), merges the results, and generates a structured report.
+    TIDDIT, Sniffles, CuteSV, SVABA), merges the results, and generates a structured report.
     The pipeline follows nf-core best practices for modularity and reproducibility.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
