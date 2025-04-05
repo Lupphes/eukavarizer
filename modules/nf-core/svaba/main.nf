@@ -49,7 +49,9 @@ process SVABA {
     ref_file=\$(basename "${fasta}")
     ref_prefix=\${ref_file%.*}
 
-    cp "${fasta}" .
+    if [ ! -f "./\${ref_file}" ]; then
+        cp "${fasta}" .
+    fi
 
     for ext in amb ann bwt pac sa; do
         cp "${bwa_index}/\${ref_prefix}.\$ext" "\${ref_file}.\$ext"
