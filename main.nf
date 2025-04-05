@@ -92,6 +92,7 @@ workflow NFCORE_EUKAVARIZER {
                 SV_UNIFICATION.out.survivor_vcf,
                 SV_UNIFICATION.out.survivor_stats,
                 SV_UNIFICATION.out.bcfmerge_vcf,
+                SV_UNIFICATION.out.bcfmerge_tbi,
                 SV_UNIFICATION.out.bcfmerge_stats,
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.tbi_list,

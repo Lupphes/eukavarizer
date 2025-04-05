@@ -57,9 +57,9 @@ cd eukavarizer
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/hg002v1.1.fasta.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/gib" \
-    --outdir "$DATADIR/dry_run_job/out" | tee -a "$LOGFILE"
+    --outdir "$DATADIR/dry_run_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true

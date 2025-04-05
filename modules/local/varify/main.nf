@@ -11,6 +11,7 @@ process VARIFY {
         tuple val(meta1), path (survivor_vcf)
         tuple val(meta2), path (survivor_stats)
         tuple val(meta3), path (bcfmerge_vcf)
+        tuple val(meta4), path (bcfmerge_tbi)
         tuple val(meta5), path (bcfmerge_stats)
         tuple val(meta6), path (vcf_list_cleaned)
         tuple val(meta7), path (reference_genome_bgzipped_index)

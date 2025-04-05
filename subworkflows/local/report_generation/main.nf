@@ -28,6 +28,7 @@ workflow REPORT_GENERATION {
         survivor_vcf
         survivor_stats
         bcfmerge_vcf
+        bcfmerge_tbi
         bcfmerge_stats
         vcf_list
         tbi_list
@@ -51,6 +52,7 @@ workflow REPORT_GENERATION {
             survivor_vcf,
             survivor_stats,
             bcfmerge_vcf,
+            bcfmerge_tbi,
             bcfmerge_stats,
             varify_input,
             reference_genome,
