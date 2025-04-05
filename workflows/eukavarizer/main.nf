@@ -58,7 +58,7 @@ workflow EUKAVARIZER {
             SV_CALLING_DELLY(
                 fastq_bam,
                 fastq_bam_indexes,
-                reference_genome_bgzipped.collect(),
+                reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect()
             )
 
@@ -75,7 +75,6 @@ workflow EUKAVARIZER {
         if (params.manta_flag) {
             SV_CALLING_MANTA(
                 bam_inputs,
-                // TODO:Unzipped
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect()
             )

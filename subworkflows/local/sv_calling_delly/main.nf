@@ -29,7 +29,7 @@ workflow SV_CALLING_DELLY {
     take:
         fastq_bam
         fastq_bam_indexes
-        reference_genome_bgzipped
+        reference_genome_unzipped
         reference_genome_faidx
 
     main:
@@ -43,7 +43,7 @@ workflow SV_CALLING_DELLY {
 
         DELLY_CALL(
             ch_delly_input,
-            reference_genome_bgzipped,
+            reference_genome_unzipped,
             reference_genome_faidx
         )
 

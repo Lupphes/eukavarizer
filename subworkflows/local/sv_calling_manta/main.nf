@@ -53,7 +53,7 @@ workflow SV_CALLING_MANTA {
     take:
         bam_inputs
         reference_genome_unzipped
-        reference_genome_bgzipped_faidx
+        reference_genome_faidx
 
     main:
         name_manta = "manta"
@@ -67,13 +67,16 @@ workflow SV_CALLING_MANTA {
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
+            .filter { meta, _bam, _bai ->
+                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+            }
             .map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}_${name_manta}"], bam, bai, [], [])
             },
             reference_genome_unzipped.map { meta, fasta ->
             tuple(meta + [id: "${meta.id}"], fasta)
             },
-            reference_genome_bgzipped_faidx.map { meta, fai ->
+            reference_genome_faidx.map { meta, fai ->
                 tuple(meta + [id: "${meta.id}"], fai)
             },
             []
