@@ -65,7 +65,7 @@ workflow REFERENCE_RETRIEVAL {
 
         bwa_index = (params.bwamem2 ? BWAMEM2_INDEX(GUNZIP.out.gunzip) : BWA_INDEX(GUNZIP.out.gunzip))
 
-        if (!params.minimap2_flag) {
+        if (params.minimap2_flag) {
             minimap_index_ch = MINIMAP2_INDEX(
                 GUNZIP.out.gunzip
             ).index
