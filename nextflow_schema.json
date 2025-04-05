@@ -343,6 +343,13 @@
             "fa_icon": "fas fa-terminal",
             "description": "Additional arguments to pass to SV callers.",
             "properties": {
+                "cutesv_profile": {
+                    "type": "string",
+                    "default": "--max_cluster_bias_INS 1000 --diff_ratio_merging_INS 0.9 --max_cluster_bias_DEL 1000 --diff_ratio_merging_DEL 0.5",
+                    "description": "CuteSV profile based on read type.",
+                    "help_text": "Profile to use for Dysgu. Automatically set depending on --read_type.",
+                    "fa_icon": "fas fa-sliders-h"
+                },
                 "dysgu_profile": {
                     "type": "string",
                     "default": "--mode  pe",
