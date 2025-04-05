@@ -77,7 +77,7 @@ workflow EUKAVARIZER {
                 bam_inputs,
                 // TODO:Unzipped
                 reference_genome_unzipped.collect(),
-                reference_genome_bgzipped_faidx.collect()
+                reference_genome_faidx.collect()
             )
 
             vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.svync_small_vcf)
