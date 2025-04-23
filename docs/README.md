@@ -12,4 +12,3 @@ The `nf-core/eukavarizer` documentation is divided into the following pages:
 
 For additional information about setting up and working with nf-core pipelines, visit the official nf-core documentation at:
 👉 [https://nf-co.re](https://nf-co.re)
-

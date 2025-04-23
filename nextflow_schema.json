@@ -23,7 +23,8 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "./output"
                 },
                 "sequence_dir": {
                     "type": "string",
@@ -51,30 +52,6 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
-                }
-            }
-        },
-        "reference_genome_options": {
-            "title": "Reference genome options",
-            "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
-            "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "exists": true,
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
                 }
             }
         },
@@ -202,6 +179,36 @@
                     "help_text": "Specify sequencing platforms to filter by (e.g., Illumina, PacBio, Nanopore).",
                     "fa_icon": "fas fa-microscope"
                 },
+                "minimum_coverage": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Minimum sequencing coverage required.",
+                    "help_text": "Specify the minimum coverage threshold (e.g., 40).",
+                    "fa_icon": "fas fa-chart-line",
+                    "default": 40
+                },
+                "maximum_coverage": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Maximum sequencing coverage allowed.",
+                    "help_text": "Specify the maximum coverage threshold (e.g., 70).",
+                    "fa_icon": "fas fa-chart-bar",
+                    "default": 70
+                },
+                "max_results": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 3,
+                    "description": "Maximum number of results to retrieve.",
+                    "help_text": "Specify how many sequencing entries to retrieve.",
+                    "fa_icon": "fas fa-list-ol"
+                },
+                "assembly_quality": {
+                    "type": "string",
+                    "description": "Assembly quality filter.",
+                    "help_text": "Specify an assembly quality category.",
+                    "fa_icon": "fas fa-star"
+                },
                 "read_type": {
                     "type": "string",
                     "enum": ["ont", "pacbio", "mixed"],
@@ -210,12 +217,20 @@
                     "help_text": "Choose the read type: 'ont', 'pacbio', or 'mixed'. Affects dysgu and alignment profiles.",
                     "fa_icon": "fas fa-dna"
                 },
-                "seqkit_sample": {
+                "dorado_model_fast5": {
+                    "type": "string",
+                    "default": "/models/dna_r9.4.1_e8_fast@v3.4"
+                },
+                "dorado_model_pod5": {
+                    "type": "string",
+                    "default": "/models/dna_r9.4.1_e8_fast@v3.4"
+                },
+                "minimap2_flag": {
                     "type": "boolean",
-                    "default": false,
-                    "description": "Enable or disable seqkit sampling instead of seqtk.",
-                    "help_text": "Use seqkit instead of seqtk for sampling FASTQ files.",
-                    "fa_icon": "fas fa-random"
+                    "description": "Enable or disable Minimap2 for read mapping.",
+                    "default": true,
+                    "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
+                    "fa_icon": "fas fa-directions"
                 },
                 "minimap2_profile": {
                     "type": "string",
@@ -223,42 +238,6 @@
                     "description": "Minimap2 alignment profile to use.",
                     "help_text": "Command-line profile option for minimap2 (e.g. -ax map-ont).",
                     "fa_icon": "fas fa-sliders-h"
-                },
-                "minimum_coverage": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "description": "Minimum sequencing coverage required.",
-                    "help_text": "Specify the minimum coverage threshold (e.g., 40).",
-                    "fa_icon": "fas fa-chart-line"
-                },
-                "maximum_coverage": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "description": "Maximum sequencing coverage allowed.",
-                    "help_text": "Specify the maximum coverage threshold (e.g., 70).",
-                    "fa_icon": "fas fa-chart-bar"
-                },
-                "max_results": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "default": 1,
-                    "description": "Maximum number of results to retrieve.",
-                    "help_text": "Specify how many sequencing entries to retrieve.",
-                    "fa_icon": "fas fa-list-ol"
-                },
-                "assembly_quality": {
-                    "type": "string",
-                    "default": "default",
-                    "description": "Assembly quality filter.",
-                    "help_text": "Specify an assembly quality category.",
-                    "fa_icon": "fas fa-star"
-                },
-                "minimap2_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Minimap2 for read mapping.",
-                    "default": false,
-                    "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
-                    "fa_icon": "fas fa-directions"
                 },
                 "long_read_threshold": {
                     "type": "integer",
@@ -271,8 +250,7 @@
                 "bwamem2": {
                     "type": "boolean",
                     "description": "Use BWA-MEM2 instead of BWA for reference indexing and alignment.",
-                    "default": false,
-                    "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. ⚠️ Not recommended unless you know your aligner compatibility and performance needs.",
+                    "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. \u26a0\ufe0f Not recommended unless you know your aligner compatibility and performance needs.",
                     "fa_icon": "fas fa-exclamation-circle"
                 },
                 "seqtk_flag": {
@@ -284,8 +262,8 @@
                 "seqtk_size": {
                     "type": "number",
                     "default": 0.1,
-                    "minimum": 0.0,
-                    "maximum": 1.0,
+                    "minimum": 0,
+                    "maximum": 1,
                     "description": "Fraction of reads to randomly sample using seqtk.",
                     "help_text": "Determines what proportion of reads are retained by `seqtk sample` (e.g., 0.1 = 10%).",
                     "fa_icon": "fas fa-percentage"
@@ -305,6 +283,18 @@
             "fa_icon": "fas fa-filter",
             "description": "Parameters for quality control tools such as FASTP and FASTPLONG.",
             "properties": {
+                "fastp_flag": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "bbmap_bbduk_flag": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "deduplicate_flag": {
+                    "type": "boolean",
+                    "default": true
+                },
                 "bbduk_trimq": {
                     "type": "integer",
                     "default": 10,
@@ -343,16 +333,15 @@
             "fa_icon": "fas fa-terminal",
             "description": "Additional arguments to pass to SV callers.",
             "properties": {
-                "cutesv_profile": {
+                "dysgu_args": {
                     "type": "string",
-                    "default": "--max_cluster_bias_INS 1000 --diff_ratio_merging_INS 0.9 --max_cluster_bias_DEL 1000 --diff_ratio_merging_DEL 0.5",
-                    "description": "CuteSV profile based on read type.",
-                    "help_text": "Profile to use for Dysgu. Automatically set depending on --read_type.",
+                    "description": "Additional arguments to pass to Dysgu.",
+                    "help_text": "Extra command-line arguments for Dysgu structural variant caller.",
                     "fa_icon": "fas fa-sliders-h"
                 },
                 "dysgu_profile": {
                     "type": "string",
-                    "default": "--mode  pe",
+                    "default": "--mode pe",
                     "description": "Dysgu profile based on read type.",
                     "help_text": "Profile to use for Dysgu. Automatically set depending on --read_type.",
                     "fa_icon": "fas fa-sliders-h"
@@ -360,58 +349,62 @@
                 "delly_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to Delly.",
-                    "default": "--svtype ALL --map-qual 1 --mad-cutoff 9 --maxreadsep 100 --minrefsep 25 --minclip 25 --min-clique-size 2 --qual-tra 20",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for Delly structural variant caller."
+                },
+                "delly_profile": {
+                    "type": "string"
                 },
                 "gridss_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to GRIDSS.",
-                    "default": "--maxcoverage 50000",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for GRIDSS structural variant caller."
                 },
-                "tiddit_args": {
-                    "type": "string",
-                    "description": "Additional arguments to pass to Tiddit.",
-                    "default": "-q 10 -p 2 -r 3 -z 50 --max_coverage 4 -n 2",
-                    "fa_icon": "fas fa-sliders-h",
-                    "help_text": "Extra command-line arguments for Tiddit structural variant caller."
-                },
-                "manta_args": {
-                    "type": "string",
-                    "description": "Additional arguments to pass to Manta.",
-                    "default": "--generateEvidenceBam",
-                    "fa_icon": "fas fa-sliders-h",
-                    "help_text": "Extra command-line arguments for Manta structural variant caller."
-                },
-                "sniffles_args": {
-                    "type": "string",
-                    "description": "Additional arguments to pass to Sniffles.",
-                    "default": "--mapq 20 --minsvlen 50 --minsupport auto --minsupport-auto-mult 0.1/0.025",
-                    "fa_icon": "fas fa-sliders-h",
-                    "help_text": "Extra command-line arguments for Sniffles structural variant caller."
+                "gridss_annotate": {
+                    "type": "boolean",
+                    "default": true
                 },
                 "cutesv_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to CuteSV.",
-                    "default": "--max_cluster_bias_INS 100 --diff_ratio_merging_INS 0.3 --max_cluster_bias_DEL 100 --diff_ratio_merging_DEL 0.3 --report_readid --sample cutesv_report_sample",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for CuteSV structural variant caller."
                 },
-                "dysgu_args": {
+                "cutesv_profile": {
                     "type": "string",
-                    "default": "--min-support 3 --min-size 50 --max-tlen 1000  --max-cov 200 --mode  pe",
-                    "description": "Additional arguments to pass to Dysgu.",
-                    "help_text": "Extra command-line arguments for Dysgu structural variant caller.",
+                    "default": "--max_cluster_bias_INS 1000 --diff_ratio_merging_INS 0.9 --max_cluster_bias_DEL 1000 --diff_ratio_merging_DEL 0.5",
+                    "description": "CuteSV profile based on read type.",
+                    "help_text": "Profile to use for Dysgu. Automatically set depending on --read_type.",
                     "fa_icon": "fas fa-sliders-h"
                 },
                 "svaba_args": {
                     "type": "string",
-                    "default": "--max-reads 50000 --max-reads-mate-region 400",
                     "description": "Additional arguments to pass to SvABA.",
                     "help_text": "Extra command-line arguments for SvABA structural variant caller.",
                     "fa_icon": "fas fa-sliders-h"
+                },
+                "svaba_annotate": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "manta_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Manta.",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Manta structural variant caller."
+                },
+                "tiddit_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Tiddit.",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Tiddit structural variant caller."
+                },
+                "sniffles_args": {
+                    "type": "string",
+                    "description": "Additional arguments to pass to Sniffles.",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Extra command-line arguments for Sniffles structural variant caller."
                 }
             }
         },
@@ -424,7 +417,7 @@
                 "bcftools_filter_args": {
                     "type": "string",
                     "description": "Arguments to pass to bcftools filter.",
-                    "default": "--include 'QUAL>30 && GT!=\"0/0\" && FILTER==\"PASS\"' -Oz",
+                    "default": "--include \\'(SVLEN <= -50 || SVLEN >= 50 || SVLEN == 0) && QUAL>20 && GT!=\"0/0\" && FILTER==\"PASS\"\\' -Oz",
                     "fa_icon": "fas fa-filter",
                     "help_text": "Custom filter expression for bcftools used in SV filtering."
                 },
@@ -444,28 +437,28 @@
                 },
                 "sur_account_for_type": {
                     "type": "integer",
-                    "default": true,
+                    "default": 1,
                     "description": "Whether to account for variant types in the report (e.g., DEL, DUP).",
                     "help_text": "If enabled (default), variant types will be considered during the reporting process. If set to false, type information will be excluded from the report.",
                     "fa_icon": "fas fa-tag"
                 },
                 "sur_account_for_sv_strands": {
                     "type": "integer",
-                    "default": false,
+                    "default": 0,
                     "description": "Whether to account for structural variant strands in the report.",
                     "help_text": "If enabled, the strands of the structural variants (e.g., forward or reverse) will be taken into account when reporting. Default is false.",
                     "fa_icon": "fas fa-sync-alt"
                 },
                 "sur_estimate_distanced_by_sv_size": {
                     "type": "integer",
-                    "default": false,
+                    "default": 0,
                     "description": "Whether to estimate the distance based on structural variant size.",
                     "help_text": "If enabled, the distance between breakpoints will be estimated based on the size of the structural variant. Default is false.",
                     "fa_icon": "fas fa-calculator"
                 },
                 "sur_min_sv_size": {
                     "type": "integer",
-                    "default": 30,
+                    "default": 40,
                     "description": "Minimum size of structural variants to report.",
                     "help_text": "Sets the minimum size of structural variants (in base pairs) that will be included in the report. Variants smaller than this value will be excluded from the results. The default size is 30 bp.",
                     "fa_icon": "fas fa-arrows-alt-v"
@@ -488,8 +481,8 @@
                 },
                 "sur_min_allele_freq_filter": {
                     "type": "number",
-                    "minimum": 0.0,
-                    "maximum": 1.0,
+                    "minimum": 0,
+                    "maximum": 1,
                     "default": 0.01,
                     "description": "Minimum allele frequency for a variant to be reported.",
                     "help_text": "Set the minimum allele frequency for structural variant filtering.",
@@ -504,13 +497,6 @@
                     "fa_icon": "fas fa-database"
                 }
             }
-        },
-        "reporting_options": {
-            "title": "Reporting options",
-            "type": "object",
-            "fa_icon": "fas fa-chart-line",
-            "description": "Options for controlling the reporting of structural variants and related metrics.",
-            "properties": {}
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -729,10 +715,10 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
-            "$ref": "#/$defs/reference_genome_options"
+            "$ref": "#/$defs/sequence_retrieval_options"
         },
         {
-            "$ref": "#/$defs/sequence_retrieval_options"
+            "$ref": "#/$defs/quality_control_options"
         },
         {
             "$ref": "#/$defs/sv_caller_arguments"

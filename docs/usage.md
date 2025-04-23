@@ -9,6 +9,7 @@
 **nf-core/eukavarizer** is a modular and reproducible pipeline built for **structural variant (SV) detection** in **eukaryotic genomes**. It supports both **short and long sequencing reads**, integrates multiple SV calling tools (e.g., **GRIDSS**, **DELLY**, **Sniffles**, **CuteSV**, etc.), and handles reference genome retrieval or uses a local reference.
 
 > **Key features** include:
+>
 > - Automated FASTQ detection without a samplesheet
 > - Reference-based or reference retrieval from **RefSeq**
 > - Quality control using **FastQC**, **MultiQC**, and optional trimming steps
@@ -25,7 +26,9 @@ Unlike some nf-core pipelines, **eukavarizer** does **not** require a sampleshee
 ```bash
 --sequence_dir './fastqs/'
 ```
+
 or
+
 ```bash
 --input_dir '/path/to/reads/*.fastq.gz'
 ```
@@ -50,6 +53,7 @@ nextflow run nf-core/eukavarizer \
 ```
 
 This will:
+
 1. Download or validate the reference genome
 2. Preprocess and QC your reads
 3. Run the selected SV callers
@@ -135,6 +139,7 @@ For lengthy jobs:
 ```bash
 nextflow run ... -bg
 ```
+
 or wrap with `tmux`, `screen`, or your HPC scheduler system (e.g., SLURM).
 
 ---

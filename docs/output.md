@@ -28,6 +28,7 @@ Below are the key result folders, with common file names and descriptions.
 <summary>Output directory: <code>{taxonomy_id}/ref/</code> and <code>{taxonomy_id}/ref/minimap</code></summary>
 
 Example structure:
+
 ```
 results/
 └── 4932/
@@ -42,11 +43,13 @@ results/
 ```
 
 **Contents**:
+
 - **Reference FASTA** + index files
 - **Minimap2**, **BWA**, or **BWA-MEM2** index files
 - Possibly compressed (`*.gz`) versions of reference plus `.fai`, `.gzi`
 
 If a local reference is used, the pipeline copies or links it into `ref/` for indexing. If using a remote reference, the pipeline places it here after download.
+
 </details>
 
 ---
@@ -68,6 +71,7 @@ results/
 ```
 
 If the pipeline downloads reads from ENA/SRA, the raw data is placed here. For **local** input (`--sequence_dir`), you may see symbolic links or collated outputs (e.g., from `SAMTOOLS_COLLATEFASTQ`, `SRATOOLS_FASTERQDUMP`).
+
 </details>
 
 ---
@@ -99,7 +103,7 @@ results/
   - `multiqc_report.html`: aggregated QC overview
   - `multiqc_data/`: raw data from each QC tool
   - `multiqc_plots/`: static assets from the HTML report
-</details>
+  </details>
 
 ---
 
@@ -125,6 +129,7 @@ results/
 - Samtools logs or sorting logs
 
 The pipeline typically sorts and indexes the BAM files for downstream analysis.
+
 </details>
 
 ---
@@ -153,6 +158,7 @@ Each folder typically contains:
 - Caller logs, intermediate files (e.g., `*.bam` for Manta evidence)
 
 If a caller is disabled via flags (e.g., `--delly_flag false`), that folder might be absent.
+
 </details>
 
 ---
@@ -189,6 +195,7 @@ results/
 - Additional stats, logs, index files
 
 These represent the **unified** SV calls and any filtering performed (minimum size, depth, or caller support).
+
 </details>
 
 ---
@@ -205,6 +212,7 @@ These represent the **unified** SV calls and any filtering performed (minimum si
   - Harmonized structural variant sets, e.g., `*.svync.tsv`
 
 Exact folder names may vary depending on your pipeline configuration and flags (e.g., `sniffles_flag`, `cutesv_flag`).
+
 </details>
 
 ---

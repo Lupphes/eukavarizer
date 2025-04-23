@@ -38,7 +38,6 @@
 5. **SV merging & filtering** with SURVIVOR and BCFtools
 6. **Report generation** (including MultiQC and HTML summaries)
 
-
 ## Usage
 
 > [!NOTE]
@@ -47,6 +46,7 @@
 ## Quick Start
 
 ### Minimal example:
+
 ```bash
 nextflow run nf-core/eukavarizer \
    -profile docker,short_quick \
@@ -55,6 +55,7 @@ nextflow run nf-core/eukavarizer \
 ```
 
 ### Local input example:
+
 ```bash
 nextflow run nf-core/eukavarizer \
    -profile docker,short_full \
@@ -78,6 +79,7 @@ The pipeline provides several pre-defined profiles to optimise analysis based on
 - `mix_quick`, `mix_medium`, `mix_full`: For hybrid/mixed sequencing
 
 Each level adjusts:
+
 - Enabled SV callers
 - Tool-specific arguments
 - Filtering thresholds for SURVIVOR and BCFtools
@@ -92,12 +94,12 @@ Use `-profile docker,short_full` for a full analysis on short-read data with Doc
 
 ### Important Parameters
 
-| Parameter          | Description                                     |
-|-------------------|-------------------------------------------------|
-| `taxonomy_id`     | NCBI Taxonomy ID for reference retrieval        |
-| `sequence_dir`    | Path to directory with raw sequence files       |
-| `reference_genome`| Path to a FASTA file for the reference genome   |
-| `outdir`          | Output directory for results                    |
+| Parameter          | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `taxonomy_id`      | NCBI Taxonomy ID for reference retrieval      |
+| `sequence_dir`     | Path to directory with raw sequence files     |
+| `reference_genome` | Path to a FASTA file for the reference genome |
+| `outdir`           | Output directory for results                  |
 
 ---
 
@@ -133,4 +135,3 @@ You can cite the `nf-core` publication as follows:
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
-
