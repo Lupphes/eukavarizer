@@ -1,0 +1,30 @@
+name: dorado
+description: Basecalling module using Dorado to convert FAST5 to FASTQ
+keywords:
+  - basecalling
+  - nanopore
+  - fast5
+  - fastq
+tools:
+  - dorado:
+      description: Oxford Nanopore Technologies' Dorado basecaller
+      homepage: https://github.com/nanoporetech/dorado
+      documentation: https://github.com/nanoporetech/dorado
+      licence: MPL-2.0
+input:
+  - meta:
+      type: map
+      description: Metadata (e.g., sample name)
+  - fast5s:
+      type: file
+      description: Folder containing FAST5 files
+  - model:
+      type: file
+      description: Dorado model (.pt) to use for basecalling
+output:
+  - fastq:
+      type: file
+      description: Gzipped FASTQ output file
+      pattern: "*.fastq.gz"
+authors:
+  - yourname

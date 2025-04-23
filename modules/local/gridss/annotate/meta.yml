@@ -1,0 +1,27 @@
+name: gridss_annotate
+description: Annotate GRIDSS breakend (BND) calls with simple structural variant types (DEL, DUP, INV, INS) using orientation and position logic, and generate BED file.
+keywords:
+  - gridss
+  - structural variants
+  - SV annotation
+  - VCF
+  - BED
+tools:
+  - gridss_annotate:
+      description: "Custom R script using StructuralVariantAnnotation to reclassify GRIDSS BND records and generate simplified BED"
+      homepage: "https://github.com/PapenfussLab/gridss"
+      licence: "GPL-3.0"
+input:
+  - meta:
+      type: map
+      description: Groovy map containing sample information (e.g. id)
+  - vcf:
+      type: file
+      description: Gzipped VCF file with GRIDSS BND-formatted structural variants (.vcf.gz)
+output:
+  - vcf:
+      type: file
+      description: Annotated VCF file with SIMPLE_TYPE and SVLEN INFO fields
+  - bed:
+      type: file
+      description: BED file containing simplified PASS-filtered variants classified as DEL, DUP, INV, or INS

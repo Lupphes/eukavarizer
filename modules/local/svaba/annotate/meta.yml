@@ -1,0 +1,24 @@
+name: svaba_annotate
+description: Classify BNDs from SVABA VCF into INV, DEL, INS, or DUP/INS using mate-pair analysis
+keywords:
+  - svaba
+  - structural variants
+  - VCF
+  - BND
+  - conversion
+tools:
+  - svaba_annotate:
+      description: "Custom script to reclassify SVABA BND records"
+      homepage: "https://your-repo-or-docs-if-any"
+      licence: "MIT"
+input:
+  - sample_id:
+      type: string
+      description: Sample identifier
+  - vcf:
+      type: file
+      description: VCF file with SVABA BNDs
+output:
+  - reclassified_vcf:
+      type: file
+      description: VCF file with reclassified SVTYPEs
