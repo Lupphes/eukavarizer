@@ -1,7 +1,7 @@
 id: gridss_$INFO/SVTYPE
 
 alt:
-  BND: TRA
+  BND: BND
   DEL: DEL
   INS: INS
   DUP: DUP
@@ -23,12 +23,9 @@ info:
     alts:
       DEL: -$INFO/SVLEN
       DEL:TANDEM: -$INFO/SVLEN
-      INS: $INFO/SVLEN
-      DUP: $INFO/SVLEN
-      DUP:TANDEM: $INFO/SVLEN
-      INV: $INFO/SVLEN
       BND: 0
       TRA: 0
+      "*": $INFO/SVLEN
 
   CIEND:
     value: $INFO/CIRPOS
@@ -43,7 +40,7 @@ info:
     description: Confidence interval around POS
 
   SVTYPE:
-    value: $INFO/SVTYPE
+    value: $INFO/SIMPLE_TYPE
     number: 1
     type: string
     description: Type of structural variant (often BND for all breakpoints)

@@ -1,7 +1,7 @@
 id: dragen_$INFO/SVTYPE
 
 alt:
-  BND: TRA
+  BND: BND
   DEL: DEL
   INS: INS
   DUP: DUP
@@ -25,11 +25,9 @@ info:
       DEL: -$INFO/SVLEN
       DEL:TANDEM: -$INFO/SVLEN
       INS: ~sum:~len:LEFT_SVINSSEQ,~len:RIGHT_SVINSSEQ
-      DUP: $INFO/SVLEN
-      DUP:TANDEM: $INFO/SVLEN
-      INV: $INFO/SVLEN
       BND: 0
       TRA: 0
+      "*": $INFO/SVLEN
 
   CIEND:
     value: $INFO/CIEND

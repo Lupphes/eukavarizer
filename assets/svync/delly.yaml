@@ -24,11 +24,9 @@ info:
       DEL: -~sub:$INFO/END,$POS
       DEL:TANDEM: -~sub:$INFO/END,$POS
       INS: $INFO/SVLEN
-      DUP: ~sub:$INFO/END,$POS
-      DUP:TANDEM: ~sub:$INFO/END,$POS
-      INV: ~sub:$INFO/END,$POS
       BND: 0
       TRA: 0
+      "*": ~sub:$INFO/END,$POS
 
   CIEND:
     value: $INFO/CIEND

@@ -1,7 +1,7 @@
 id: sniffles_$INFO/SVTYPE
 
 alt:
-  BND: TRA
+  BND: BND
   DEL: DEL
   INS: INS
   DUP: DUP
@@ -29,12 +29,9 @@ info:
     alts:
       DEL: -$INFO/SVLEN
       DEL:TANDEM: -$INFO/SVLEN
-      INS: $INFO/SVLEN
-      DUP: $INFO/SVLEN
-      DUP:TANDEM: $INFO/SVLEN
-      INV: $INFO/SVLEN
       BND: 0
       TRA: 0
+      "*": $INFO/SVLEN
 
   END:
     value: $INFO/END

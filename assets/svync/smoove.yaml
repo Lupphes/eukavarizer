@@ -1,7 +1,7 @@
 id: smoove_$INFO/SVTYPE
 
 alt:
-  BND: TRA
+  BND: BND
   DEL: DEL
   INS: INS
   DUP: DUP

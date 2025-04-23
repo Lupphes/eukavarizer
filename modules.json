@@ -120,9 +120,19 @@
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
                         "installed_by": ["modules"]
                     },
+                    "samtools/fixmate": {
+                        "branch": "master",
+                        "git_sha": "c726d63739c90251337733c6d0b061d0ee8878aa",
+                        "installed_by": ["modules"]
+                    },
                     "samtools/index": {
                         "branch": "master",
                         "git_sha": "05954dab2ff481bcb999f24455da29a5828af08d",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/markdup": {
+                        "branch": "master",
+                        "git_sha": "c726d63739c90251337733c6d0b061d0ee8878aa",
                         "installed_by": ["modules"]
                     },
                     "samtools/sort": {
