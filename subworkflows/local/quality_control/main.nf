@@ -41,62 +41,73 @@ workflow QUALITY_CONTROL {
             fastq_files
         )
 
-        // FASTP
-        FASTP(
-            fastq_files
-            // Don't use on long reads
-            .filter { meta, _fastq ->
-                meta.median_bp < params.long_read_threshold
-            },
-            [],
-            false,
-            false,
-            false
-        )
-
-        FASTPLONG(
-            fastq_files
-            // Don't use on short reads
-            .filter { meta, _fastq ->
-                meta.median_bp >= params.long_read_threshold
-            },
-            [],
-            false,
-            false
-        )
-
-        // FASTP Short reads & FASTPLONG Long reads
-        fastp_combined_result = FASTP.out.reads.mix(FASTPLONG.out.reads)
-
-        BBMAP_BBDUK(
-            fastp_combined_result
+        if (params.fastp_flag) {
+            // FASTP
+            FASTP(
+                fastq_files
                 // Don't use on long reads
                 .filter { meta, _fastq ->
                     meta.median_bp < params.long_read_threshold
-                }
-                .filter { it ->
-                    if (it[1] instanceof List) {
-                        // Paired-end: check both files
-                        it[1][0].toFile().length() > 0 && it[1][1].toFile().length() > 0
-                    } else {
-                        // Single-end: check single file
-                        it[1].toFile().length() > 0
-                    }
                 },
-            []
-        )
+                [],
+                false,
+                false,
+                false
+            )
+
+            FASTPLONG(
+                fastq_files
+                // Don't use on short reads
+                .filter { meta, _fastq ->
+                    meta.median_bp >= params.long_read_threshold
+                },
+                [],
+                false,
+                false
+            )
+
+            // FASTP Short reads & FASTPLONG Long reads
+            fastp_combined_result = FASTP.out.reads.mix(FASTPLONG.out.reads)
+        }
+        else {
+            fastp_combined_result = fastq_files
+        }
+
+        non_null_fastp_combined = fastp_combined_result.filter { it ->
+            if (it[1] instanceof List) {
+                // Paired-end: check both files
+                it[1][0].toFile().length() > 0 && it[1][1].toFile().length() > 0
+            } else {
+                // Single-end: check single file
+                it[1].toFile().length() > 0
+            }
+        }
+
+        if (params.bbmap_bbduk_flag) {
+            bbduk_result = BBMAP_BBDUK(
+                non_null_fastp_combined
+                    // Don't use on long reads
+                    .filter { meta, _fastq ->
+                        meta.median_bp < params.long_read_threshold
+                    },
+                []
+            ).reads
+        }
+        else {
+            bbduk_result = non_null_fastp_combined
+        }
+
 
         // Trimmed Illumina reads and filtered long reads
-        bbduk_combined_result = BBMAP_BBDUK.out.reads.mix(
+        bbduk_combined_result = bbduk_result.mix(
             fastp_combined_result.filter { meta, _fastq ->
                 meta.median_bp >= params.long_read_threshold
-            })
+        })
 
         if (params.seqtk_flag) {
-            SEQTK_SAMPLE(
+            seqtk_combined_result = SEQTK_SAMPLE(
                 bbduk_combined_result.map { meta, fastq -> tuple(meta, fastq, params.seqtk_size) }
-            )
-            seqtk_combined_result = SEQTK_SAMPLE.out.reads
+            ).reads
         } else{
             seqtk_combined_result = bbduk_combined_result
         }

@@ -79,13 +79,13 @@ workflow SEQUENCE_PROCESSOR {
             fastqs_unzipped = Channel.fromPath("${params.sequence_dir}/**/*.fastq")
 
             // Zip the uncompressed ones
-            fastqs_zipped = GZIP(
+            GZIP(
                 fastqs_unzipped.map { file -> tuple([id: file.simpleName], file) }
-            ).gzip.map { _meta, file -> file }
+            )
 
 
             // Merge zipped and pre-zipped fastq files
-            raw_fastqs = fastqs_gz.mix(fastqs_zipped)
+            raw_fastqs = fastqs_gz.mix(GZIP.out.gzip.map { _meta, file -> file })
         } else {
             raw_fastqs = BIODBCORE_ENA.out.fastq_files
         }
@@ -295,20 +295,24 @@ workflow SEQUENCE_PROCESSOR {
                 tuple(meta + [id: "${meta.id}_mixed"], bam)
             }
 
-        // Sort paired BAM files
-        SAMTOOLS_SORT_NAMES(
-            mixed_bam_inputs.filter { meta, _fastq -> !meta.single_end },
-            reference_genome_unzipped.collect()
-        )
+        if (params.deduplicate_flag) {
+            // Sort paired BAM files
+            SAMTOOLS_SORT_NAMES(
+                mixed_bam_inputs.filter { meta, _fastq -> !meta.single_end },
+                reference_genome_unzipped.collect()
+            )
 
-        // FIXMATE for paired BAM files
-        SAMTOOLS_FIXMATE(
-            SAMTOOLS_SORT_NAMES.out.bam,
-        )
+            // FIXMATE for paired BAM files
+            bam_fixmate = SAMTOOLS_FIXMATE(
+                SAMTOOLS_SORT_NAMES.out.bam,
+            ).bam
+        } else {
+            bam_fixmate = []
+        }
 
         // Sort mixed BAM files
         SAMTOOLS_SORT_COORD(
-            SAMTOOLS_FIXMATE.out.bam.map { meta, bam ->
+            bam_fixmate.map { meta, bam ->
                 tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_coo')], bam)
             }.mix(
                 mixed_bam_inputs.filter { meta, _fastq -> meta.single_end }
@@ -316,16 +320,20 @@ workflow SEQUENCE_PROCESSOR {
             reference_genome_unzipped.collect()
         )
 
-        // Mark duplicates of paired BAM files
-        mark_dup = SAMTOOLS_MARKDUP(
-            SAMTOOLS_SORT_COORD.out.bam.map { meta, bam ->
-                tuple(meta + [id: meta.id.replaceFirst(/_coo$/, '_mar')], bam)
-            }.filter { meta, _fastq -> !meta.single_end },
-            reference_genome_unzipped.collect()
-        )
+        if (params.deduplicate_flag) {
+            // Mark duplicates of paired BAM files
+            mark_dup = SAMTOOLS_MARKDUP(
+                SAMTOOLS_SORT_COORD.out.bam.map { meta, bam ->
+                    tuple(meta + [id: meta.id.replaceFirst(/_coo$/, '_mar')], bam)
+                }.filter { meta, _fastq -> !meta.single_end },
+                reference_genome_unzipped.collect()
+            ).bam
+        } else {
+            mark_dup = []
+        }
 
         // Mix sorted BAM files with unpaired reads with marked duplicates
-        samtools_result = mark_dup.bam.map { meta, bam ->
+        samtools_result = mark_dup.map { meta, bam ->
             tuple(meta + [id: meta.id.replaceFirst(/_mar$/, '_sas')], bam)
         }
         .mix(SAMTOOLS_SORT_COORD.out.bam.filter { meta, _fastq -> meta.single_end })
