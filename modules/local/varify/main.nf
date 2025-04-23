@@ -4,7 +4,7 @@ process VARIFY {
     cache false
 
     conda "${moduleDir}/environment.yml"
-    container "luppo/varify:latest"
+    container "luppo/varify:0.2.5"
 
     input:
         val taxonomy_id

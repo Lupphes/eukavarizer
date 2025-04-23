@@ -20,6 +20,7 @@
 */
 
 include { SVABA             } from '../../../modules/nf-core/svaba/main'
+include { SVABA_ANNOTATE    } from '../../../modules/local/svaba/annotate/main.nf'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
 include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
@@ -48,10 +49,18 @@ workflow SV_CALLING_SVABA {
             [[],[]],
         )
 
+        if (params.svaba_annotate) {
+            svaba_annotate = SVABA_ANNOTATE(
+                SVABA.out.sv
+            ).vcf
+        } else {
+            svaba_annotate = SVABA.out.sv
+        }
+
         SAMPLE_REHEADER(
-            SVABA.out.sv,
-            SVABA.out.sv.map { meta, _vcf -> "${meta.id}_${name_svaba}" },
-            true
+            svaba_annotate,
+            svaba_annotate.map { meta, _vcf -> "${meta.id}_${name_svaba}" },
+            false
         )
 
         SVYNC(

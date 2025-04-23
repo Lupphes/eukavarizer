@@ -112,3 +112,9 @@ format:
     number: 1
     type: integer
     description: High-quality reference reads
+
+  PR:
+    value: $FORMAT/DR
+    number: 1
+    type: integer
+    description: High-quality reference reads

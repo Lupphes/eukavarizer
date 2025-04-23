@@ -3,9 +3,9 @@
     EUKAVARIZER WORKFLOW
     Structural Variant (SV) calling pipeline for short- and long-read sequencing data.
     This workflow integrates multiple SV callers:
-    - DELLY, MANTA, GRIDSS, Dysgu, TIDDIT – for short reads
+    - Delly, Manta, GRIDSS, Dysgu, TIDDIT, SvABA – for short reads
     - Sniffles, CuteSV – for long reads
-    - SVABA – for both short and long reads (currently not supported)
+    - Delly, Dysgu can also be used for long reads
 
     The outputs of this workflow include all synchronized and filtered VCFs along with
     their associated index files and metadata.

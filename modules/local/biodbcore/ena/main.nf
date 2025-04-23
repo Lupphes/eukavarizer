@@ -23,6 +23,8 @@ process BIODBCORE_ENA {
         path "**/*.bam", emit: bam_files, optional: true
         path "**/*.cram", emit: cram_files, optional: true
         path "**/*.sra", emit: sra_files, optional: true
+        path "**/*.fast5", emit: fast5_files, optional: true
+        path "**/*.pod5", emit: pod5_files, optional: true
 
     script:
     """

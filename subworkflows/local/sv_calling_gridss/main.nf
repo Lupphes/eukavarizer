@@ -21,6 +21,7 @@
 */
 
 include { GRIDSS_GRIDSS     } from '../../../modules/nf-core/gridss/gridss/main'
+include { GRIDSS_ANNOTATE    } from '../../../modules/local/gridss/annotate/main.nf'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
 include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
@@ -49,11 +50,17 @@ workflow SV_CALLING_GRIDSS {
             reference_genome_bwa_index
         )
 
-        gridss_result = GRIDSS_GRIDSS.out.vcf
+        if (params.gridss_annotate) {
+            gridss_annotate = GRIDSS_ANNOTATE(
+                GRIDSS_GRIDSS.out.vcf
+            ).vcf
+        } else {
+            gridss_annotate = GRIDSS_GRIDSS.out.vcf
+        }
 
         SAMPLE_REHEADER(
-            gridss_result,
-            gridss_result.map { meta, _vcf -> "${meta.id}_${name_gridss}" },
+            gridss_annotate,
+            gridss_annotate.map { meta, _vcf -> "${meta.id}_${name_gridss}" },
             false
         )
 

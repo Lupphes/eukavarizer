@@ -59,7 +59,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/nano" \
-    --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
+    --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 --seqtk_flag false --read_type "ont" --minimap2_flag true | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
