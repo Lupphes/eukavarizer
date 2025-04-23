@@ -262,8 +262,6 @@ workflow SEQUENCE_PROCESSOR {
             tuple(meta + [median_bp: length], fastq)
         }
 
-        tagged_collected_fastqs.view()
-
         QUALITY_CONTROL(
             tagged_collected_fastqs
         )

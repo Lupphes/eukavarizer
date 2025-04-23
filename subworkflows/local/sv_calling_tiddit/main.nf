@@ -55,7 +55,7 @@ workflow SV_CALLING_TIDDIT {
 
         TIDDIT_MAP(
             bam_inputs
-            // Only keep paired-end reads as MANTA does not support unpaired reads
+            // Only keep paired-end reads as TIDDIT does not support unpaired reads
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }

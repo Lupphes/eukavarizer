@@ -2,7 +2,7 @@ process SVABA_ANNOTATE {
     tag "$meta.id"
     label 'process_low'
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/quay.io/biocontainers/python:3.10'
+    container 'quay.io/biocontainers/python:3.10'
 
     input:
     tuple val(meta), path(vcf)
