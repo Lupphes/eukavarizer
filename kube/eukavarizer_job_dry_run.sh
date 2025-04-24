@@ -52,6 +52,8 @@ export NXF_LOG_FILE=$DATADIR/dry_run_job/logs/.nextflow_dry.log
 
 # Enter pipeline directory
 cd eukavarizer
+chmod +x bin/svaba_annotate.py
+chmod +x bin/simple-event-annotation.R
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"

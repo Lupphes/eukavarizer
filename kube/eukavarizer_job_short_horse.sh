@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_short_horse
-#PBS -l select=1:ncpus=64:mem=1024gb:scratch_local=2000gb
+#PBS -l select=1:ncpus=32:mem=728gb:scratch_local=1000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
@@ -52,6 +52,8 @@ export NXF_LOG_FILE=$DATADIR/short_job_horse/logs/.nextflow_short.log
 
 # Enter pipeline directory
 cd eukavarizer
+chmod +x bin/svaba_annotate.py
+chmod +x bin/simple-event-annotation.R
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
