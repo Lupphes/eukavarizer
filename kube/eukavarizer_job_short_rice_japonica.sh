@@ -56,7 +56,7 @@ cd eukavarizer
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,rice_japonica,qc_off \
-    --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCA_001433935.1.fasta.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_001433935.1_IRGSP-1.0_genomic.fna.gz" \
     --outdir "$DATADIR/short_job_rice_japonica/out" | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
