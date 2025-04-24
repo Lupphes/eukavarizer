@@ -20,7 +20,7 @@ def makeMateDict(m):
                 duplicateId = re.search(r'(\d+):',id2).group(1)
                 duplicateNumMate = re.search(r':(\d)',id2).group(1)
                 if duplicateId == origId and int(duplicateNumMate) == 2:
-                    d[line1] = line2
+                    d[line.strip()] = line2.strip()
                     break
     return d
 
@@ -35,7 +35,7 @@ def classify(line, ALT_INDEX, mdict):
     if int(re.search(r':(\d)',id).group(1)) != 1:
         return "NONE"
 
-    mateLine = mdict[line].split('\t')
+    mateLine = mdict[line.strip()].split('\t')
     mateChrom = mateLine[0]
     mateAlt = mateLine[ALT_INDEX]
 
