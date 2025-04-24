@@ -1,11 +1,11 @@
 #!/bin/bash
-#PBS -N eukavarizer_job_short_rice_horse
+#PBS -N eukavarizer_job_short_horse
 #PBS -l select=1:ncpus=64:mem=1024gb:scratch_local=2000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short_rice_horse.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short_horse.log
 
 # Exit on errors, undefined vars, and failed pipes
 set -euo pipefail
@@ -13,7 +13,7 @@ set -euo pipefail
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/short_job_horse/logs/eukavarizer_job_short_rice_horse_sad.log"
+LOGFILE="$DATADIR/short_job_horse/logs/eukavarizer_job_short_horse_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
 echo "=== Job EUKAVARIZER_JOB_SHORT started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
