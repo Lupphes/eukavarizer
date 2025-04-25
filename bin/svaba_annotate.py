@@ -35,6 +35,10 @@ def classify(line, ALT_INDEX, mdict):
     if int(re.search(r':(\d)',id).group(1)) != 1:
         return "NONE"
 
+    key = line.strip()
+    if key not in mdict:
+        return "BND"
+
     mateLine = mdict[line.strip()].split('\t')
     mateChrom = mateLine[0]
     mateAlt = mateLine[ALT_INDEX]
