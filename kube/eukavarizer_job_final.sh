@@ -21,10 +21,10 @@ module add openjdk/17
 module add mambaforge
 
 # Configure mamba channels
-echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-conda config --add channels luppo
-conda config --add channels bioconda
-conda config --add channels conda-forge
+# echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
+# conda config --add channels luppo
+# conda config --add channels bioconda
+# conda config --add channels conda-forge
 
 # Move to scratch space
 cd "$SCRATCH"
@@ -38,13 +38,14 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next" "$SCRATCH/.nextflow"
 export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/final_job/work
 export NXF_LOG_FILE=$DATADIR/final_job/logs/.nextflow_final.log
+export NXF_HOME="$SCRATCH/.nextflow"
 
 # Enter pipeline directory
 cd eukavarizer
