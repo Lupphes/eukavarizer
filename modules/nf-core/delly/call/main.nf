@@ -32,10 +32,11 @@ process DELLY_CALL {
     def vcf_output = suffix == "vcf" ? "| bgzip ${args2} --threads ${task.cpus} --stdout > ${prefix}.vcf.gz && tabix ${prefix}.vcf.gz" : ""
 
     def genotype = vcf ? "--vcffile ${vcf}" : ""
+    def command = meta.median_bp > params.long_read_threshold ? "lr" : "call"
 
     """
     delly \\
-        call \\
+        ${command} \\
         ${args} \\
         ${bcf_output} \\
         --genome ${fasta} \\
