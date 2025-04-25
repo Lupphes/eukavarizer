@@ -7,9 +7,6 @@
 #PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short.log
 
-# Exit on errors, undefined vars, and failed pipes
-set -euo pipefail
-
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
@@ -41,10 +38,9 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p ./.conda_pkgs ./.conda_envs ./.conda_dir
-export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
-export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
-export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next"
+export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/short_job/work
@@ -61,7 +57,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
-    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false --deduplicate_flag false | tee -a "$LOGFILE"
+    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false --deduplicate_flag false --svaba_flag false --bwamem2 true | tee -a "$LOGFILE"
 
 
 # Clean scratch

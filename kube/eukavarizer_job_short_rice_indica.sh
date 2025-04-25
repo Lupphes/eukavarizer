@@ -7,9 +7,6 @@
 #PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short_rice_indica.log
 
-# Exit on errors, undefined vars, and failed pipes
-set -euo pipefail
-
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
@@ -42,10 +39,9 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p ./.conda_pkgs ./.conda_envs ./.conda_dir
-export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
-export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
-export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next"
+export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/short_job_rice_indica/work

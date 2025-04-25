@@ -7,9 +7,6 @@
 #PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short_rice_japonica.log
 
-# Exit on errors, undefined vars, and failed pipes
-set -euo pipefail
-
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
@@ -42,10 +39,9 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p ./.conda_pkgs ./.conda_envs ./.conda_dir
-export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
-export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
-export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next"
+export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/short_job_rice_japonica/work
@@ -61,9 +57,6 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,rice_japonica,qc_off \
     --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_001433935.1_IRGSP-1.0_genomic.fna.gz" \
     --outdir "$DATADIR/short_job_rice_japonica/out" | tee -a "$LOGFILE"
-
-echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
-find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"

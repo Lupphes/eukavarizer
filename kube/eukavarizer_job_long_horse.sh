@@ -7,12 +7,9 @@
 #PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_long_horse.log
 
-# Exit on errors, undefined vars, and failed pipes
-set -euo pipefail
-
 # Define paths
 DATADIR=/storage/brno2/home/luppo
-SCRATCH
+SCRATCH=$SCRATCHDIR
 LOGFILE="$DATADIR/long_job_horse/logs/eukavarizer_job_long_horse_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
@@ -22,12 +19,6 @@ echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 # Load required modules
 module add openjdk/17
 module add mambaforge
-
-# Configure mamba channels
-echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-conda config --add channels luppo
-conda config --add channels bioconda
-conda config --add channels conda-forge
 
 echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 # Move to scratch space
@@ -42,19 +33,24 @@ echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Conda envs in scratch
-mkdir -p ./.conda_pkgs ./.conda_envs ./.conda_dir
-export CONDA_PKGS_DIRS=$SCRATCH/.conda_pkgs
-export NXF_CONDA_CACHEDIR="$(pwd)/.conda_next"
-export CONDA_PKGS_DIRS="$(pwd)/.conda_dir"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next"
+export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK=$DATADIR/long_job_horse/work
-export NXF_LOG_FILE=$DATADIR/long_job_horse/logs/.nextflow_short.log
+export NXF_WORK="$DATADIR/long_job_horse/work"
+export NXF_LOG_FILE="$DATADIR/long_job_horse/logs/.nextflow_short.log"
 
 # Enter pipeline directory
 cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
+
+# Configure mamba channels
+# echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
+# conda config --add channels luppo
+# conda config --add channels bioconda
+# conda config --add channels conda-forge
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
