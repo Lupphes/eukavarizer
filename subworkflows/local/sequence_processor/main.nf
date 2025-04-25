@@ -282,12 +282,12 @@ workflow SEQUENCE_PROCESSOR {
             true,
             [],
             false,
-            false
+            true
         )
 
         sorted_indexed_bed = params.bwamem2 ?
-            BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), false) :
-            BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), false)
+            BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), !params.deduplicate_flag) :
+            BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), !params.deduplicate_flag)
 
         mixed_bam_inputs = sorted_indexed_bed.bam
             .mix(MINIMAP2_ALIGN.out.bam)
@@ -306,37 +306,41 @@ workflow SEQUENCE_PROCESSOR {
             bam_fixmate = SAMTOOLS_FIXMATE(
                 SAMTOOLS_SORT_NAMES.out.bam,
             ).bam
-        } else {
-            bam_fixmate = []
-        }
 
-        // Sort mixed BAM files
-        SAMTOOLS_SORT_COORD(
-            bam_fixmate.map { meta, bam ->
-                tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_coo')], bam)
-            }.mix(
-                mixed_bam_inputs.filter { meta, _fastq -> meta.single_end }
-            ),
-            reference_genome_unzipped.collect()
-        )
-
-        if (params.deduplicate_flag) {
-            // Mark duplicates of paired BAM files
-            mark_dup = SAMTOOLS_MARKDUP(
-                SAMTOOLS_SORT_COORD.out.bam.map { meta, bam ->
-                    tuple(meta + [id: meta.id.replaceFirst(/_coo$/, '_mar')], bam)
-                }.filter { meta, _fastq -> !meta.single_end },
+            // Sort mixed BAM files
+            SAMTOOLS_SORT_COORD(
+                bam_fixmate.mix(
+                        mixed_bam_inputs.filter { meta, _fastq -> meta.single_end }
+                    ).map { meta, bam ->
+                    tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_coo')], bam)
+                },
                 reference_genome_unzipped.collect()
-            ).bam
-        } else {
-            mark_dup = []
-        }
+            )
 
-        // Mix sorted BAM files with unpaired reads with marked duplicates
-        samtools_result = mark_dup.map { meta, bam ->
-            tuple(meta + [id: meta.id.replaceFirst(/_mar$/, '_sas')], bam)
+            all_coord = SAMTOOLS_SORT_COORD.out.bam
+                .map { meta, bam ->
+                    tuple(meta + [id: meta.id.replaceFirst(/_coo$/, '_mar')], bam)
+                }
+
+            // Mark duplicates of paired BAM files
+            SAMTOOLS_MARKDUP(
+                all_coord.filter { meta, _fastq -> !meta.single_end },
+                reference_genome_unzipped.collect()
+            )
+
+
+            // Mix sorted BAM files with unpaired reads with marked duplicates
+            samtools_result = all_coord.filter { meta, _fastq -> meta.single_end}
+                .mix(SAMTOOLS_MARKDUP.out.bam)
+                .map { meta, bam ->
+                    tuple(meta + [id: meta.id.replaceFirst(/_mar$/, '_sas')], bam)
+                }
+        } else {
+            samtools_result = mixed_bam_inputs
+                .map { meta, bam ->
+                    tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_sas')], bam)
+                }
         }
-        .mix(SAMTOOLS_SORT_COORD.out.bam.filter { meta, _fastq -> meta.single_end })
 
         // Sort and index BAM files
         SAMTOOLS_INDEX(
