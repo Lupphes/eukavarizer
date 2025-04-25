@@ -43,8 +43,6 @@ process SRATOOLS_FASTERQDUMP {
         ${key_file} \\
         ${sra}
 
-    $exclude_third
-
     pigz \\
         $args2 \\
         --no-name \\
