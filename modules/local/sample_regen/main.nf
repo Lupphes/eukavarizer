@@ -34,47 +34,42 @@ process SAMPLE_REHEADER {
         tabix -p vcf "\${VCF_INPUT}"
     fi
 
-    # Check if the VCF is readable (must have at least a #CHROM line)
-    if bcftools view "\${VCF_INPUT}" | grep -q '^#CHROM'; then
-        # Get sample names count
-        SAMPLE_COUNT=\$(bcftools query -l "\${VCF_INPUT}" | wc -l)
+    # Get sample names count
+    SAMPLE_COUNT=\$(bcftools query -l "\${VCF_INPUT}" | wc -l)
 
-        if [[ "\${SAMPLE_COUNT}" -gt 0 ]]; then
-            if [[ "${remove_headers}" == "true" ]]; then
-                # Strip/filter FILTER headers with empty or malformed descriptions and sanitize
-                bcftools view -h "\${VCF_INPUT}" | awk '
-                    /^##FILTER=/ {
-                        match(\$0, /Description="[^"]+"/)
-                        if (RSTART > 0) {
-                            desc = substr(\$0, RSTART + 12, RLENGTH - 13)
-                            # Mask greater-than symbol
-                            gsub(/>/, "\\\\&gt;", desc)
-                            sub(/Description="[^"]+"/, "Description=\\"" desc "\\"")
-                        }
+    if [[ "\${SAMPLE_COUNT}" -gt 0 ]]; then
+        if [[ "${remove_headers}" == "true" ]]; then
+            # Strip/filter FILTER headers with empty or malformed descriptions and sanitize
+            bcftools view -h "\${VCF_INPUT}" | awk '
+                /^##FILTER=/ {
+                    match(\$0, /Description="[^"]+"/)
+                    if (RSTART > 0) {
+                        desc = substr(\$0, RSTART + 12, RLENGTH - 13)
+                        # Mask greater-than symbol
+                        gsub(/>/, "\\\\&gt;", desc)
+                        sub(/Description="[^"]+"/, "Description=\\"" desc "\\"")
                     }
-                    { print }
-                ' > filtered_header.hdr
-            else
-                bcftools view -h "\${VCF_INPUT}" > filtered_header.hdr
-            fi
-
-            # Extract original sample names and prepend new_name
-            bcftools query -l "\${VCF_INPUT}" | awk -v prefix="[${new_name}]" '{print prefix \$0}' > sample_names_${new_name}.txt
-
-            # Create a new header with updated sample names
-            bcftools reheader -h filtered_header.hdr -s sample_names_${new_name}.txt -o reheadered_${new_name}.vcf.gz "\${VCF_INPUT}"
-
-            # Index the new VCF (both TBI and CSI)
-            tabix -p vcf reheadered_${new_name}.vcf.gz
-            bcftools index --csi reheadered_${new_name}.vcf.gz
-
-            # Also provide an uncompressed VCF
-            bcftools view reheadered_${new_name}.vcf.gz -Ov -o reheadered_${new_name}.vcf
+                }
+                { print }
+            ' > filtered_header.hdr
         else
-            echo "No samples found in VCF. Skipping reheadering."
+            bcftools view -h "\${VCF_INPUT}" > filtered_header.hdr
         fi
+
+        # Extract original sample names and prepend new_name
+        bcftools query -l "\${VCF_INPUT}" | awk -v prefix="[${new_name}]" '{print prefix \$0}' > sample_names_${new_name}.txt
+
+        # Create a new header with updated sample names
+        bcftools reheader -h filtered_header.hdr -s sample_names_${new_name}.txt -o reheadered_${new_name}.vcf.gz "\${VCF_INPUT}"
+
+        # Index the new VCF (both TBI and CSI)
+        tabix -p vcf reheadered_${new_name}.vcf.gz
+        bcftools index --csi reheadered_${new_name}.vcf.gz
+
+        # Also provide an uncompressed VCF
+        bcftools view reheadered_${new_name}.vcf.gz -Ov -o reheadered_${new_name}.vcf
     else
-        echo "Invalid or empty VCF. Skipping reheadering."
+        echo "No samples found in VCF. Skipping reheadering."
     fi
 
     # Capture versions
@@ -83,7 +78,6 @@ process SAMPLE_REHEADER {
         bcftools: \$(bcftools --version | head -n 1 | sed 's/^.*bcftools //')
     END_VERSIONS
     """
-
 
     stub:
     """
