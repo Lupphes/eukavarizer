@@ -45,6 +45,7 @@ export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK=$DATADIR/nano_job/work
 export NXF_LOG_FILE=$DATADIR/nano_job/logs/.nextflow_nano.log
+export NXF_HOME="$SCRATCH/.nextflow"
 
 # Enter pipeline directory
 cd eukavarizer

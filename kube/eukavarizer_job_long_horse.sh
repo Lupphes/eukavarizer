@@ -40,6 +40,7 @@ export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK="$DATADIR/long_job_horse/work"
 export NXF_LOG_FILE="$DATADIR/long_job_horse/logs/.nextflow_short.log"
+export NXF_HOME="$SCRATCH/.nextflow"
 
 # Enter pipeline directory
 cd eukavarizer
