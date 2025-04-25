@@ -63,8 +63,6 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --sequence_dir "$DATADIR/eukavarizer/data/9606/gib" \
     --outdir "$DATADIR/dry_run_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
 
-
-
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch
