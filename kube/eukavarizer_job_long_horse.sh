@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Define paths
 DATADIR=/storage/brno2/home/luppo
-SCRATCH=$SCRATCHDIR
+SCRATCH
 LOGFILE="$DATADIR/long_job_horse/logs/eukavarizer_job_long_horse_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
@@ -29,6 +29,7 @@ conda config --add channels luppo
 conda config --add channels bioconda
 conda config --add channels conda-forge
 
+echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 # Move to scratch space
 cd "$SCRATCH"
 
