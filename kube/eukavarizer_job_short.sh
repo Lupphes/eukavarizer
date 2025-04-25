@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_short
 #PBS -l select=1:ncpus=64:mem=1500gb:scratch_local=3000gb
-#PBS -l walltime=36:00:00
+#PBS -l walltime=48:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
