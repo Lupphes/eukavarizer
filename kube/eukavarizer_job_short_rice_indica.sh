@@ -62,9 +62,6 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --reference_genome "$DATADIR/eukavarizer/data/39946/ref/GCA_019338905.1_ASM1933890v1_genomic.fna.gz" \
     --outdir "$DATADIR/short_job_rice_indica/out" | tee -a "$LOGFILE"
 
-echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
-find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
-
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch

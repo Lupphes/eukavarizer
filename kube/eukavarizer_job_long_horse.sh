@@ -62,8 +62,6 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --sequence_dir "$DATADIR/eukavarizer/data/9796/seq" \
     --outdir "$DATADIR/long_job_horse/out" --read_type "pacbio" | tee -a "$LOGFILE"
 
-echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
-find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"

@@ -63,8 +63,6 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --sequence_dir "$DATADIR/eukavarizer/data/9606/final" \
     --outdir "$DATADIR/final_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
 
-echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
-find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"
