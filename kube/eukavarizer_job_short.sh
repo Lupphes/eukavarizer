@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_short
 #PBS -l select=1:ncpus=64:mem=1500gb:scratch_local=3000gb
-#PBS -l walltime=24:00:00
+#PBS -l walltime=36:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
@@ -61,7 +61,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
-    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
+    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false --deduplicate_flag false | tee -a "$LOGFILE"
 
 echo ">>> Cleaning up any broken conda environments..." | tee -a "$LOGFILE"
 find "$NXF_CONDA_CACHEDIR" -type d -name "envs" -exec rm -rf {} + || true
