@@ -222,7 +222,7 @@ workflow SEQUENCE_PROCESSOR {
         fqdump_reads = SRATOOLS_FASTERQDUMP.out.reads
         .map { meta, fastqs ->
             def single_end = fastqs.size() == 1
-            [[id: "${meta.id}", single_end: single_end], fastqs.sort()]
+            [[id: "${meta.id}", single_end: single_end], fastqs ? fastqs : []]
         }
 
         // Process Dorado parsed reads (fast5) (paired + unpaired)
