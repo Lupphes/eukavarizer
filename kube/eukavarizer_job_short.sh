@@ -58,7 +58,7 @@ echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --sequence_dir "$DATADIR/eukavarizer/data/9606/short" \
-    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false --deduplicate_flag false --svaba_flag false --bwamem2 false | tee -a "$LOGFILE"
+    --outdir "$DATADIR/short_job/out" --seqtk_size 1.0 --seqtk_flag false --deduplicate_flag false --svaba_flag true --bwamem2 false --minimap2_flag false | tee -a "$LOGFILE"
 
 
 # Clean scratch
