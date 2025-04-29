@@ -56,7 +56,7 @@ chmod +x bin/simple-event-annotation.R
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,rice_japonica,qc_off \
-    --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_001433935.1_IRGSP-1.0_genomic.fna.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/39946/ref/GCA_019338905.1_ASM1933890v1_genomic.fna.gz" \
     --outdir "$DATADIR/short_job_rice_japonica/out" | tee -a "$LOGFILE"
 
 # Clean scratch
