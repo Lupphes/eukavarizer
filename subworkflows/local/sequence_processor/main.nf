@@ -18,339 +18,51 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
-
-include { GZIP                  } from '../../../modules/local/gzip/main'
-
-include { SRATOOLS_FASTERQDUMP } from '../../../modules/nf-core/sratools/fasterqdump/main'
-include { DORADO as DORADO_FAST5    } from '../../../modules/local/dorado/main'
-include { DORADO as DORADO_POD5     } from '../../../modules/local/dorado/main'
-include { SAMTOOLS_COLLATEFASTQ as BAM_SAMTOOLS_COLLATEFASTQ    } from '../../../modules/nf-core/samtools/collatefastq/main'
-include { SAMTOOLS_COLLATEFASTQ as CRAM_SAMTOOLS_COLLATEFASTQ   } from '../../../modules/nf-core/samtools/collatefastq/main'
-
+include { SEQUENCE_FASTQ_CONVERTOR       } from '../../../subworkflows/local/sequence_fastq_convertor/main'
 include { QUALITY_CONTROL       } from '../../../subworkflows/local/quality_control/main'
+include { SEQUENCE_ALIGNER       } from '../../../subworkflows/local/sequence_aligner/main'
+include { SEQUENCE_MERGER       } from '../../../subworkflows/local/sequence_merger/main'
 
-include { SEQKIT_SIZE           } from '../../../modules/local/seqkit/size/main'
-include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
-include { BWAMEM2_MEM           } from '../../../modules/nf-core/bwamem2/mem/main'
-include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
-
-include { SAMTOOLS_MARKDUP      } from '../../../modules/nf-core/samtools/markdup/main'
-include { SAMTOOLS_SORT as SAMTOOLS_SORT_NAMES   } from '../../../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_SORT as SAMTOOLS_SORT_COORD   } from '../../../modules/nf-core/samtools/sort/main'
-include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
-include { SAMTOOLS_FIXMATE      } from '../../../modules/nf-core/samtools/fixmate/main'
+// include { SAMTOOLS_MARKDUP      } from '../../../modules/nf-core/samtools/markdup/main'
+// include { SAMTOOLS_SORT as SAMTOOLS_SORT_NAMES   } from '../../../modules/nf-core/samtools/sort/main'
+// include { SAMTOOLS_SORT as SAMTOOLS_SORT_COORD   } from '../../../modules/nf-core/samtools/sort/main'
+// include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
+// include { SAMTOOLS_FIXMATE      } from '../../../modules/nf-core/samtools/fixmate/main'
+// include { SEQKIT_CONCAT         } from '../../../modules/nf-core/seqkit/concat/main'
 
 workflow SEQUENCE_PROCESSOR {
 
     take:
-        taxonomy_id
-        outdir
-        sequences_abs_dir
-        reference_genome_ungapped_size
+        samplesheet
         reference_genome_unzipped
-        reference_genome_bgzipped
         reference_genome_bwa_index
 
     main:
-        ch_library_strategy    = params.library_strategy ? Channel.value(params.library_strategy) : Channel.value([])
-        ch_instrument_platform = params.instrument_platform ? Channel.value(params.instrument_platform) : Channel.value([])
-        ch_minimum_coverage    = params.minimum_coverage ? Channel.value(params.minimum_coverage) : Channel.value(1)
-        ch_maximum_coverage    = params.maximum_coverage ? Channel.value(params.maximum_coverage) : Channel.value("")
-        ch_max_results         = params.max_results ? Channel.value(params.max_results) : Channel.value(1)
-        ch_assembly_quality    = params.assembly_quality ? Channel.value(params.assembly_quality) : Channel.value("")
-
-        BIODBCORE_ENA(
-            taxonomy_id,
-            reference_genome_ungapped_size,
-            outdir,
-            ch_library_strategy.map     { it.join(' ').trim() },
-            ch_instrument_platform.map  { it.join(' ').trim() },
-            ch_minimum_coverage,
-            ch_maximum_coverage,
-            ch_max_results,
-            ch_assembly_quality,
-            sequences_abs_dir
+        SEQUENCE_FASTQ_CONVERTOR(
+            samplesheet,
+            reference_genome_unzipped,
+            reference_genome_bwa_index
         )
-
-        if (sequences_abs_dir != []) {
-            // Separate gzipped and uncompressed files
-            fastqs_gz = Channel.fromPath("${params.sequence_dir}/**/*.fastq.gz")
-            fastqs_unzipped = Channel.fromPath("${params.sequence_dir}/**/*.fastq")
-
-            // Zip the uncompressed ones
-            GZIP(
-                fastqs_unzipped.map { file -> tuple([id: file.simpleName], file) }
-            )
-
-
-            // Merge zipped and pre-zipped fastq files
-            raw_fastqs = fastqs_gz.mix(GZIP.out.gzip.map { _meta, file -> file })
-        } else {
-            raw_fastqs = BIODBCORE_ENA.out.fastq_files
-        }
-
-        raw_sra = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.sra")
-            : BIODBCORE_ENA.out.sra_files).collect().flatten()
-
-        raw_fast5 = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.fast5")
-            : BIODBCORE_ENA.out.sra_files).collect().flatten()
-
-        raw_pod5 = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.pod5")
-            : BIODBCORE_ENA.out.sra_files).collect().flatten()
-
-        raw_bam = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.bam")
-            : BIODBCORE_ENA.out.bam_files).collect().flatten()
-
-        raw_cram = (sequences_abs_dir != [] ?
-            Channel
-                .fromPath("${params.sequence_dir}/**/*.cram")
-            : BIODBCORE_ENA.out.cram_files).collect().flatten()
-
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        grouped_fastqs = raw_fastqs
-            .flatMap { file ->
-                file instanceof List ? file : [file]
-            }
-            .map { file -> tuple(file.getParent().getName(), file) }
-            .groupTuple()
-            .map { run_accession, files ->
-                def paired = files.findAll { f ->
-                    def base = f.toString().replaceAll(/_[12]\.fastq\.gz$/, '')
-                    files.any { it.toString() == "${base}_1.fastq.gz" } &&
-                    files.any { it.toString() == "${base}_2.fastq.gz" }
-                }
-
-                def is_paired = paired.size() == 2
-
-                if (is_paired) {
-                    // Paired-end
-                    tuple([id: run_accession, single_end: !is_paired], paired.sort())
-                } else {
-                    // Single-end
-                    def unpaired = files - paired
-                    tuple([id: run_accession, single_end: !is_paired], unpaired.sort())
-                }
-            }
-
-        grouped_bam = raw_bam
-            .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file) }
-
-        grouped_cram = raw_cram
-            .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file) }
-
-        grouped_sra = raw_sra
-            .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file) }
-
-        grouped_fast5 = raw_fast5
-            .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file) }
-
-        grouped_pod5 = raw_pod5
-            .flatMap { file -> file instanceof List ? file : [file] }
-            .map { file -> tuple([id: file.getParent().getName()], file) }
-
-        SRATOOLS_FASTERQDUMP(
-            grouped_sra,
-            [],
-            []
-        )
-
-        DORADO_FAST5(
-            grouped_fast5
-        )
-
-        DORADO_POD5(
-            grouped_pod5
-        )
-
-        BAM_SAMTOOLS_COLLATEFASTQ(
-            grouped_bam,
-            reference_genome_bgzipped.collect(),
-            false
-        )
-
-        CRAM_SAMTOOLS_COLLATEFASTQ(
-            grouped_cram,
-            reference_genome_bgzipped.collect(),
-            false
-        )
-
-        // Process BAM reads (paired + unpaired)
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        bam_paired = BAM_SAMTOOLS_COLLATEFASTQ.out.fastq
-            .filter { _meta, files -> files.size() == 2 }
-            .map { meta, fastqs ->
-                [[id: "${meta.id}_paired", single_end: false], fastqs.sort()]
-            }
-
-        bam_unpaired = BAM_SAMTOOLS_COLLATEFASTQ.out.fastq_singleton
-            .map { meta, fastqs ->
-                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs : []]
-            }
-
-        // Process CRAM reads (paired + unpaired)
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        cram_paired = CRAM_SAMTOOLS_COLLATEFASTQ.out.fastq
-            .filter { _meta, files -> files.size() == 2 }
-            .map { meta, fastqs ->
-                [[id: "${meta.id}_paired", single_end: false], fastqs.sort()]
-            }
-
-        cram_unpaired = CRAM_SAMTOOLS_COLLATEFASTQ.out.fastq_singleton
-            .map { meta, fastqs ->
-                [[id: "${meta.id}_unpaired", single_end: true], fastqs ? fastqs : []]
-            }
-
-        // Process SRA parsed reads (paired + unpaired)
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        fqdump_reads = SRATOOLS_FASTERQDUMP.out.reads
-        .map { meta, fastqs ->
-            def single_end = fastqs.size() == 1
-            [[id: "${meta.id}", single_end: single_end], fastqs ? fastqs : []]
-        }
-
-        // Process Dorado parsed reads (fast5) (paired + unpaired)
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        dorado_fast5 = DORADO_FAST5.out.fastq
-        .map { meta, fastqs ->
-            def single_end = fastqs.size() == 1
-            [[id: "${meta.id}", single_end: single_end], fastqs ? fastqs : []]
-        }
-
-        // Process Dorado parsed reads (pod5) (paired + unpaired)
-        // Paired reads: [[id: sample_id, single_end: true/false], [file1, file2]]
-        // Single-end reads: [[id: sample_id, single_end: true/false], [file1]]
-        dorado_pod5 = DORADO_POD5.out.fastq
-        .map { meta, fastqs ->
-            def single_end = fastqs.size() == 1
-            [[id: "${meta.id}", single_end: single_end], fastqs ? fastqs : []]
-        }
-
-        collected_fastqs = grouped_fastqs
-            .mix(bam_paired)
-            .mix(bam_unpaired)
-            .mix(cram_paired)
-            .mix(cram_unpaired)
-            .mix(fqdump_reads)
-            .mix(dorado_fast5)
-            .mix(dorado_pod5)
-
-        SEQKIT_SIZE(
-            collected_fastqs
-        )
-
-        // Add median_bp to the metadata
-        tagged_collected_fastqs = SEQKIT_SIZE.out.median_bp.map { meta, fastq, median_bp ->
-            def length = median_bp.text.trim().toInteger()
-            tuple(meta + [median_bp: length], fastq)
-        }
 
         QUALITY_CONTROL(
-            tagged_collected_fastqs
+            SEQUENCE_FASTQ_CONVERTOR.out.tagged_collected_fastqs
         )
 
-        minimap2_bam = QUALITY_CONTROL.out.fastq_filtered
-            .filter { meta, _fastq ->
-                params.minimap2_flag && (meta.median_bp > params.long_read_threshold)
-            }
-
-        bwa_bam = QUALITY_CONTROL.out.fastq_filtered
-            .filter { meta, _fastq ->
-                !params.minimap2_flag || (meta.median_bp <= params.long_read_threshold)
-            }
-
-        MINIMAP2_ALIGN(
-            minimap2_bam,
-            reference_genome_unzipped.collect(),
-            true,
-            [],
-            false,
-            true
+        SEQUENCE_ALIGNER(
+            QUALITY_CONTROL.out.fastq_filtered,
+            reference_genome_unzipped,
+            reference_genome_bwa_index
         )
 
-        sorted_indexed_bed = params.bwamem2 ?
-            BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), !params.deduplicate_flag) :
-            BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), !params.deduplicate_flag)
-
-        mixed_bam_inputs = sorted_indexed_bed.bam
-            .mix(MINIMAP2_ALIGN.out.bam)
-            .map { meta, bam ->
-                tuple(meta + [id: "${meta.id}_mixed"], bam)
-            }
-
-        if (params.deduplicate_flag) {
-            // Sort paired BAM files
-            SAMTOOLS_SORT_NAMES(
-                mixed_bam_inputs.filter { meta, _fastq -> !meta.single_end },
-                reference_genome_unzipped.collect()
-            )
-
-            // FIXMATE for paired BAM files
-            bam_fixmate = SAMTOOLS_FIXMATE(
-                SAMTOOLS_SORT_NAMES.out.bam,
-            ).bam
-
-            // Sort mixed BAM files
-            SAMTOOLS_SORT_COORD(
-                bam_fixmate.mix(
-                        mixed_bam_inputs.filter { meta, _fastq -> meta.single_end }
-                    ).map { meta, bam ->
-                    tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_coo')], bam)
-                },
-                reference_genome_unzipped.collect()
-            )
-
-            all_coord = SAMTOOLS_SORT_COORD.out.bam
-                .map { meta, bam ->
-                    tuple(meta + [id: meta.id.replaceFirst(/_coo$/, '_mar')], bam)
-                }
-
-            // Mark duplicates of paired BAM files
-            SAMTOOLS_MARKDUP(
-                all_coord.filter { meta, _fastq -> !meta.single_end },
-                reference_genome_unzipped.collect()
-            )
-
-
-            // Mix sorted BAM files with unpaired reads with marked duplicates
-            samtools_result = all_coord.filter { meta, _fastq -> meta.single_end}
-                .mix(SAMTOOLS_MARKDUP.out.bam)
-                .map { meta, bam ->
-                    tuple(meta + [id: meta.id.replaceFirst(/_mar$/, '_sas')], bam)
-                }
-        } else {
-            samtools_result = mixed_bam_inputs
-                .map { meta, bam ->
-                    tuple(meta + [id: meta.id.replaceFirst(/_mixed$/, '_sas')], bam)
-                }
-        }
-
-        // Sort and index BAM files
-        SAMTOOLS_INDEX(
-            samtools_result
+        SEQUENCE_MERGER(
+            SEQUENCE_ALIGNER.out.bam_mapped,
+            reference_genome_unzipped,
+            reference_genome_bwa_index
         )
 
     emit:
         fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files
-        fastq_bam                   = samtools_result                       // Sorted BAM files (.bam)
-        fastq_bam_indexes           = SAMTOOLS_INDEX.out.bai                // BAM index files (.bai)
+        bam_bai                     = SEQUENCE_MERGER.out.bam_bai           // Sorted, Deduplicated (BAM, BAI) tuples
         multiqc_report              = QUALITY_CONTROL.out.multiqc_report    // Path to MultiQC report
 }
 

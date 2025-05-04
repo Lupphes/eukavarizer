@@ -33,6 +33,24 @@ info:
       TRA: 0
       "*": $INFO/SVLEN
 
+  EUK_CALLER:
+    value: $INFO/EUK_CALLER
+    number: 1
+    type: string
+    description: SV calling algorithm used
+
+  EUK_PLATFORM:
+    value: $INFO/EUK_PLATFORM
+    number: 1
+    type: string
+    description: Sequencing platform
+
+  EUK_SE:
+    value: $INFO/EUK_SE
+    number: 1
+    type: string
+    description: Single-end or paired-end
+
   IMPRECISE:
     value: $INFO/IMPRECISE
     number: 0
@@ -161,7 +179,6 @@ format:
     type: integer
     description: Break-end alignments supporting variant (sample-level)
 
-  # Add as needed (MAPQP, MAPQS, NMP, NMS, NP, etc.)
   MAPQP:
     value: $FORMAT/MAPQP
     number: 1

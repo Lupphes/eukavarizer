@@ -38,17 +38,20 @@ workflow NFCORE_EUKAVARIZER {
     take:
         taxonomy_id
         outdir
-        sequences_abs_dir
+        samplesheet
         reference_genome
 
     main:
-
         report = Channel.empty()
-        sv_callers_enabled = params.gridss_flag || params.delly_flag || params.manta_flag ||
-                                params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
-                                params.dysgu_flag || (params.svaba_flag && !params.bwamem2)
+        sv_callers_enabled =
+            params.gridss_flag || params.delly_flag || params.manta_flag ||
+            params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
+            params.dysgu_flag || (params.svaba_flag && !params.bwamem2)
 
         log.info "🧬 SV callers enabled: ${sv_callers_enabled}"
+        if (params.svaba_flag && params.bwamem2) {
+            log.warn "⚠️ SVABA is not compatible with BWA-MEM2. Please use BWA-MEM v1 to run SVABA."
+        }
 
         REFERENCE_RETRIEVAL(
             taxonomy_id,
@@ -57,24 +60,18 @@ workflow NFCORE_EUKAVARIZER {
         )
 
         SEQUENCE_PROCESSOR(
-            taxonomy_id,
-            outdir,
-            sequences_abs_dir,
-            REFERENCE_RETRIEVAL.out.reference_genome_ungapped_size,
+            samplesheet,
             REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
-            REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
             REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
         )
 
         if (sv_callers_enabled) {
 
             EUKAVARIZER(
-                SEQUENCE_PROCESSOR.out.fastq_bam,
-                SEQUENCE_PROCESSOR.out.fastq_bam_indexes,
+                SEQUENCE_PROCESSOR.out.bam_bai,
                 REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
                 REFERENCE_RETRIEVAL.out.reference_genome_faidx,
                 REFERENCE_RETRIEVAL.out.reference_genome_bwa_index,
-                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx,
                 REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
                 REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
             )
@@ -102,11 +99,12 @@ workflow NFCORE_EUKAVARIZER {
         }
         else {
             log.warn "⚠️ No SV callers enabled. Skipping variant calling and report generation."
-
         }
 
+    log.info "📂 Results will be saved in: ${params.outdir}"
+
     emit:
-        multiqc_report      = SEQUENCE_PROCESSOR.out.multiqc_report
+        multiqc_report      = Channel.empty()
         report_file         = sv_callers_enabled ? report : Channel.empty()
 }
 
@@ -122,11 +120,7 @@ workflow {
         //
         // Input channels for the workflow
         //
-        taxonomy_id             = Channel.value(params.taxonomy_id)
-        outdir                  = Channel.value(params.outdir)
         reference_genome        = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
-        sequence_dir            = params.sequence_dir ? Channel.fromPath(params.sequence_dir, type: 'dir', checkIfExists: true) : []
-        // input                   = params.input ? Channel.fromPath(params.input, type: 'file', checkIfExists: true) : []
 
         //
         // SUBWORKFLOW: Run initialisation tasks
@@ -136,17 +130,17 @@ workflow {
             params.validate_params,
             params.monochrome_logs,
             args,
-            outdir
-            // input
+            params.outdir,
+            params.input
         )
 
         //
         // WORKFLOW: Run main workflow
         //
         NFCORE_EUKAVARIZER (
-            taxonomy_id,
-            outdir,
-            sequence_dir,
+            params.taxonomy_id,
+            params.outdir,
+            PIPELINE_INITIALISATION.out.samplesheet,
             reference_genome
         )
 

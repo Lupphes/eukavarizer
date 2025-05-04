@@ -7,27 +7,140 @@
     "items": {
         "type": "object",
         "properties": {
+            "patient": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Patient ID must be provided and cannot contain spaces",
+                "meta": ["patient"]
+            },
             "sample": {
                 "type": "string",
                 "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces",
-                "meta": ["id"]
+                "errorMessage": "Sample ID must be provided and cannot contain spaces",
+                "meta": ["sample"]
+            },
+            "sex": {
+                "errorMessage": "Sex cannot contain spaces",
+                "meta": ["sex"],
+                "default": "NA",
+                "type": "string",
+                "pattern": "^\\S+$"
+            },
+            "status": {
+                "type": "integer",
+                "errorMessage": "Status can only be 0 (normal) or 1 (tumor). Defaults to 0, if none is supplied.",
+                "meta": ["status"],
+                "default": 0,
+                "minimum": 0,
+                "maximum": 1
+            },
+            "lane": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "meta": ["lane"]
+            },
+            "platform": {
+                "errorMessage": "Platform must be a string indicating the sequencing technology",
+                "pattern": "^\\S+$",
+                "type": "string",
+                "meta": ["platform"]
             },
             "fastq_1": {
+                "errorMessage": "FastQ file for reads 1 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
                 "type": "string",
-                "format": "file-path",
-                "exists": true,
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "format": "file-path",
+                "exists": true
             },
             "fastq_2": {
+                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
                 "type": "string",
-                "format": "file-path",
-                "exists": true,
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "format": "file-path",
+                "exists": true
+            },
+            "bam": {
+                "errorMessage": "BAM file cannot contain spaces and must have extension '.bam'",
+                "type": "string",
+                "pattern": "^\\S+\\.bam$",
+                "format": "file-path",
+                "exists": true
+            },
+            "cram": {
+                "errorMessage": "CRAM file cannot contain spaces and must have extension '.cram'",
+                "type": "string",
+                "pattern": "^\\S+\\.cram$",
+                "format": "file-path",
+                "exists": true
+            },
+            "sra": {
+                "errorMessage": "SRA ID must start with SRR followed by digits",
+                "type": "string",
+                "pattern": "^SRR[0-9]{6,}$",
+                "format": "file-path",
+                "exists": true
+            },
+            "bax.h5": {
+                "errorMessage": "bax.h5 must end in .bax.h5 and contain no spaces",
+                "type": "string",
+                "pattern": "^\\S+\\.bax\\.h5$",
+                "format": "file-path",
+                "exists": true
+            },
+            "fast5": {
+                "errorMessage": "FAST5 input must end in .tar.gz or .fast5 and contain no spaces",
+                "type": "string",
+                "pattern": "^\\S+\\.(tar\\.gz|fast5)$",
+                "format": "file-path",
+                "exists": true
             }
         },
-        "required": ["sample", "fastq_1"]
+        "required": [
+            "patient",
+            "sample",
+            "lane",
+            "platform"
+        ],
+        "anyOf": [
+            {
+                "required": [
+                    "fastq_1"
+                ]
+            },
+            {
+                "required": [
+                    "bam"
+                ]
+            },
+            {
+                "required": [
+                    "cram"
+                ]
+            },
+            {
+                "required": [
+                    "sra"
+                ]
+            },
+            {
+                "required": [
+                    "bax.h5"
+                ]
+            },
+            {
+                "required": [
+                    "fast5"
+                ]
+            }
+        ],
+        "errorMessage": {
+            "required": {
+                "patient": "Patient ID is required",
+                "sample": "Sample name is required",
+                "lane": "Lane number is required",
+                "platform": "Platform must be specified"
+            },
+            "anyOf": "At least one sequencing input must be provided: fastq_1, bam, cram, sra, bax.h5, or fast5"
+        }
     }
 }

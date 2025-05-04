@@ -19,6 +19,11 @@
                     "help_text": "Specify the taxonomy ID for your target organism (e.g., 4932 for *Saccharomyces cerevisiae*).",
                     "fa_icon": "fas fa-dna"
                 },
+                "input": {
+                    "type": "string",
+                    "default": "[]",
+                    "description": "Input samplesheet"
+                },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
@@ -26,20 +31,13 @@
                     "fa_icon": "fas fa-folder-open",
                     "default": "./output"
                 },
-                "sequence_dir": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Path to local directory containing input sequences.",
-                    "help_text": "Specify a local directory with input sequence files.",
-                    "fa_icon": "fas fa-folder"
-                },
                 "reference_genome": {
                     "type": "string",
                     "format": "file-path",
                     "description": "Path to the local reference genome file",
-                    "pattern": ".*\\.(fa|fna|fasta|gz)$",
                     "help_text": "Specify a directory containing reference sequences.",
-                    "fa_icon": "fas fa-folder"
+                    "fa_icon": "fas fa-folder",
+                    "default": "[]"
                 },
                 "email": {
                     "type": "string",
@@ -198,7 +196,7 @@
                 "max_results": {
                     "type": "integer",
                     "minimum": 1,
-                    "default": 3,
+                    "default": 1,
                     "description": "Maximum number of results to retrieve.",
                     "help_text": "Specify how many sequencing entries to retrieve.",
                     "fa_icon": "fas fa-list-ol"
@@ -292,8 +290,7 @@
                     "default": true
                 },
                 "deduplicate_flag": {
-                    "type": "boolean",
-                    "default": true
+                    "type": "boolean"
                 },
                 "bbduk_trimq": {
                     "type": "integer",

@@ -21,6 +21,8 @@ include { SURVIVOR_MERGE        } from '../../../modules/nf-core/survivor/merge/
 include { SURVIVOR_STATS        } from '../../../modules/nf-core/survivor/stats/main'
 include { SURVIVOR_FILTER       } from '../../../modules/nf-core/survivor/filter/main'
 
+include { BCFTOOLS_CONCAT       } from '../../../modules/nf-core/bcftools/concat/main'
+include { BCFTOOLS_SORT         } from '../../../modules/nf-core/bcftools/sort/main'
 include { BCFTOOLS_MERGE        } from '../../../modules/nf-core/bcftools/merge/main'
 include { BCFTOOLS_STATS        } from '../../../modules/nf-core/bcftools/stats/main'
 include { BCFTOOLS_FILTER       } from '../../../modules/nf-core/bcftools/filter/main'
@@ -94,43 +96,36 @@ workflow SV_UNIFICATION {
             .combine(tbi_list_cleaned.collect().unique().collect(flat: false))
             .filter { vcfgz_files, tbi_files -> vcfgz_files && tbi_files }
             .map { vcfgz_files, tbi_files ->
-                tuple([id: "bcftools_merge"], vcfgz_files, tbi_files)
+                tuple([id: "bcftools_concat"], vcfgz_files, tbi_files)
             }
 
-        BCFTOOLS_MERGE(
-            bcfmerge_input,
-            [[], []],
-            [[], []],
-            [[], []]
+        BCFTOOLS_CONCAT(
+            bcfmerge_input
         )
-
-        vcf_index_bcfmerge = BCFTOOLS_MERGE.out.vcf
-            .map { meta, vfc ->
-                tuple(meta, vfc, [])
-            }
 
         BCFTOOLS_FILTER(
-            vcf_index_bcfmerge
+            BCFTOOLS_CONCAT.out.vcf
+            .join(BCFTOOLS_CONCAT.out.tbi, by: 0)
         )
 
-        vcf_index_bcfmerge_filtered = BCFTOOLS_FILTER.out.vcf
-            .map { meta, vfc ->
-                tuple(meta, vfc, [])
-            }
+        BCFTOOLS_SORT(
+            BCFTOOLS_FILTER.out.vcf
+        )
 
         BCFTOOLS_STATS(
-            vcf_index_bcfmerge_filtered,
-            [[], []],
-            [[], []],
-            [[], []],
-            [[], []],
+            BCFTOOLS_SORT.out.vcf
+            .join(BCFTOOLS_SORT.out.tbi, by: 0),
+            [[id: "regions"], []],
+            [[id: "targets"], []],
+            [[id: "samples"], []],
+            [[id: "exons"], []],
             reference_genome_bgzipped
         )
 
     emit:
-        survivor_vcf = SURVIVOR_FILTER.out.vcf
-        survivor_stats = SURVIVOR_STATS.out.stats
-        bcfmerge_vcf = BCFTOOLS_FILTER.out.vcf
-        bcfmerge_tbi = BCFTOOLS_FILTER.out.tbi
-        bcfmerge_stats = BCFTOOLS_STATS.out.stats
+        survivor_vcf    = SURVIVOR_FILTER.out.vcf
+        survivor_stats  = SURVIVOR_STATS.out.stats
+        bcfmerge_vcf    = BCFTOOLS_SORT.out.vcf
+        bcfmerge_tbi    = BCFTOOLS_SORT.out.tbi
+        bcfmerge_stats  = BCFTOOLS_STATS.out.stats
 }

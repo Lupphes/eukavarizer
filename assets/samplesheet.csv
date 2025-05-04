@@ -1,3 +1,7 @@
-sample,fastq_1,fastq_2
-SAMPLE_PAIRED_END,/path/to/fastq/files/AEG588A1_S1_L002_R1_001.fastq.gz,/path/to/fastq/files/AEG588A1_S1_L002_R2_001.fastq.gz
-SAMPLE_SINGLE_END,/path/to/fastq/files/AEG588A4_S4_L003_R1_001.fastq.gz,
+patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5
+kvasinak,NA,0,normal_sample,illumina,SRR7057769,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/SRR7057769/SRR7057769_1.fastq.gz,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/SRR7057769/SRR7057769_2.fastq.gz,,,,,,
+kvasinak,NA,0,normal_sample,illumina,SRR7517852,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/SRR7517852/SRR7517852_1.fastq.gz,,,,,,,
+kvasinak,NA,0,normal_sample,illumina,ERR1730249,,,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/ERR1730249/ERR17.bam,,,,,
+kvasinak,NA,0,normal_sample,illumina,ERR1729543,,,,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/ERR1729543/ERR1729543.cram,,,,
+kvasinak,NA,0,normal_sample,illumina,ERR19_err,,,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/ERR19_err/ERR19_err.bam,,,,,
+kvasinak,NA,0,normal_sample,illumina,ERR20_err,,,,/mnt/c/Users/onsl/root/thesis/nf-core-eukavarizer/data/4932/ena/ERR20_err/ERR20_err.cram,,,,

@@ -20,9 +20,8 @@
 */
 
 include { CUTESV            } from '../../../modules/nf-core/cutesv/main'
-include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
-include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
+include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 
 workflow SV_CALLING_CUTESV {
     take:
@@ -34,40 +33,30 @@ workflow SV_CALLING_CUTESV {
 
         CUTESV(
             bam_inputs.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_${name_cutesv}"], bam, bai)
+                tuple(meta + [id: "${meta.id}-${name_cutesv}"], bam, bai)
             },
-            reference_genome_bgzipped.map { meta, fasta ->
-                tuple(meta + [id: "${meta.id}_${name_cutesv}"], fasta)
-            }
-        )
-
-        SAMPLE_REHEADER(
-            CUTESV.out.vcf,
-            CUTESV.out.vcf.map { meta, _vcf -> "${meta.id}_${name_cutesv}" },
-            false
+            reference_genome_bgzipped
         )
 
         SVYNC(
-            SAMPLE_REHEADER.out.vcf
-                .join(SAMPLE_REHEADER.out.tbi, by: 0)
-                .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+            CUTESV.out.vcf
+                .map { meta, vcf ->
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, [])
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_cutesv}.yaml"))
                 )
         )
 
-        GUNZIP(
-            SVYNC.out.vcf
+        SAMPLE_REHEADER(
+            SVYNC.out.vcf,
+            name_cutesv,
+            ""
         )
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
-        vcfgz = SAMPLE_REHEADER.out.vcfgz
+        vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
-        svync_vcf = GUNZIP.out.gunzip
-        svync_vcfgz = SVYNC.out.vcf
-        svync_tbi = SVYNC.out.tbi
 }

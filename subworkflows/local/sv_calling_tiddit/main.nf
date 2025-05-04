@@ -21,10 +21,8 @@
 
 include { TIDDIT_SV as TIDDIT_MAP   } from '../../../modules/nf-core/tiddit/sv/main'
 include { TIDDIT_SV as TIDDIT_BWA   } from '../../../modules/nf-core/tiddit/sv/main'
-include { SAMPLE_REHEADER           } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC                     } from '../../../modules/nf-core/svync/main'
-include { GUNZIP                    } from '../../../modules/nf-core/gunzip/main'
-
+include { SAMPLE_REHEADER           } from '../../../modules/local/sample_regen/main.nf'
 
 workflow SV_CALLING_TIDDIT {
     take:
@@ -42,15 +40,14 @@ workflow SV_CALLING_TIDDIT {
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
+            // Use BWA for short reads
             .filter { meta, _bam, _bai ->
-                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
             }.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
+                tuple(meta + [id: "${meta.id}-${name_tiddit}"], bam, bai)
             },
             reference_genome_bgzipped,
-            reference_genome_bwa_index.map { meta, bwa ->
-                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bwa)
-            }
+            reference_genome_bwa_index
         )
 
         TIDDIT_MAP(
@@ -59,46 +56,37 @@ workflow SV_CALLING_TIDDIT {
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
+            // Use minimap2 for long reads
             .filter { meta, _bam, _bai ->
-                params.minimap2_flag && meta.median_bp > params.long_read_threshold
+                params.minimap2_flag && ((meta.median_bp > params.long_read_threshold) || meta.platform == 'ont' || meta.platform == 'pacbio')
             }.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bam, bai)
+                tuple(meta + [id: "${meta.id}"], bam, bai)
             },
             reference_genome_bgzipped,
-            reference_genome_minimap_index.map { meta, bwa ->
-                tuple(meta + [id: "${meta.id}_${name_tiddit}"], bwa)
-            }
+            reference_genome_minimap_index
         )
 
         tiddit_result = TIDDIT_BWA.out.vcf.mix(TIDDIT_MAP.out.vcf)
 
-        SAMPLE_REHEADER(
-            tiddit_result,
-            tiddit_result.map { meta, _vcf -> "${meta.id}_${name_tiddit}" },
-            false
-        )
-
         SVYNC(
-            SAMPLE_REHEADER.out.vcf
-                .join(SAMPLE_REHEADER.out.tbi, by: 0)
-                .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+            tiddit_result
+                .map { meta, vcf ->
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, [])
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_tiddit}.yaml"))
                 )
         )
 
-        GUNZIP(
-            SVYNC.out.vcf
+        SAMPLE_REHEADER(
+            SVYNC.out.vcf,
+            name_tiddit,
+            ""
         )
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
-        vcfgz = SAMPLE_REHEADER.out.vcfgz
+        vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
-        svync_vcf = GUNZIP.out.gunzip
-        svync_vcfgz = SVYNC.out.vcf
-        svync_tbi = SVYNC.out.tbi
 }

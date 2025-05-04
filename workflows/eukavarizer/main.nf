@@ -30,20 +30,14 @@ include { SV_CALLING_CUTESV     } from '../../subworkflows/local/sv_calling_cute
 workflow EUKAVARIZER {
 
     take:
-        fastq_bam                           // SEQUENCE_PROCESSOR.out.bam_files
-        fastq_bam_indexes                   // SEQUENCE_PROCESSOR.out.bam_indexes
+        bam_bai
         reference_genome_bgzipped           // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
         reference_genome_faidx              // REFERENCE_RETRIEVAL.out.reference_genome_faidx
         reference_genome_bwa_index          // REFERENCE_RETRIEVAL.out.reference_genome_bwa_index
-        reference_genome_bgzipped_faidx     // REFERENCE_RETRIEVAL.out.reference_genome_bgzipped_faidx
         reference_genome_unzipped           // REFERENCE_RETRIEVAL.out.reference_genome_unzipped
         reference_genome_minimap_index      // REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
 
     main:
-        bam_inputs = fastq_bam
-            .join(fastq_bam_indexes, by: 0)
-            .map { meta, bam, bai -> tuple(meta, bam, bai) }
-
         vcf_list    = Channel.value([])
         vcfgz_list  = Channel.value([])
         tbi_list    = Channel.value([])
@@ -56,16 +50,15 @@ workflow EUKAVARIZER {
         */
         if (params.delly_flag) {
             SV_CALLING_DELLY(
-                fastq_bam,
-                fastq_bam_indexes,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_DELLY.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_DELLY.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_DELLY.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_DELLY.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_DELLY.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_DELLY.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_DELLY.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_DELLY.out.vcf.map { meta, _vcf -> meta })
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,25 +67,25 @@ workflow EUKAVARIZER {
         */
         if (params.manta_flag) {
             SV_CALLING_MANTA(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.svync_small_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.svync_small_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.svync_small_tbi)
-            meta_list = meta_list.concat(SV_CALLING_MANTA.out.svync_small_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.small_vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.small_vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.small_tbi)
+            meta_list = meta_list.concat(SV_CALLING_MANTA.out.small_vcf.map { meta, _vcf -> meta })
 
-            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.svync_candidate_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.svync_candidate_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.svync_candidate_tbi)
-            meta_list = meta_list.concat(SV_CALLING_MANTA.out.svync_candidate_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.candidate_vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.candidate_vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.candidate_tbi)
+            meta_list = meta_list.concat(SV_CALLING_MANTA.out.candidate_vcf.map { meta, _vcf -> meta })
 
-            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.svync_diploid_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.svync_diploid_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.svync_diploid_tbi)
-            meta_list = meta_list.concat(SV_CALLING_MANTA.out.svync_diploid_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_MANTA.out.diploid_vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_MANTA.out.diploid_vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_MANTA.out.diploid_tbi)
+            meta_list = meta_list.concat(SV_CALLING_MANTA.out.diploid_vcf.map { meta, _vcf -> meta })
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,17 +94,16 @@ workflow EUKAVARIZER {
         */
         if (params.gridss_flag) {
             SV_CALLING_GRIDSS(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect(),
-                reference_genome_bwa_index.collect(),
-                reference_genome_minimap_index.collect()
+                reference_genome_bwa_index.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_GRIDSS.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_GRIDSS.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_GRIDSS.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_GRIDSS.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_GRIDSS.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_GRIDSS.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_GRIDSS.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_GRIDSS.out.vcf.map { meta, _vcf -> meta })
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,15 +112,15 @@ workflow EUKAVARIZER {
         */
         if (params.dysgu_flag) {
             SV_CALLING_DYSGU(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_DYSGU.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_DYSGU.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_DYSGU.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_DYSGU.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_DYSGU.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_DYSGU.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_DYSGU.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_DYSGU.out.vcf.map { meta, _vcf -> meta })
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,16 +129,16 @@ workflow EUKAVARIZER {
         */
         if (params.tiddit_flag) {
             SV_CALLING_TIDDIT(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_bwa_index.collect(),
                 reference_genome_minimap_index.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_TIDDIT.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_TIDDIT.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_TIDDIT.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_TIDDIT.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_TIDDIT.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_TIDDIT.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_TIDDIT.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_TIDDIT.out.vcf.map { meta, _vcf -> meta })
         }
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,16 +147,16 @@ workflow EUKAVARIZER {
         */
         if (params.svaba_flag && !params.bwamem2) {
             SV_CALLING_SVABA(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect(),
                 reference_genome_faidx.collect(),
                 reference_genome_bwa_index.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_SVABA.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_SVABA.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_SVABA.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_SVABA.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_SVABA.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_SVABA.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_SVABA.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_SVABA.out.vcf.map { meta, _vcf -> meta })
         }
 
         /*
@@ -174,14 +166,14 @@ workflow EUKAVARIZER {
         */
         if (params.sniffles_flag) {
             SV_CALLING_SNIFFLES(
-                bam_inputs,
+                bam_bai,
                 reference_genome_bgzipped.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_SNIFFLES.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_SNIFFLES.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_SNIFFLES.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_SNIFFLES.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_SNIFFLES.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_SNIFFLES.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_SNIFFLES.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_SNIFFLES.out.vcf.map { meta, _vcf -> meta })
         }
 
         /*
@@ -191,14 +183,14 @@ workflow EUKAVARIZER {
         */
         if (params.cutesv_flag) {
             SV_CALLING_CUTESV(
-                bam_inputs,
+                bam_bai,
                 reference_genome_unzipped.collect()
             )
 
-            vcf_list = vcf_list.concat(SV_CALLING_CUTESV.out.svync_vcf)
-            vcfgz_list = vcfgz_list.concat(SV_CALLING_CUTESV.out.svync_vcfgz)
-            tbi_list = tbi_list.concat(SV_CALLING_CUTESV.out.svync_tbi)
-            meta_list = meta_list.concat(SV_CALLING_CUTESV.out.svync_vcf.map { meta, _vcf -> meta })
+            vcf_list = vcf_list.concat(SV_CALLING_CUTESV.out.vcf)
+            vcfgz_list = vcfgz_list.concat(SV_CALLING_CUTESV.out.vcfgz)
+            tbi_list = tbi_list.concat(SV_CALLING_CUTESV.out.tbi)
+            meta_list = meta_list.concat(SV_CALLING_CUTESV.out.vcf.map { meta, _vcf -> meta })
         }
 
 

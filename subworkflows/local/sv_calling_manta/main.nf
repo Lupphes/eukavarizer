@@ -35,19 +35,19 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { MANTA_GERMLINE                                  } from '../../../modules/nf-core/manta/germline/main'
+include { MANTA_GERMLINE                                } from '../../../modules/nf-core/manta/germline/main'
 
-include { SAMPLE_REHEADER as SMALL_SAMPLE_REHEADER        } from '../../../modules/local/sample_regen/main.nf'
-include { SAMPLE_REHEADER as CANDIDATE_SAMPLE_REHEADER    } from '../../../modules/local/sample_regen/main.nf'
-include { SAMPLE_REHEADER as DIPLOID_SAMPLE_REHEADER      } from '../../../modules/local/sample_regen/main.nf'
+include { SAMPLE_REHEADER as INDELS_SAMPLE_REHEADER     } from '../../../modules/local/sample_regen/main.nf'
+include { SAMPLE_REHEADER as SV_SAMPLE_REHEADER         } from '../../../modules/local/sample_regen/main.nf'
+include { SAMPLE_REHEADER as DIPLOID_SAMPLE_REHEADER    } from '../../../modules/local/sample_regen/main.nf'
 
-include { SVYNC as SMALL_SVYNC                            } from '../../../modules/nf-core/svync/main'
-include { SVYNC as CANDIDATE_SVYNC                        } from '../../../modules/nf-core/svync/main'
-include { SVYNC as DIPLOID_SVYNC                          } from '../../../modules/nf-core/svync/main'
+include { SVYNC as INDEL_SVYNC                          } from '../../../modules/nf-core/svync/main'
+include { SVYNC as SV_SVYNC                             } from '../../../modules/nf-core/svync/main'
+include { SVYNC as DIPLOID_SVYNC                        } from '../../../modules/nf-core/svync/main'
 
-include { GUNZIP as SMALL_GUNZIP                          } from '../../../modules/nf-core/gunzip/main'
-include { GUNZIP as CANDIDATE_GUNZIP                      } from '../../../modules/nf-core/gunzip/main'
-include { GUNZIP as DIPLOID_GUNZIP                        } from '../../../modules/nf-core/gunzip/main'
+include { GUNZIP as INDEL_GUNZIP                        } from '../../../modules/nf-core/gunzip/main'
+include { GUNZIP as SV_GUNZIP                           } from '../../../modules/nf-core/gunzip/main'
+include { GUNZIP as DIPLOID_GUNZIP                      } from '../../../modules/nf-core/gunzip/main'
 
 workflow SV_CALLING_MANTA {
     take:
@@ -68,55 +68,51 @@ workflow SV_CALLING_MANTA {
                 !meta.single_end
             }
             .filter { meta, _bam, _bai ->
-                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
             }
             .map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_${name_manta}"], bam, bai, [], [])
+                tuple(meta + [id: "${meta.id}-${name_manta}"], bam, bai, [], [])
             },
-            reference_genome_unzipped.map { meta, fasta ->
-            tuple(meta + [id: "${meta.id}"], fasta)
-            },
-            reference_genome_faidx.map { meta, fai ->
-                tuple(meta + [id: "${meta.id}"], fai)
-            },
+            reference_genome_unzipped,
+            reference_genome_faidx,
             []
         )
 
-        SMALL_SAMPLE_REHEADER(
+        // TODO: Make proper fix fox manta when VCF file completelly empty and don't rely first on REHEADER
+        INDELS_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.candidate_small_indels_vcf,
-            MANTA_GERMLINE.out.candidate_small_indels_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_small}" },
-            false
+            name_manta,
+            "-${name_manta_small}"
         )
 
-        CANDIDATE_SAMPLE_REHEADER(
+        SV_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.candidate_sv_vcf,
-            MANTA_GERMLINE.out.candidate_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_candidate}" },
-            false
+            name_manta,
+            "-${name_manta_candidate}"
         )
 
         DIPLOID_SAMPLE_REHEADER(
             MANTA_GERMLINE.out.diploid_sv_vcf,
-            MANTA_GERMLINE.out.diploid_sv_vcf.map { meta, _vcf -> "${meta.id}_${name_manta_diploid}" },
-            false
+            name_manta,
+            "-${name_manta_diploid}"
         )
 
-
-        SMALL_SVYNC(
-            SMALL_SAMPLE_REHEADER.out.vcf
-                .join(SMALL_SAMPLE_REHEADER.out.tbi, by: 0)
+        INDEL_SVYNC(
+            INDELS_SAMPLE_REHEADER.out.vcf
+                .join(INDELS_SAMPLE_REHEADER.out.tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
-        CANDIDATE_SVYNC(
-            CANDIDATE_SAMPLE_REHEADER.out.vcf
-                .join(CANDIDATE_SAMPLE_REHEADER.out.tbi, by: 0)
+        SV_SVYNC(
+            SV_SAMPLE_REHEADER.out.vcf
+                .join(SV_SAMPLE_REHEADER.out.tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
@@ -127,19 +123,19 @@ workflow SV_CALLING_MANTA {
             DIPLOID_SAMPLE_REHEADER.out.vcf
                 .join(DIPLOID_SAMPLE_REHEADER.out.tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
-        SMALL_GUNZIP(
-            SMALL_SVYNC.out.vcf
+        INDEL_GUNZIP(
+            INDEL_SVYNC.out.vcf
         )
 
-        CANDIDATE_GUNZIP(
-            CANDIDATE_SVYNC.out.vcf
+        SV_GUNZIP(
+            SV_SVYNC.out.vcf
         )
 
         DIPLOID_GUNZIP(
@@ -147,27 +143,18 @@ workflow SV_CALLING_MANTA {
         )
 
     emit:
-        small_vcf = SMALL_SAMPLE_REHEADER.out.vcf
-        small_vcfgz = SMALL_SAMPLE_REHEADER.out.vcfgz
-        small_tbi = SMALL_SAMPLE_REHEADER.out.tbi
-        small_csi = SMALL_SAMPLE_REHEADER.out.csi
-        svync_small_vcf = SMALL_GUNZIP.out.gunzip
-        svync_small_vcfgz = SMALL_SVYNC.out.vcf
-        svync_small_tbi = SMALL_SVYNC.out.tbi
+        small_vcf = INDEL_GUNZIP.out.gunzip
+        small_vcfgz = INDEL_SVYNC.out.vcf
+        small_tbi = INDEL_SVYNC.out.tbi
+        small_csi = INDELS_SAMPLE_REHEADER.out.csi
 
-        candidate_vcf = CANDIDATE_SAMPLE_REHEADER.out.vcf
-        candidate_vcfgz = CANDIDATE_SAMPLE_REHEADER.out.vcfgz
-        candidate_tbi = CANDIDATE_SAMPLE_REHEADER.out.tbi
-        candidate_csi = CANDIDATE_SAMPLE_REHEADER.out.csi
-        svync_candidate_vcf = CANDIDATE_GUNZIP.out.gunzip
-        svync_candidate_vcfgz = CANDIDATE_SVYNC.out.vcf
-        svync_candidate_tbi = CANDIDATE_SVYNC.out.tbi
+        candidate_vcf = SV_GUNZIP.out.gunzip
+        candidate_vcfgz = SV_SVYNC.out.vcf
+        candidate_tbi = SV_SVYNC.out.tbi
+        candidate_csi = SV_SAMPLE_REHEADER.out.csi
 
-        diploid_vcf = DIPLOID_SAMPLE_REHEADER.out.vcf
-        diploid_vcfgz = DIPLOID_SAMPLE_REHEADER.out.vcfgz
-        diploid_tbi = DIPLOID_SAMPLE_REHEADER.out.tbi
+        diploid_vcf = DIPLOID_GUNZIP.out.gunzip
+        diploid_vcfgz = DIPLOID_SVYNC.out.vcf
+        diploid_tbi = DIPLOID_SVYNC.out.tbi
         diploid_csi = DIPLOID_SAMPLE_REHEADER.out.csi
-        svync_diploid_vcf = DIPLOID_GUNZIP.out.gunzip
-        svync_diploid_vcfgz = DIPLOID_SVYNC.out.vcf
-        svync_diploid_tbi = DIPLOID_SVYNC.out.tbi
 }

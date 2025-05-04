@@ -21,9 +21,8 @@
 
 include { SVABA             } from '../../../modules/nf-core/svaba/main'
 include { SVABA_ANNOTATE    } from '../../../modules/local/svaba/annotate/main.nf'
-include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
-include { GUNZIP            } from '../../../modules/nf-core/gunzip/main'
+include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 
 workflow SV_CALLING_SVABA {
     take:
@@ -36,10 +35,11 @@ workflow SV_CALLING_SVABA {
         name_svaba = "svaba"
 
         SVABA(
+            // SVABA requires Illumina paired-end reads
             bam_inputs.filter { meta, _bam, _bai ->
-                !params.minimap2_flag || meta.median_bp <= params.long_read_threshold
+                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
             }.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}_svaba"], bam, bai, [], [])
+                tuple(meta + [id: "${meta.id}"], bam, bai, [], [])
             },
             reference_genome_unzipped,
             reference_genome_faidx,
@@ -57,33 +57,25 @@ workflow SV_CALLING_SVABA {
             svaba_annotate = SVABA.out.sv
         }
 
-        SAMPLE_REHEADER(
-            svaba_annotate,
-            svaba_annotate.map { meta, _vcf -> "${meta.id}_${name_svaba}" },
-            false
-        )
-
         SVYNC(
-            SAMPLE_REHEADER.out.vcf
-                .join(SAMPLE_REHEADER.out.tbi, by: 0)
-                .map { meta, vcf, tbi ->
-                    tuple([id: "${meta.id}_svync"], vcf, tbi)
+            svaba_annotate
+                .map { meta, vcf ->
+                    tuple(meta + [id: "${meta.id}-${name_svaba}-svync"], vcf, [])
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_svaba}.yaml"))
                 )
         )
 
-        GUNZIP(
-            SVYNC.out.vcf
+        SAMPLE_REHEADER(
+            SVYNC.out.vcf,
+            name_svaba,
+            ""
         )
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
-        vcfgz = SAMPLE_REHEADER.out.vcfgz
+        vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
-        svync_vcf = GUNZIP.out.gunzip
-        svync_vcfgz = SVYNC.out.vcf
-        svync_tbi = SVYNC.out.tbi
 }

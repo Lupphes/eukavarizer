@@ -39,6 +39,24 @@ info:
     type: string
     description: Type of structural variant
 
+  EUK_CALLER:
+    value: $INFO/EUK_CALLER
+    number: 1
+    type: string
+    description: SV calling algorithm used
+
+  EUK_PLATFORM:
+    value: $INFO/EUK_PLATFORM
+    number: 1
+    type: string
+    description: Sequencing platform
+
+  EUK_SE:
+    value: $INFO/EUK_SE
+    number: 1
+    type: string
+    description: Single-end or paired-end
+
   CHR2:
     value: $INFO/CHR2
     number: 1

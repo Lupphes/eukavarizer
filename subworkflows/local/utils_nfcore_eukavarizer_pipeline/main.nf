@@ -17,6 +17,7 @@
     - `versions` – Software version summary (currently empty channel placeholder).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
 include { UTILS_NFSCHEMA_PLUGIN     } from '../../nf-core/utils_nfschema_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-schema'
@@ -36,7 +37,7 @@ workflow PIPELINE_INITIALISATION {
     monochrome_logs     // boolean: Do not use coloured log outputs
     nextflow_cli_args   // array: List of positional nextflow CLI args
     outdir              // string: The output directory where the results will be saved
-    // input            // string: Path to input samplesheet
+    input               // string: Path to input samplesheet
 
 
     main:
@@ -72,35 +73,110 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
-    // Not using currently samplesheet
 
-    // if (params.input) {
-    //     Channel
-    //         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-    //         .map {
-    //             meta, fastq_1, fastq_2 ->
-    //                 if (!fastq_2) {
-    //                     return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-    //                 } else {
-    //                     return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-    //                 }
-    //         }
-    //         .groupTuple()
-    //         .map { samplesheet ->
-    //             validateInputSamplesheet(samplesheet)
-    //         }
-    //         .map {
-    //             meta, fastqs ->
-    //                 return [ meta, fastqs.flatten() ]
-    //         }
-    //         .set { ch_samplesheet }
-    // } else {
-    //     log.info "No samplesheet provided — will search for input FASTQs automatically"
-    //     Channel.empty().set { ch_samplesheet }
-    // }
+    if (input) {
+        // Adapted from nf-core/sarek
+        Channel
+            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
+            .map { meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5 ->
+                [ meta.patient + meta.sample, [meta, fastq_1, fastq_2, cram, bam, sra, bax_h5, fast5] ]
+            }.tap { ch_with_patient_sample } // save the channel
+            .groupTuple() //group by patient_sample to get all lanes
+            .map { patient_sample, ch_items ->
+                [ patient_sample, ch_items.size() ]
+            }.combine(ch_with_patient_sample, by: 0) // for each entry add numLanes
+            .map { patient_sample, num_lanes, ch_items ->
+                def (meta, fastq_1, fastq_2, cram, bam, sra, bax_h5, fast5) = ch_items
+
+                if (meta.lane && fastq_1 && fastq_2) {
+                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: false, data_type: "fastq_gz", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta, [ fastq_1, fastq_2 ] ]
+
+                } else if (fastq_1 && fastq_2) {
+                    meta = meta + [id: meta.sample, single_end: false, data_type: 'fastq_gz', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), [ fastq_1, fastq_2 ] ]
+
+                } else if (meta.lane && fastq_1 && !fastq_2) {
+                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: "fastq_gz", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta, [ fastq_1 ] ]
+
+                } else if (fastq_1 && !fastq_2) {
+                    meta = meta + [id: meta.sample, single_end: true, data_type: 'fastq_gz', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), [ fastq_1 ] ]
+
+                } else if (meta.lane && bam) {
+                    meta            = meta + [id: "${meta.sample}-${meta.lane}".toString()]
+                    def CN          = params.seq_center ? "CN:${params.seq_center}\\t" : ''
+                    def read_group  = "\"@RG\\tID:${meta.sample}_${meta.lane}\\t${CN}PU:${meta.lane}\\tSM:${meta.patient}_${meta.sample}\\tLB:${meta.sample}\\tPL:${meta.platform}\""
+
+                    meta            = meta - meta.subMap('lane') + [read_group: read_group.toString(), single_end: true, data_type: 'bam', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), bam ]
+
+                } else if (bam) {
+                    meta = meta + [id: meta.sample, data_type: 'bam', platform: meta.platform]
+
+                    return [ meta - meta.subMap('lane'), bam ]
+
+                } else if (meta.lane && cram) {
+                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'cram', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), cram ]
+
+                } else if (cram) {
+                    meta = meta + [id: meta.sample, data_type: 'cram', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), cram ]
+
+                } else if (meta.lane && sra) {
+                    meta            = meta + [id: "${meta.sample}-${meta.lane}".toString()]
+                    def CN          = params.seq_center ? "CN:${params.seq_center}\\t" : ''
+                    def read_group  = "\"@RG\\tID:${meta.sample}_${meta.lane}\\t${CN}PU:${meta.lane}\\tSM:${meta.patient}_${meta.sample}\\tLB:${meta.sample}\\tPL:${meta.platform}\""
+
+                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'sra', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), sra ]
+
+                } else if (sra) {
+                    meta = meta + [id: meta.sample, data_type: 'sra', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), sra ]
+
+                } else if (meta.lane && fast5) {
+                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'fast5', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), fast5 ]
+
+                } else if (fast5) {
+                    meta = meta + [id: meta.sample, single_end: true, data_type: 'fast5', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), fast5 ]
+
+                } else if (meta.lane && bax_h5) {
+                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'bax_h5', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), bax_h5 ]
+
+                } else if (bax_h5) {
+                    meta = meta + [id: meta.sample, single_end: true, data_type: 'bax_h5', platform: meta.platform]
+                    return [ meta - meta.subMap('lane'), bax_h5 ]
+
+                } else {
+                    error("Samplesheet does not contain a sequence. Please check your samplesheet or adjust it accordingly.")
+                }
+        }.set { ch_samplesheet }
+    } else {
+        log.info "No samplesheet provided — will search for input FASTQs automatically"
+        Channel.empty().set { [] }
+
+        //TODO: This should just return samplesheet
+        BIODBCORE_ENA(
+            params.taxonomy_id,
+            params.reference_genome,
+            outdir,
+            params.library_strategy.map     { it.join(' ').trim() },
+            params.instrument_platform.map  { it.join(' ').trim() },
+            params.minimum_coverage,
+            params.maximum_coverage,
+            params.max_results,
+            params.assembly_quality,
+        )
+    }
 
     emit:
-    // samplesheet = ch_samplesheet
+    samplesheet = ch_samplesheet
     versions    = ch_versions
 }
 
