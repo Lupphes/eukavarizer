@@ -64,6 +64,10 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
             []
         )
 
+        sra_file = SRATOOLS_FASTERQDUMP.out.reads.map { meta, sra_fastq ->
+            tuple(meta + [single_end: sra_fastq.size() == 1], sra_fastq)
+        }
+
         DORADO_FAST5(
             input_sample_type.fast5,
         )
@@ -74,13 +78,13 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
 
         fastq_gz = input_sample_type.fastq_gz.map { meta, files -> addReadgroupToMeta(meta, files) }
         zipped_joined_ch = input_sample_type.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
-        sra = SRATOOLS_FASTERQDUMP.out.reads.map { meta, files -> addReadgroupToMeta(meta, files) }
+        sra = sra_file.map { meta, files -> addReadgroupToMeta(meta, files) }
         fast5 = DORADO_FAST5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
         pod5 = DORADO_POD5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
 
         collected_fastqs = fastq_gz
             .mix(zipped_joined_ch)
-            .mix(sra)
+            // .mix(sra)
             .mix(fast5)
             .mix(pod5)
             .mix(BAM_SAMTOOLS_COLLATEFASTQ.out.reads)
@@ -130,6 +134,11 @@ def flowcellLaneFromFastq(path) {
     // First line of FASTQ file contains sequence identifier plus optional description
     def firstLine = readFirstLineOfFastq(path)
     def flowcell_id = null
+
+    if (!firstLine) {
+        log.warn "FASTQ file(${path}): Empty or unreadable, cannot extract flowcell ID"
+        return flowcell_id
+    }
 
     // Expected format from ILLUMINA
     // cf https://en.wikipedia.org/wiki/FASTQ_format#Illumina_sequence_identifiers

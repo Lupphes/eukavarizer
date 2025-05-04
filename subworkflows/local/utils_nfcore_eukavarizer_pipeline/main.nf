@@ -149,15 +149,13 @@ workflow PIPELINE_INITIALISATION {
                     return [ meta - meta.subMap('lane'), cram ]
 
                 } else if (meta.lane && sra) {
-                    meta            = meta + [id: "${meta.sample}-${meta.lane}".toString()]
-                    def CN          = params.seq_center ? "CN:${params.seq_center}\\t" : ''
-                    def read_group  = "\"@RG\\tID:${meta.sample}_${meta.lane}\\t${CN}PU:${meta.lane}\\tSM:${meta.patient}_${meta.sample}\\tLB:${meta.sample}\\tPL:${meta.platform}\""
-
-                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'sra', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
-                    return [ meta - meta.subMap('lane'), sra ]
+                    // Single-end SRA will be parsed to fastq and then updated
+                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type : "sra", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    return [ meta, sra ]
 
                 } else if (sra) {
-                    meta = meta + [id: meta.sample, data_type: 'sra', platform: meta.platform]
+                    // Single-end SRA will be parsed to fastq and then updated
+                    meta = meta + [id: meta.sample, single_end: true, data_type : "sra", platform: meta.platform]
                     return [ meta - meta.subMap('lane'), sra ]
 
                 } else if (meta.lane && fast5) {
