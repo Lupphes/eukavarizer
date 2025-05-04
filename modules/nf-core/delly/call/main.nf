@@ -33,7 +33,7 @@ process DELLY_CALL {
 
     def genotype = vcf ? "--vcffile ${vcf}" : ""
     def isShortRead = (meta.platform && meta.platform == 'illumina') || (!meta.platform && meta.median_bp <= params.long_read_threshold)
-    def command = isShortRead ? "lr" : "call"
+    def command = isShortRead ? "call" : "lr"
 
     """
     delly \\
