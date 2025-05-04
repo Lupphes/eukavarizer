@@ -1,0 +1,7 @@
+patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382244,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382244_subreads.fastq.gz,,,,,,,
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382245,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382245_subreads.fastq.gz,,,,,,,
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382246,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382246_subreads.fastq.gz,,,,,,,
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382247,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382247_subreads.fastq.gz,,,,,,,
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382248,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382248_subreads.fastq.gz,,,,,,,
+prjna586863,NA,0,pacbio_prjna586863,pacbio,SRR10382249,$DATADIR/eukavarizer/data/9606/PRJNA586863/SRR10382249_subreads.fastq.gz,,,,,,,
