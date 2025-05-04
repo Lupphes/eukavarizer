@@ -53,6 +53,12 @@ workflow NFCORE_EUKAVARIZER {
             log.warn "⚠️ SVABA is not compatible with BWA-MEM2. Please use BWA-MEM v1 to run SVABA."
         }
 
+        if (params.minimap2_flag && params.bwamem2) {
+            error "❌ You can only enable one aligner at a time. Choose one of: minimap2, bwamem2, or bwa."
+        } else {
+            log.info "🧬 Using ${params.minimap2_flag ? 'Minimap2' : params.bwamem2 ? 'BWA-MEM2' : 'BWA-MEM'} for alignment."
+        }
+
         REFERENCE_RETRIEVAL(
             taxonomy_id,
             outdir,

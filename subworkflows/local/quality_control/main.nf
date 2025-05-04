@@ -47,7 +47,10 @@ workflow QUALITY_CONTROL {
                 fastq_files
                 // Don't use on long reads
                 .filter { meta, _fastq ->
-                    meta.median_bp < params.long_read_threshold
+                    (
+                        (meta.platform && meta.platform == 'illumina') ||
+                        (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                    )
                 },
                 [],
                 false,
@@ -59,7 +62,10 @@ workflow QUALITY_CONTROL {
                 fastq_files
                 // Don't use on short reads
                 .filter { meta, _fastq ->
-                    meta.median_bp >= params.long_read_threshold
+                    (
+                        (meta.platform && meta.platform == 'ont' || meta.platform == 'pacbio') ||
+                        (!meta.platform && meta.median_bp > params.long_read_threshold)
+                    )
                 },
                 [],
                 false,
@@ -88,7 +94,10 @@ workflow QUALITY_CONTROL {
                 non_null_fastp_combined
                     // Don't use on long reads
                     .filter { meta, _fastq ->
-                        meta.median_bp < params.long_read_threshold
+                        (
+                            (meta.platform && meta.platform == 'illumina') ||
+                            (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                        )
                     },
                 []
             ).reads
@@ -101,7 +110,10 @@ workflow QUALITY_CONTROL {
         // Trimmed Illumina reads and filtered long reads
         bbduk_combined_result = bbduk_result.mix(
             fastp_combined_result.filter { meta, _fastq ->
-                meta.median_bp >= params.long_read_threshold
+            (
+                (meta.platform && meta.platform == 'ont' || meta.platform == 'pacbio') ||
+                (!meta.platform && meta.median_bp > params.long_read_threshold)
+            )
         })
 
         if (params.seqtk_flag) {

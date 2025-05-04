@@ -55,15 +55,15 @@ workflow SV_CALLING_TIDDIT {
 
         TIDDIT_MAP(
             bam_inputs
-            // Only keep paired-end reads as TIDDIT does not support unpaired reads
+            // Only keep paired-end reads as TIDDIT does not support unpaired reads or long reads
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
             // Use minimap2 for long reads
             .filter { meta, _bam, _bai ->
                 params.minimap2_flag && (
-                    (meta.platform && meta.platform == 'ont' || meta.platform == 'pacbio') ||
-                    (!meta.platform && meta.median_bp > params.long_read_threshold)
+                    (meta.platform && meta.platform == 'illumina') ||
+                    (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )
             }.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}"], bam, bai)

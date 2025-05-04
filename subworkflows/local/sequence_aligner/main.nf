@@ -29,24 +29,15 @@ workflow SEQUENCE_ALIGNER {
             else [ meta, reads ]
         }
 
-        minimap2_bam = reads_for_alignment
-            .filter { meta, _fastq ->
-                params.minimap2_flag && (
-                    (meta.platform && meta.platform == 'ont' || meta.platform == 'pacbio') ||
-                    (!meta.platform && meta.median_bp > params.long_read_threshold)
-                )
-            }
-
-        bwa_bam = reads_for_alignment
-            .filter { meta, _fastq ->
-                !params.minimap2_flag || (
-                    (meta.platform && meta.platform == 'illumina') ||
-                    (!meta.platform && meta.median_bp <= params.long_read_threshold)
-                )
-            }
+        // TODO: If both enabled, extra platform logic?
+        align_bwa = reads_for_alignment.branch{ _meta, _reads ->
+            minimap2:  params.minimap2_flag && !params.bwamem2
+            bwa2:      params.bwamem2 && !params.minimap2_flag
+            bwa:      !params.minimap2_flag && !params.bwamem2
+        }
 
         MINIMAP2_ALIGN(
-            minimap2_bam,
+            align_bwa.minimap2,
             reference_genome_unzipped.collect(),
             true,
             "",
@@ -54,11 +45,22 @@ workflow SEQUENCE_ALIGNER {
             true
         )
 
-        sorted_indexed_bed = params.bwamem2 ?
-            BWAMEM2_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true) :
-            BWA_MEM(bwa_bam, reference_genome_bwa_index.collect(), reference_genome_unzipped.collect(), true)
+        BWAMEM2_MEM(
+            align_bwa.bwa2,
+            reference_genome_bwa_index.collect(),
+            reference_genome_unzipped.collect(),
+            true
+        )
 
-        mixed_bam_inputs = sorted_indexed_bed.bam.mix(MINIMAP2_ALIGN.out.bam)
+
+        BWA_MEM(
+            align_bwa.bwa,
+            reference_genome_bwa_index.collect(),
+            reference_genome_unzipped.collect(),
+            true
+        )
+
+        mixed_bam_inputs = BWA_MEM.out.bam.mix(BWAMEM2_MEM.out.bam).mix(MINIMAP2_ALIGN.out.bam)
 
         // Grouping the bams from the same samples not to stall the workflow
         // Use groupKey to make sure that the correct group can advance as soon as it is complete

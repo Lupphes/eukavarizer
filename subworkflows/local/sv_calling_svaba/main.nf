@@ -35,10 +35,11 @@ workflow SV_CALLING_SVABA {
         name_svaba = "svaba"
 
         SVABA(
-            // SVABA requires Illumina paired-end reads
+            // SVABA requires Illumina paired-end reads, does not support minimap2 & bwamem2
             bam_inputs.filter { meta, _bam, _bai ->
-                !params.minimap2_flag || (
-                    (meta.platform && meta.platform == 'illumina') ||
+                !(params.bwamem2) &&
+                (
+                    (meta.platform == 'illumina') ||
                     (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )
             }.map { meta, bam, bai ->

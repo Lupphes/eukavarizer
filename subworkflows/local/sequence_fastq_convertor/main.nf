@@ -29,18 +29,25 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
 
         // Zip the uncompressed ones
         TABIX_BGZIP_FASTQ1(
-            input_sample_type.fastq.map {meta, fastq1, _fastq2 ->
-                tuple(meta, fastq1)
-            }
+            input_sample_type.fastq
+                .filter { _meta, fastq -> fastq[0] }
+                .map { meta, fastq -> tuple(meta, fastq[0]) }
         )
 
         TABIX_BGZIP_FASTQ2(
-            input_sample_type.fastq.map {meta, _fastq1, fastq2 ->
-                tuple(meta, fastq2)
-            }
+            input_sample_type.fastq
+                .filter { _meta, fastq -> fastq.size() > 1 && fastq[1] }
+                .map { meta, fastq -> tuple(meta, fastq[1]) }
         )
 
-        zipped_joined_ch = TABIX_BGZIP_FASTQ1.out.output.join(TABIX_BGZIP_FASTQ2.out.output, by: 0, failOnDuplicate: true, failOnMismatch: true)
+        fastq_gz_zipped_join = TABIX_BGZIP_FASTQ1.out.output
+            .join(TABIX_BGZIP_FASTQ2.out.output, by: 0, failOnMismatch: false, failOnDuplicate: true)
+            .map { meta, fastq_gz ->
+                def files = fastq_gz.findAll { it != null }
+                tuple(meta, files)
+            }
+
+        fastq_gz_zipped_join.view()
 
         // Convert BAM or CRAM to FASTQ
         interleave_input = false  // Currently don't allow interleaved input
@@ -77,13 +84,13 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
         )
 
         fastq_gz = input_sample_type.fastq_gz.map { meta, files -> addReadgroupToMeta(meta, files) }
-        zipped_joined_ch = input_sample_type.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
+        fastq_gz_zipped = fastq_gz_zipped_join.map { meta, files -> addReadgroupToMeta(meta, files) }
         sra = sra_file.map { meta, files -> addReadgroupToMeta(meta, files) }
         fast5 = DORADO_FAST5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
         pod5 = DORADO_POD5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
 
         collected_fastqs = fastq_gz
-            .mix(zipped_joined_ch)
+            .mix(fastq_gz_zipped)
             .mix(sra)
             .mix(fast5)
             .mix(pod5)

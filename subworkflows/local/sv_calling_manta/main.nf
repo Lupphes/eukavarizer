@@ -68,7 +68,7 @@ workflow SV_CALLING_MANTA {
                 !meta.single_end
             }
             .filter { meta, _bam, _bai ->
-                !params.minimap2_flag || (
+                (
                     (meta.platform && meta.platform == 'illumina') ||
                     (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )

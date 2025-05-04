@@ -37,9 +37,12 @@ workflow SV_CALLING_GRIDSS {
 
         GRIDSS_GRIDSS(
             bam_inputs
-                // Don't use on long reads as GRIDSS does not support MINIMAP2 or PacBio/Nanopore raw reads
+                // Don't use on long reads (PacBio/Nanopore raw reads). GRIDSS does not support MINIMAP2.
                 .filter { meta, _bam, _bai ->
-                    meta.median_bp < params.long_read_threshold
+                    !params.minimap2_flag && (
+                        (meta.platform == 'illumina') ||
+                        (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                    )
                 }
                 .map { meta, bam, _bai -> tuple(meta + [id: "${meta.id}-${name_gridss}"], bam) },
             reference_genome_unzipped,
