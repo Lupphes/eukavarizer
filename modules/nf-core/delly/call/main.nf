@@ -32,7 +32,8 @@ process DELLY_CALL {
     def vcf_output = suffix == "vcf" ? "| bgzip ${args2} --threads ${task.cpus} --stdout > ${prefix}.vcf.gz && tabix ${prefix}.vcf.gz" : ""
 
     def genotype = vcf ? "--vcffile ${vcf}" : ""
-    def command = ((meta.median_bp > params.long_read_threshold) || meta.platform == 'ont' || meta.platform == 'pacbio') ? "lr" : "call"
+    def isShortRead = (meta.platform && meta.platform == 'illumina') || (!meta.platform && meta.median_bp <= params.long_read_threshold)
+    def command = isShortRead ? "lr" : "call"
 
     """
     delly \\

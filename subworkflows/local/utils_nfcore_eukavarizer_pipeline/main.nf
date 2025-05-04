@@ -78,30 +78,49 @@ workflow PIPELINE_INITIALISATION {
         // Adapted from nf-core/sarek
         Channel
             .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-            .map { meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5 ->
-                [ meta.patient + meta.sample, [meta, fastq_1, fastq_2, cram, bam, sra, bax_h5, fast5] ]
+            .map { meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5 ->
+                [ meta.patient + meta.sample, [meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5] ]
             }.tap { ch_with_patient_sample } // save the channel
             .groupTuple() //group by patient_sample to get all lanes
             .map { patient_sample, ch_items ->
                 [ patient_sample, ch_items.size() ]
             }.combine(ch_with_patient_sample, by: 0) // for each entry add numLanes
             .map { patient_sample, num_lanes, ch_items ->
-                def (meta, fastq_1, fastq_2, cram, bam, sra, bax_h5, fast5) = ch_items
+                def (meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5) = ch_items
+                def isZipped = { file -> file?.name.endsWith('.gz') }
 
                 if (meta.lane && fastq_1 && fastq_2) {
-                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: false, data_type: "fastq_gz", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    def zipped1 = isZipped(fastq_1)
+                    def zipped2 = isZipped(fastq_2)
+
+                    if (zipped1 != zipped2) {
+                        throw new IllegalArgumentException("FASTQ pair has inconsistent compression: ${fastq_1.name} and ${fastq_2.name}")
+                    }
+                    def zipped = zipped1 && zipped2
+
+                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: false, data_type : zipped ? "fastq_gz" : "fastq", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
                     return [ meta, [ fastq_1, fastq_2 ] ]
 
                 } else if (fastq_1 && fastq_2) {
-                    meta = meta + [id: meta.sample, single_end: false, data_type: 'fastq_gz', platform: meta.platform]
+                    def zipped1 = isZipped(fastq_1)
+                    def zipped2 = isZipped(fastq_2)
+
+                    if (zipped1 != zipped2) {
+                        throw new IllegalArgumentException("FASTQ pair has inconsistent compression: ${fastq_1.name} and ${fastq_2.name}")
+                    }
+                    def zipped = zipped1 && zipped2
+
+                    meta = meta + [id: meta.sample, single_end: false, data_type : zipped ? "fastq_gz" : "fastq", platform: meta.platform]
                     return [ meta - meta.subMap('lane'), [ fastq_1, fastq_2 ] ]
 
                 } else if (meta.lane && fastq_1 && !fastq_2) {
-                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: "fastq_gz", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    def zipped = isZipped(fastq_1)
+                    meta = meta + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type : zipped ? "fastq_gz" : "fastq", num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
                     return [ meta, [ fastq_1 ] ]
 
                 } else if (fastq_1 && !fastq_2) {
-                    meta = meta + [id: meta.sample, single_end: true, data_type: 'fastq_gz', platform: meta.platform]
+                    def zipped = isZipped(fastq_1)
+                    meta = meta + [id: meta.sample, single_end: true, data_type : zipped ? "fastq_gz" : "fastq", platform: meta.platform]
                     return [ meta - meta.subMap('lane'), [ fastq_1 ] ]
 
                 } else if (meta.lane && bam) {
@@ -118,7 +137,11 @@ workflow PIPELINE_INITIALISATION {
                     return [ meta - meta.subMap('lane'), bam ]
 
                 } else if (meta.lane && cram) {
-                    meta = meta - meta.subMap('lane') + [id: "${meta.sample}-${meta.lane}".toString(), single_end: true, data_type: 'cram', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
+                    meta            = meta + [id: "${meta.sample}-${meta.lane}".toString()]
+                    def CN          = params.seq_center ? "CN:${params.seq_center}\\t" : ''
+                    def read_group  = "\"@RG\\tID:${meta.sample}_${meta.lane}\\t${CN}PU:${meta.lane}\\tSM:${meta.patient}_${meta.sample}\\tLB:${meta.sample}\\tPL:${meta.platform}\""
+
+                    meta            = meta - meta.subMap('lane') + [read_group: read_group.toString(), single_end: true, data_type: 'cram', num_lanes: num_lanes.toInteger(), size: 1, platform: meta.platform]
                     return [ meta - meta.subMap('lane'), cram ]
 
                 } else if (cram) {

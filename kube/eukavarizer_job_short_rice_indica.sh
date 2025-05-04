@@ -53,11 +53,13 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_rice_indica.csv" > "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv"
+
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,rice_indica,qc_off \
     --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_034140825.1_ASM3414082v1_genomic.fna.gz" \
-    --sequence_dir "$DATADIR/eukavarizer/data/39946/ena" \
+    --input "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv" \
     --outdir "$DATADIR/short_job_rice_indica/out" | tee -a "$LOGFILE"
 
 # Clean scratch

@@ -1,14 +1,14 @@
 include { SAMTOOLS_INDEX as INDEX_MERGE_BAM } from '../../../modules/nf-core/samtools/index/main'
 include { SAMTOOLS_INDEX as INDEX_MARKDUPLICATES } from '../../../modules/nf-core/samtools/index/main'
-include { SAMTOOLS_MERGE                } from '../../../modules/nf-core/samtools/merge/main'
+include { SAMTOOLS_MERGE                    } from '../../../modules/nf-core/samtools/merge/main'
 
-include { GATK4SPARK_MARKDUPLICATES     } from '../../../modules/nf-core/gatk4spark/markduplicates/main'
-include { GATK4SPARK_BASERECALIBRATOR   } from '../../../modules/nf-core/gatk4spark/baserecalibrator/main'
-include { GATK4SPARK_APPLYBQSR          } from '../../../modules/nf-core/gatk4spark/applybqsr/main'
+include { GATK4SPARK_MARKDUPLICATES         } from '../../../modules/nf-core/gatk4spark/markduplicates/main'
+include { GATK4SPARK_BASERECALIBRATOR       } from '../../../modules/nf-core/gatk4spark/baserecalibrator/main'
+include { GATK4SPARK_APPLYBQSR              } from '../../../modules/nf-core/gatk4spark/applybqsr/main'
 
-include { GATK4_MARKDUPLICATES     } from '../../../modules/nf-core/gatk4/markduplicates/main'
-include { GATK4_BASERECALIBRATOR } from '../../../modules/nf-core/gatk4/baserecalibrator/main'
-include { GATK4_APPLYBQSR } from '../../../modules/nf-core/gatk4/applybqsr/main'
+include { GATK4_MARKDUPLICATES              } from '../../../modules/nf-core/gatk4/markduplicates/main'
+include { GATK4_BASERECALIBRATOR            } from '../../../modules/nf-core/gatk4/baserecalibrator/main'
+include { GATK4_APPLYBQSR                   } from '../../../modules/nf-core/gatk4/applybqsr/main'
 
 workflow SEQUENCE_MERGER {
     take:

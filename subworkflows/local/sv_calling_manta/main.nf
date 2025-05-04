@@ -68,9 +68,11 @@ workflow SV_CALLING_MANTA {
                 !meta.single_end
             }
             .filter { meta, _bam, _bai ->
-                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
-            }
-            .map { meta, bam, bai ->
+                !params.minimap2_flag || (
+                    (meta.platform && meta.platform == 'illumina') ||
+                    (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                )
+            }.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}-${name_manta}"], bam, bai, [], [])
             },
             reference_genome_unzipped,

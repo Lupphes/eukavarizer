@@ -40,9 +40,13 @@
                 "meta": ["lane"]
             },
             "platform": {
-                "errorMessage": "Platform must be a string indicating the sequencing technology",
-                "pattern": "^\\S+$",
                 "type": "string",
+                "pattern": "^\\S+$",
+                "enum": ["ont", "pacbio", "illumina"],
+                "errorMessage": {
+                    "enum": "Platform must be one of: 'ont', 'pacbio', or 'illumina'",
+                    "pattern": "Platform must be a string indicating the sequencing technology and cannot contain spaces"
+                },
                 "meta": ["platform"]
             },
             "fastq_1": {
@@ -93,44 +97,84 @@
                 "pattern": "^\\S+\\.(tar\\.gz|fast5)$",
                 "format": "file-path",
                 "exists": true
+            },
+            "pod5": {
+                "errorMessage": "POD5 input must end in .pod5 and contain no spaces",
+                "type": "string",
+                "pattern": "^\\S+\\.pod5$",
+                "format": "file-path",
+                "exists": true
             }
         },
-        "required": [
-            "patient",
-            "sample",
-            "lane",
-            "platform"
-        ],
+        "required": ["patient", "sample", "lane", "platform"],
         "anyOf": [
             {
-                "required": [
-                    "fastq_1"
-                ]
+                "required": ["fastq_1"]
             },
             {
-                "required": [
-                    "bam"
-                ]
+                "required": ["bam"]
             },
             {
-                "required": [
-                    "cram"
-                ]
+                "required": ["cram"]
             },
             {
-                "required": [
-                    "sra"
-                ]
+                "required": ["sra"]
             },
             {
-                "required": [
-                    "bax.h5"
-                ]
+                "required": ["bax.h5"]
             },
             {
-                "required": [
-                    "fast5"
-                ]
+                "required": ["fast5"]
+            },
+            {
+                "required": ["pod5"]
+            }
+        ],
+        "allOf": [
+            {
+                "if": {
+                    "required": ["fast5"]
+                },
+                "then": {
+                    "properties": {
+                        "platform": {
+                            "const": "ont"
+                        }
+                    },
+                    "errorMessage": {
+                        "platform": "If 'fast5' is provided, platform must be 'ont'"
+                    }
+                }
+            },
+            {
+                "if": {
+                    "required": ["pod5"]
+                },
+                "then": {
+                    "properties": {
+                        "platform": {
+                            "const": "ont"
+                        }
+                    },
+                    "errorMessage": {
+                        "platform": "If 'pod5' is provided, platform must be 'ont'"
+                    }
+                }
+            },
+            {
+                "if": {
+                    "required": ["bax.h5"]
+                },
+                "then": {
+                    "properties": {
+                        "platform": {
+                            "const": "pacbio"
+                        }
+                    },
+                    "errorMessage": {
+                        "platform": "If 'bax.h5' is provided, platform must be 'pacbio'"
+                    }
+                }
             }
         ],
         "errorMessage": {

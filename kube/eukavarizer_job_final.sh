@@ -52,12 +52,14 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_human_final.csv" > "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv"
+
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,mix_medium,qc_off \
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
-    --sequence_dir "$DATADIR/eukavarizer/data/9606/final" \
+    --input "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv" \
     --outdir "$DATADIR/final_job/out" --seqtk_size 1.0 --seqtk_flag false | tee -a "$LOGFILE"
 
 

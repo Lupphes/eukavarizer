@@ -7,7 +7,6 @@
     2. **SAMTOOLS_COLLATEFASTQ** – Converts BAM/CRAM to paired and unpaired FASTQ files.
     3. **QUALITY_CONTROL** – Filters and quality checks the FASTQ files.
     4. **BWAMEM2_MEM** or **BWA_MEM** – Aligns reads to a reference genome.
-    5. **SAMTOOLS_SORT** – Sorts the BAM files.
     6. **SAMTOOLS_INDEX** – Indexes the sorted BAM files.
 
     Outputs:
@@ -18,17 +17,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { SEQUENCE_FASTQ_CONVERTOR       } from '../../../subworkflows/local/sequence_fastq_convertor/main'
-include { QUALITY_CONTROL       } from '../../../subworkflows/local/quality_control/main'
-include { SEQUENCE_ALIGNER       } from '../../../subworkflows/local/sequence_aligner/main'
-include { SEQUENCE_MERGER       } from '../../../subworkflows/local/sequence_merger/main'
-
-// include { SAMTOOLS_MARKDUP      } from '../../../modules/nf-core/samtools/markdup/main'
-// include { SAMTOOLS_SORT as SAMTOOLS_SORT_NAMES   } from '../../../modules/nf-core/samtools/sort/main'
-// include { SAMTOOLS_SORT as SAMTOOLS_SORT_COORD   } from '../../../modules/nf-core/samtools/sort/main'
-// include { SAMTOOLS_INDEX        } from '../../../modules/nf-core/samtools/index/main'
-// include { SAMTOOLS_FIXMATE      } from '../../../modules/nf-core/samtools/fixmate/main'
-// include { SEQKIT_CONCAT         } from '../../../modules/nf-core/seqkit/concat/main'
+include { SEQUENCE_FASTQ_CONVERTOR      } from '../../../subworkflows/local/sequence_fastq_convertor/main'
+include { QUALITY_CONTROL               } from '../../../subworkflows/local/quality_control/main'
+include { SEQUENCE_ALIGNER              } from '../../../subworkflows/local/sequence_aligner/main'
+include { SEQUENCE_MERGER               } from '../../../subworkflows/local/sequence_merger/main'
 
 workflow SEQUENCE_PROCESSOR {
 

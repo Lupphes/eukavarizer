@@ -31,19 +31,25 @@ workflow SEQUENCE_ALIGNER {
 
         minimap2_bam = reads_for_alignment
             .filter { meta, _fastq ->
-                params.minimap2_flag && ((meta.median_bp > params.long_read_threshold) || meta.platform == 'ont' || meta.platform == 'pacbio')
+                params.minimap2_flag && (
+                    (meta.platform && meta.platform == 'ont' || meta.platform == 'pacbio') ||
+                    (!meta.platform && meta.median_bp > params.long_read_threshold)
+                )
             }
 
         bwa_bam = reads_for_alignment
             .filter { meta, _fastq ->
-                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
+                !params.minimap2_flag || (
+                    (meta.platform && meta.platform == 'illumina') ||
+                    (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                )
             }
 
         MINIMAP2_ALIGN(
             minimap2_bam,
             reference_genome_unzipped.collect(),
             true,
-            [],
+            "",
             false,
             true
         )

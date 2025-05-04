@@ -25,7 +25,7 @@ workflow BAM_CONVERT_SAMTOOLS {
     versions = Channel.empty()
 
     SAMTOOLS_INDEX(input)
-    bam_bai = input.join(SAMTOOLS_INDEX.out.bai, by: 0)
+    bam_bai = input.join(SAMTOOLS_INDEX.out.bai.mix(SAMTOOLS_INDEX.out.crai), by: 0)
 
     // MAP - MAP
     SAMTOOLS_VIEW_MAP_MAP(bam_bai, fasta, [], [])
@@ -40,18 +40,18 @@ workflow BAM_CONVERT_SAMTOOLS {
     SAMTOOLS_VIEW_MAP_UNMAP(bam_bai, fasta, [], [])
 
     // Merge UNMAP
-    all_unmapped_bam = SAMTOOLS_VIEW_UNMAP_UNMAP.out.bam
-        .join(SAMTOOLS_VIEW_UNMAP_MAP.out.bam, failOnDuplicate: true, remainder: true)
-        .join(SAMTOOLS_VIEW_MAP_UNMAP.out.bam, failOnDuplicate: true, remainder: true)
+    all_unmapped_bam = SAMTOOLS_VIEW_UNMAP_UNMAP.out.bam.mix(SAMTOOLS_VIEW_UNMAP_UNMAP.out.cram)
+        .join(SAMTOOLS_VIEW_UNMAP_MAP.out.bam.mix(SAMTOOLS_VIEW_UNMAP_MAP.out.cram), failOnDuplicate: true, remainder: true)
+        .join(SAMTOOLS_VIEW_MAP_UNMAP.out.bam.mix(SAMTOOLS_VIEW_MAP_UNMAP.out.cram), failOnDuplicate: true, remainder: true)
         .map{ meta, unmap_unmap, unmap_map, map_unmap -> [ meta, [ unmap_unmap, unmap_map, map_unmap ] ] }
 
     SAMTOOLS_MERGE_UNMAP(all_unmapped_bam, fasta, fasta_fai)
 
     // Collate & convert unmapped
-    COLLATE_FASTQ_UNMAP(SAMTOOLS_MERGE_UNMAP.out.bam, fasta, interleaved)
+    COLLATE_FASTQ_UNMAP(SAMTOOLS_MERGE_UNMAP.out.bam.mix(SAMTOOLS_MERGE_UNMAP.out.cram), fasta, interleaved)
 
     // Collate & convert mapped
-    COLLATE_FASTQ_MAP(SAMTOOLS_VIEW_MAP_MAP.out.bam, fasta, interleaved)
+    COLLATE_FASTQ_MAP(SAMTOOLS_VIEW_MAP_MAP.out.bam.mix(SAMTOOLS_VIEW_MAP_MAP.out.cram), fasta, interleaved)
 
     // join Mapped & unmapped fastq
 

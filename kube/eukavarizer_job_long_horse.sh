@@ -53,11 +53,13 @@ chmod +x bin/simple-event-annotation.R
 # conda config --add channels bioconda
 # conda config --add channels conda-forge
 
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_long_horse.csv" > "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv"
+
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,horse,qc_off \
-    --sequence_dir "$DATADIR/eukavarizer/data/9796/seq" \
-    --outdir "$DATADIR/long_job_horse/out" --read_type "pacbio" | tee -a "$LOGFILE"
+    --input "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_formatted.csv" \
+    --outdir "$DATADIR/long_job_horse/out" | tee -a "$LOGFILE"
 
 
 # Clean scratch

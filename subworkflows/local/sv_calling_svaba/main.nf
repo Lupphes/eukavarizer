@@ -37,7 +37,10 @@ workflow SV_CALLING_SVABA {
         SVABA(
             // SVABA requires Illumina paired-end reads
             bam_inputs.filter { meta, _bam, _bai ->
-                !params.minimap2_flag || ((meta.median_bp <= params.long_read_threshold) || meta.platform == 'illumina')
+                !params.minimap2_flag || (
+                    (meta.platform && meta.platform == 'illumina') ||
+                    (!meta.platform && meta.median_bp <= params.long_read_threshold)
+                )
             }.map { meta, bam, bai ->
                 tuple(meta + [id: "${meta.id}"], bam, bai, [], [])
             },

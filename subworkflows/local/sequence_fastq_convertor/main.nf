@@ -1,12 +1,13 @@
-include { GZIP                  } from '../../../modules/local/gzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_FASTQ1                     } from '../../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_FASTQ2                     } from '../../../modules/nf-core/tabix/bgzip/main'
 
-include { SEQKIT_SIZE           } from '../../../modules/local/seqkit/size/main'
+include { SEQKIT_SIZE                                           } from '../../../modules/local/seqkit/size/main'
 
-include { SRATOOLS_FASTERQDUMP } from '../../../modules/nf-core/sratools/fasterqdump/main'
-include { DORADO as DORADO_FAST5    } from '../../../modules/local/dorado/main'
-include { DORADO as DORADO_POD5     } from '../../../modules/local/dorado/main'
-include { BAM_CONVERT_SAMTOOLS as BAM_SAMTOOLS_COLLATEFASTQ    } from '../../../subworkflows/sarek/bam_convert_samtools/main'
-include { BAM_CONVERT_SAMTOOLS as CRAM_SAMTOOLS_COLLATEFASTQ   } from '../../../subworkflows/sarek/bam_convert_samtools/main'
+include { SRATOOLS_FASTERQDUMP                                  } from '../../../modules/nf-core/sratools/fasterqdump/main'
+include { DORADO as DORADO_FAST5                                } from '../../../modules/local/dorado/main'
+include { DORADO as DORADO_POD5                                 } from '../../../modules/local/dorado/main'
+include { BAM_CONVERT_SAMTOOLS as BAM_SAMTOOLS_COLLATEFASTQ     } from '../../../subworkflows/sarek/bam_convert_samtools/main'
+include { BAM_CONVERT_SAMTOOLS as CRAM_SAMTOOLS_COLLATEFASTQ    } from '../../../subworkflows/sarek/bam_convert_samtools/main'
 
 workflow SEQUENCE_FASTQ_CONVERTOR {
     take:
@@ -17,7 +18,7 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
     main:
     input_sample_type = samplesheet.branch{
             fastq_gz:           it[0].data_type == "fastq_gz"
-            // fastq:              it[0].data_type == "fastq"
+            fastq:              it[0].data_type == "fastq"
             bam:                it[0].data_type == "bam"
             cram:               it[0].data_type == "cram"
             sra:                it[0].data_type == "sra"
@@ -25,6 +26,21 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
             pod5:               it[0].data_type == "pod5"
             bax_h5:             it[0].data_type == "bax_h5"
         }
+
+        // Zip the uncompressed ones
+        TABIX_BGZIP_FASTQ1(
+            input_sample_type.fastq.map {meta, fastq1, _fastq2 ->
+                tuple(meta, fastq1)
+            }
+        )
+
+        TABIX_BGZIP_FASTQ2(
+            input_sample_type.fastq.map {meta, _fastq1, fastq2 ->
+                tuple(meta, fastq2)
+            }
+        )
+
+        zipped_joined_ch = TABIX_BGZIP_FASTQ1.out.output.join(TABIX_BGZIP_FASTQ2.out.output, by: 0, failOnDuplicate: true, failOnMismatch: true)
 
         // Convert BAM or CRAM to FASTQ
         interleave_input = false  // Currently don't allow interleaved input
@@ -57,20 +73,16 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
         )
 
         fastq_gz = input_sample_type.fastq_gz.map { meta, files -> addReadgroupToMeta(meta, files) }
-
-
-        // Compress fastq sequences
-        // fastqs_unzipped = Channel.fromPath("${params.sequence_dir}/**/*.fastq")
-
-        // Zip the uncompressed ones
-        // GZIP(
-        //     fastqs_unzipped.map { file -> tuple([id: file.simpleName], file) }
-        // )
+        zipped_joined_ch = input_sample_type.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
+        sra = SRATOOLS_FASTERQDUMP.out.reads.map { meta, files -> addReadgroupToMeta(meta, files) }
+        fast5 = DORADO_FAST5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
+        pod5 = DORADO_POD5.out.fastq.map { meta, files -> addReadgroupToMeta(meta, files) }
 
         collected_fastqs = fastq_gz
-            .mix(SRATOOLS_FASTERQDUMP.out.reads)
-            .mix(DORADO_FAST5.out.fastq)
-            .mix(DORADO_POD5.out.fastq)
+            .mix(zipped_joined_ch)
+            .mix(sra)
+            .mix(fast5)
+            .mix(pod5)
             .mix(BAM_SAMTOOLS_COLLATEFASTQ.out.reads)
             .mix(CRAM_SAMTOOLS_COLLATEFASTQ.out.reads)
 
@@ -133,6 +145,15 @@ def flowcellLaneFromFastq(path) {
     } else if (fields.size() >= 7) {
         // Get the actual flowcell ID
         flowcell_id = fields[2]
+    } else if (fields.size() == 1 && fields[0].startsWith('@SRR')) {
+        log.info "FASTQ file(${path}): SRA-style header detected, no flowcell ID present"
+    } else if (firstLine ==~ /^@m\d+_\d+_\d+/) {
+        // PacBio movie name: @m64011_191205_205309/136540764/ccs
+        flowcell_id = firstLine.split('/')[0].substring(1)
+        log.info "FASTQ file(${path}): Detected PacBio movie ID as flowcell: ${flowcell_id}"
+    } else if (firstLine.startsWith('@read')) {
+        // ONT/Dorado: No flowcell in FASTQ
+        log.info "FASTQ file(${path}): Detected ONT read ID format, no flowcell ID present"
     } else if (fields.size() != 0) {
         log.warn "FASTQ file(${path}): Cannot extract flowcell ID from ${firstLine}"
     }
@@ -143,12 +164,15 @@ def flowcellLaneFromFastq(path) {
 def readFirstLineOfFastq(path) {
     def line = null
     try {
-        path.withInputStream {
-            InputStream gzipStream = new java.util.zip.GZIPInputStream(it)
-            Reader decoder = new InputStreamReader(gzipStream, 'ASCII')
-            BufferedReader buffered = new BufferedReader(decoder)
-            line = buffered.readLine()
-            assert line.startsWith('@')
+        InputStream stream = path.name.endsWith(".gz") ?
+            new java.util.zip.GZIPInputStream(path.newInputStream()) :
+            path.newInputStream()
+
+        def reader = new BufferedReader(new InputStreamReader(stream, 'ASCII'))
+        line = reader.readLine()
+        if (line == null || !line.startsWith('@')) {
+            log.warn "FASTQ file(${path}): Invalid or missing header line"
+            return null
         }
     } catch (Exception e) {
         log.warn "FASTQ file(${path}): Error streaming"

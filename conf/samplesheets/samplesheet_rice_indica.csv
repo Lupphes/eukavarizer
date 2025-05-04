@@ -1,0 +1,2 @@
+patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
+indica,NA,0,rice_sample_indica,illumina,DRX511013,$DATADIR/eukavarizer/data/39946/ena/DRR527132/DRR527132_1.fastq.gz,$DATADIR/eukavarizer/data/39946/ena/DRR527132/DRR527132_2.fastq.gz,,,,,,
