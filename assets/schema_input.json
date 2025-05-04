@@ -80,7 +80,7 @@
             "sra": {
                 "errorMessage": "SRA ID must start with SRR followed by digits",
                 "type": "string",
-                "pattern": "^SRR[0-9]{6,}$",
+                "pattern": "^(SR[ARPXS]|ER[RPX]|DR[RPX])[0-9]{6,}$",
                 "format": "file-path",
                 "exists": true
             },
