@@ -84,7 +84,7 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
 
         collected_fastqs = fastq_gz
             .mix(zipped_joined_ch)
-            // .mix(sra)
+            .mix(sra)
             .mix(fast5)
             .mix(pod5)
             .mix(BAM_SAMTOOLS_COLLATEFASTQ.out.reads)
@@ -113,11 +113,14 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
 // Add readgroup to meta and remove lane
 def addReadgroupToMeta(meta, files) {
     def CN = params.seq_center ? "CN:${params.seq_center}\\t" : ''
-    def flowcell = flowcellLaneFromFastq(files[0])
+    def flowcell = flowcellLaneFromFastq(files instanceof List ? files[0] : files)
 
     // Check if flowcell ID matches
-    if ( flowcell && flowcell != flowcellLaneFromFastq(files[1]) ){
-        error("Flowcell ID does not match for paired reads of sample ${meta.id} - ${files}")
+    if (files instanceof List && files.size() > 1) {
+        def flowcell2 = flowcellLaneFromFastq(files[1])
+        if (flowcell && flowcell != flowcell2) {
+            error("Flowcell ID does not match for paired reads of sample ${meta.id} - ${files}")
+        }
     }
 
     // If we cannot read the flowcell ID from the fastq file, then we don't use it
