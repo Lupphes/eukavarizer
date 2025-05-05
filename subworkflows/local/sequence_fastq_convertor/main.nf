@@ -1,5 +1,6 @@
-include { TABIX_BGZIP as TABIX_BGZIP_FASTQ1                     } from '../../../modules/nf-core/tabix/bgzip/main'
-include { TABIX_BGZIP as TABIX_BGZIP_FASTQ2                     } from '../../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_SINGLE_FASTQ               } from '../../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_DOUBLE_1                   } from '../../../modules/nf-core/tabix/bgzip/main'
+include { TABIX_BGZIP as TABIX_BGZIP_DOUBLE_2                   } from '../../../modules/nf-core/tabix/bgzip/main'
 
 include { SEQKIT_SIZE                                           } from '../../../modules/local/seqkit/size/main'
 
@@ -27,27 +28,33 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
             bax_h5:             it[0].data_type == "bax_h5"
         }
 
+        result = input_sample_type.fastq.branch{
+            fastq_single: it[1].size() == 1
+            fastq_double: it[1].size() > 1
+        }
+
         // Zip the uncompressed ones
-        TABIX_BGZIP_FASTQ1(
-            input_sample_type.fastq
+        TABIX_BGZIP_SINGLE_FASTQ(
+            result.fastq_single
+        )
+
+        TABIX_BGZIP_DOUBLE_1(
+            result.fastq_double
                 .filter { _meta, fastq -> fastq[0] }
                 .map { meta, fastq -> tuple(meta, fastq[0]) }
         )
 
-        TABIX_BGZIP_FASTQ2(
-            input_sample_type.fastq
-                .filter { _meta, fastq -> fastq.size() > 1 && fastq[1] }
+        TABIX_BGZIP_DOUBLE_2(
+            result.fastq_double
+                .filter { _meta, fastq ->  fastq[1] }
                 .map { meta, fastq -> tuple(meta, fastq[1]) }
         )
 
-        fastq_gz_zipped_join = TABIX_BGZIP_FASTQ1.out.output
-            .join(TABIX_BGZIP_FASTQ2.out.output, by: 0, failOnMismatch: false, failOnDuplicate: true)
-            .map { meta, fastq_gz ->
-                def files = fastq_gz.findAll { it != null }
-                tuple(meta, files)
-            }
+        fastq_gz_double = TABIX_BGZIP_DOUBLE_1.out.output
+            .join(TABIX_BGZIP_DOUBLE_2.out.output, by: 0, failOnMismatch: true, failOnDuplicate: true)
+            .map { meta, fastq1, fastq2 -> tuple(meta, [fastq1, fastq2]) }
 
-        fastq_gz_zipped_join.view()
+        fastq_gz_zipped_join = fastq_gz_double.mix(TABIX_BGZIP_SINGLE_FASTQ.out.output)
 
         // Convert BAM or CRAM to FASTQ
         interleave_input = false  // Currently don't allow interleaved input
