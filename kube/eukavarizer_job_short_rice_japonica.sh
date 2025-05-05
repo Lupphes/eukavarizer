@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_short_rice_japonica
-#PBS -l select=1:ncpus=32:mem=768gb:scratch_local=1000gb
+#PBS -l select=1:ncpus=16:mem=256gb:scratch_local=2000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com

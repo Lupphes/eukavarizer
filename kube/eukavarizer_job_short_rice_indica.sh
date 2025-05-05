@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_short_rice_indica
-#PBS -l select=1:ncpus=32:mem=768gb:scratch_local=2000gb
+#PBS -l select=1:ncpus=16:mem=256gb:scratch_local=2000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
@@ -58,7 +58,7 @@ sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,rice_indica,qc_off \
-    --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCA_001623345.3_ZS97RS3_genomic.fna.gz" \
+    --reference_genome "$DATADIR/eukavarizer/data/39946/ref/GCA_001623345.3_ZS97RS3_genomic.fna.gz" \
     --input "$SCRATCH/samplesheet_formatted.csv" \
     --outdir "$DATADIR/short_job_rice_indica/out" | tee -a "$LOGFILE"
 
