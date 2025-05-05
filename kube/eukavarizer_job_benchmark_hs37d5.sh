@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N eukavarizer_job_benchmark_hs37d5
-#PBS -l select=1:ncpus=64:mem=768gb:scratch_local=1000gb
+#PBS -l select=1:ncpus=16:mem=768gb:scratch_local=1000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
