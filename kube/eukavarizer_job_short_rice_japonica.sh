@@ -67,3 +67,6 @@ echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch
 
 echo "=== Job $PBS_JOBID completed at $(date) ===" | tee -a "$LOGFILE"
+
+# GCA_001623345.3_ZS97RS3_genomic.fna.gz # INDICA
+# GCF_034140825.1_ASM3414082v1_genomic.fna.gz # JAPONICA
