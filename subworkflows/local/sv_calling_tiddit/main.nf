@@ -42,7 +42,7 @@ workflow SV_CALLING_TIDDIT {
             }
             // Use BWA for short reads
             .filter { meta, _bam, _bai ->
-                !params.minimap2_flag || (
+                !params.minimap2_flag && (
                     (meta.platform && meta.platform == 'illumina') ||
                     (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )
@@ -59,14 +59,13 @@ workflow SV_CALLING_TIDDIT {
             .filter { meta, _bam, _bai ->
                 !meta.single_end
             }
-            // Use minimap2 for long reads
             .filter { meta, _bam, _bai ->
                 params.minimap2_flag && (
                     (meta.platform && meta.platform == 'illumina') ||
                     (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )
             }.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}"], bam, bai)
+                tuple(meta + [id: "${meta.id}-${name_tiddit}"], bam, bai)
             },
             reference_genome_bgzipped,
             reference_genome_minimap_index

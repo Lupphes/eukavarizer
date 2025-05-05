@@ -46,7 +46,7 @@ workflow SV_CALLING_SNIFFLES {
             SNIFFLES.out.vcf
                 .join(SNIFFLES.out.tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple(meta + [id: "${meta.id}-${name_sniffles}-svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_sniffles}.yaml"))
