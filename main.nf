@@ -127,7 +127,6 @@ workflow {
         // Input channels for the workflow
         //
         reference_genome        = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
-
         //
         // SUBWORKFLOW: Run initialisation tasks
         //

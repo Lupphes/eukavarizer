@@ -34,7 +34,7 @@ workflow PIPELINE_INITIALISATION {
     take:
     version             // boolean: Display version and exit
     validate_params     // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs     // boolean: Do not use coloured log outputs
+    _monochrome_logs     // boolean: Do not use coloured log outputs
     nextflow_cli_args   // array: List of positional nextflow CLI args
     outdir              // string: The output directory where the results will be saved
     input               // string: Path to input samplesheet
@@ -85,8 +85,8 @@ workflow PIPELINE_INITIALISATION {
             .map { patient_sample, ch_items ->
                 [ patient_sample, ch_items.size() ]
             }.combine(ch_with_patient_sample, by: 0) // for each entry add numLanes
-            .map { patient_sample, num_lanes, ch_items ->
-                def (meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5) = ch_items
+            .map { _patient_sample, num_lanes, ch_items ->
+                def (meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, _pod5) = ch_items
                 def isZipped = { file -> file?.name.endsWith('.gz') }
 
                 if (meta.lane && fastq_1 && fastq_2) {
