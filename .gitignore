@@ -194,3 +194,4 @@ HG002/
 HG002_reads/
 src/out/
 .history
+nextflow.config.bak
