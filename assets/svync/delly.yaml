@@ -1,12 +1,13 @@
 id: delly_$INFO/SVTYPE
 
 alt:
-  BND: TRA
-  DEL: DEL
-  INS: INS
-  DUP: DUP
-  INV: INV
-  TRA: TRA
+  alts:
+    BND: TRA
+    DEL: DEL
+    INS: INS
+    DUP: DUP
+    INV: INV
+    TRA: TRA
 
 info:
   CALLER:

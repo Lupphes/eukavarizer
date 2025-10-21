@@ -1,12 +1,13 @@
 id: cutesv_$INFO/SVTYPE
 
 alt:
-  BND: BND
-  DEL: DEL
-  INS: INS
-  DUP: DUP
-  INV: INV
-  TRA: TRA
+  alts:
+    BND: BND
+    DEL: DEL
+    INS: INS
+    DUP: DUP
+    INV: INV
+    TRA: TRA
 
 info:
   CALLER:
