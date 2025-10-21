@@ -23,7 +23,7 @@
         fastq_filtered            tuple(meta, fastq)     Filtered and trimmed FASTQ files
         multiqc_report            path(html)             MultiQC quality control report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,17 +37,13 @@ include { FASTPLONG                 } from '../../../modules/nf-core/fastplong/m
 include { BBMAP_BBDUK               } from '../../../modules/nf-core/bbmap/bbduk/main'
 include { SEQTK_SAMPLE              } from '../../../modules/nf-core/seqtk/sample/main'
 
-include { paramsSummaryMap          } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc      } from '../../nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML    } from '../..//nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText    } from '../../local/utils_nfcore_eukavarizer_pipeline'
-
 workflow QUALITY_CONTROL {
 
     take:
         fastq_files
 
     main:
+        ch_versions = Channel.empty()
 
         PRE_FASTQC_MULTIQC_ANALYSIS(
             fastq_files
@@ -153,11 +149,24 @@ workflow QUALITY_CONTROL {
             seqtk_combined_result
         )
 
+        ch_versions = ch_versions.mix(PRE_FASTQC_MULTIQC_ANALYSIS.out.versions)
+        ch_versions = ch_versions.mix(AFTER_FASTQC_MULTIQC_ANALYSIS.out.versions)
+        if (params.fastp_flag) {
+            ch_versions = ch_versions.mix(FASTP.out.versions.first())
+            ch_versions = ch_versions.mix(FASTPLONG.out.versions.first())
+        }
+        if (params.bbmap_bbduk_flag) {
+            ch_versions = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
+        }
+        if (params.seqtk_flag) {
+            ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first())
+        }
+
     emit:
         fastqc_report   = params.fastqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.fastqc_report.toList() : null      // Path to FastQC reports, or null if FastQC is not run
         multiqc_report  = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.multiqc_report.toList() : null    // Path to MultiQC report, or null if MultiQC is not run
         fastq_filtered  = seqtk_combined_result                                                                    // Processed FASTQ files
-        versions        = params.multiqc_flag ? AFTER_FASTQC_MULTIQC_ANALYSIS.out.versions : null                   // Path to versions.yml (this is always generated)
+        versions        = ch_versions                                                                              // Software versions
 
 }
 

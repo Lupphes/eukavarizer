@@ -5,11 +5,10 @@ nf_core_version: 3.4.1
 org_path: nf-core
 
 lint:
-  # Linting configuration
+  # Lint for nextflow plugin
   plugin_includes: false
-  pipeline_if_empty_null: false
 
-  # Files to exclude from linting
+  # Files that must exist
   files_exist:
     - .editorconfig
     - .gitattributes
@@ -49,10 +48,11 @@ lint:
     - nextflow.config
     - nextflow_schema.json
 
-  # Files that can have outdated versions
-  files_unchanged: []
+  # List of files that should not be changed
+  files_unchanged:
+    - .gitignore
 
-  # Modules configuration
+  # List of modules that should not be changed
   modules_config: true
 
   # Nextflow config checks
@@ -91,6 +91,7 @@ template:
   skip_features:
     - fastqc
     - multiqc
+    - email
   is_nfcore: true
 
   # Template customization

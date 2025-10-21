@@ -8,10 +8,10 @@ keywords:
   - illumina
   - assembly
 components:
-  - GRIDSS_GRIDSS
-  - GRIDSS_ANNOTATE
-  - SVYNC
-  - SAMPLE_REHEADER
+  - gridss/gridss
+  - gridss/annotate
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

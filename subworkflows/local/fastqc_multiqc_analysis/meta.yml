@@ -8,8 +8,8 @@ keywords:
   - qc
   - sequencing
 components:
-  - FASTQC
-  - MULTIQC
+  - fastqc
+  - multiqc
 input:
   - fastq_files:
       type: file

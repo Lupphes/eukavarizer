@@ -8,10 +8,9 @@ keywords:
   - illumina
   - indels
 components:
-  - MANTA_GERMLINE
-  - MANTA_CONVERTINVERSION
-  - SVYNC
-  - SAMPLE_REHEADER
+  - manta/germline
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

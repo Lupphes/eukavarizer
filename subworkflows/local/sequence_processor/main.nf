@@ -27,7 +27,7 @@
         samtools_stats            tuple(meta, stats)     Samtools alignment statistics
         multiqc_report            path(html)             MultiQC quality control report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

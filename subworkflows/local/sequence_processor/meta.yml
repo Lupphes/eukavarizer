@@ -8,11 +8,11 @@ keywords:
   - quality control
   - bam
 components:
-  - SEQUENCE_FASTQ_CONVERTOR
-  - QUALITY_CONTROL
-  - SEQUENCE_ALIGNER
-  - SEQUENCE_MERGER
-  - SAMTOOLS_STATS
+  - sequence/fastq/convertor
+  - quality/control
+  - sequence/aligner
+  - sequence/merger
+  - samtools/stats
 input:
   - samplesheet:
       type: file

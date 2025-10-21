@@ -1,0 +1,104 @@
+name: "Run nf-test"
+description: "Run nf-test with a specific profile and shard"
+inputs:
+  profile:
+    description: "Profile to use for testing"
+    required: true
+  shard:
+    description: "Shard number"
+    required: true
+  total_shards:
+    description: "Total number of shards"
+    required: true
+  paths:
+    description: "Paths to search for nf-test files"
+    required: false
+    default: ""
+  tags:
+    description: "Tags to filter nf-test files"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Nextflow
+      uses: nf-core/setup-nextflow@v2
+      with:
+        version: ${{ matrix.NXF_VER }}
+
+    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
+      with:
+        python-version: "3.14"
+
+    - name: Install nf-test
+      shell: bash
+      run: |
+        wget -qO- https://get.nf-test.com | bash
+        sudo mv nf-test /usr/local/bin/
+        # Install pdiff for snapshot comparison
+        wget -qO- https://github.com/askimed/nf-test/releases/download/v${{ env.NFT_VER }}/pdiff-${{ env.NFT_VER }}-linux-x86_64.tar.gz | tar -xz
+        sudo mv pdiff /usr/local/bin/
+
+    - name: Set up Apptainer
+      if: inputs.profile == 'singularity'
+      uses: eWaterCycle/setup-apptainer@main
+
+    - name: Set up Singularity
+      if: inputs.profile == 'singularity'
+      shell: bash
+      run: |
+        mkdir -p $NXF_SINGULARITY_CACHEDIR
+        mkdir -p $NXF_SINGULARITY_LIBRARYDIR
+
+    - name: Set up Miniconda
+      if: inputs.profile == 'conda'
+      uses: conda-incubator/setup-miniconda@a4260408e20b96e80095f42ff7f1a15b27dd94ca # v3
+      with:
+        miniconda-version: "latest"
+        auto-update-conda: true
+        conda-solver: libmamba
+        channels: conda-forge,bioconda
+
+    - name: Set up Conda
+      if: inputs.profile == 'conda'
+      shell: bash
+      run: |
+        echo $(realpath $CONDA)/condabin >> $GITHUB_PATH
+        echo $(realpath python) >> $GITHUB_PATH
+
+    - name: Clean up Disk space
+      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+
+    - name: Run nf-test
+      shell: bash
+      run: |
+        nf-test test \
+          --profile=+${{ inputs.profile }} \
+          --ci \
+          --changed-since HEAD^ \
+          --verbose \
+          --tap=test.tap \
+          --shard ${{ inputs.shard }}/${{ inputs.total_shards }} \
+          ${{ inputs.paths }} \
+          ${{ inputs.tags && format('--tag {0}', inputs.tags) || '' }}
+
+    - name: Output test results
+      if: always()
+      shell: bash
+      run: |
+        if [ -f test.tap ]; then
+          echo "## Test Results - ${{ inputs.profile }} (Shard ${{ inputs.shard }}/${{ inputs.total_shards }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | Test |" >> $GITHUB_STEP_SUMMARY
+          echo "|:------:|------|" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r line; do
+            if [[ $line == ok* ]]; then
+              test_name=$(echo "$line" | sed -E 's/ok [0-9]+ (.+)/\1/')
+              echo "| :white_check_mark: | $test_name |" >> $GITHUB_STEP_SUMMARY
+            elif [[ $line == "not ok"* ]]; then
+              test_name=$(echo "$line" | sed -E 's/not ok [0-9]+ (.+)/\1/')
+              echo "| :x: | $test_name |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done < test.tap
+        fi

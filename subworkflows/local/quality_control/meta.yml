@@ -9,11 +9,11 @@ keywords:
   - fastplong
   - bbduk
 components:
-  - FASTQC_MULTIQC_ANALYSIS
-  - FASTP
-  - FASTPLONG
-  - BBMAP_BBDUK
-  - SEQTK_SAMPLE
+  - fastqc/multiqc/analysis
+  - fastp
+  - fastplong
+  - bbmap/bbduk
+  - seqtk/sample
 input:
   - fastq_files:
       type: file

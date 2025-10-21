@@ -26,7 +26,7 @@
     Output Channels (emit):
         tagged_collected_fastqs   tuple(meta, fastq)     Compressed FASTQ with metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,10 +151,14 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
         }
 
         ch_versions = ch_versions.mix(TABIX_BGZIP_SINGLE_FASTQ.out.versions.first())
+        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_1.out.versions.first())
+        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_2.out.versions.first())
         ch_versions = ch_versions.mix(SEQKIT_SIZE.out.versions.first())
         ch_versions = ch_versions.mix(SRATOOLS_FASTERQDUMP.out.versions.first())
         ch_versions = ch_versions.mix(DORADO_FAST5.out.versions.first())
+        ch_versions = ch_versions.mix(DORADO_POD5.out.versions.first())
         ch_versions = ch_versions.mix(BAM_SAMTOOLS_COLLATEFASTQ.out.versions.first())
+        ch_versions = ch_versions.mix(CRAM_SAMTOOLS_COLLATEFASTQ.out.versions.first())
 
     emit:
         tagged_collected_fastqs

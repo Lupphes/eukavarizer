@@ -1,0 +1,125 @@
+name: nf-test
+# Run nf-tests on pull requests against the master branch
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+      - master
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "**.png"
+      - "**.svg"
+      - ".gitpod.yml"
+      - ".github/**"
+      - "!.github/workflows/nf-test.yml"
+      - "!.github/actions/**"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Cancel if a newer run is started
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NFT_VER: "0.9.3"
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/.singularity
+  NXF_SINGULARITY_LIBRARYDIR: ${{ github.workspace }}/.singularity
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  nf-test-changes:
+    name: Determine nf-test shards
+    runs-on: ubuntu-latest
+    outputs:
+      # Outputs a JSON encoded array of shard numbers
+      shard: ${{ steps.shards.outputs.shard }}
+      total_shards: ${{ steps.shards.outputs.total_shards }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install nf-test
+        run: |
+          wget -qO- https://get.nf-test.com | bash
+          sudo mv nf-test /usr/local/bin/
+
+      - name: Get number of shards
+        id: shards
+        uses: ./.github/actions/get-shards
+        with:
+          max_shards: 7
+
+  nf-test:
+    name: ${{ matrix.profile }} | ${{ matrix.NXF_VER }} | shard ${{ matrix.shard }}/${{ needs.nf-test-changes.outputs.total_shards }}
+    needs: [nf-test-changes]
+    if: needs.nf-test-changes.outputs.total_shards != '0'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        NXF_VER:
+          - "24.04.2"
+          - "latest-everything"
+        profile:
+          - "conda"
+          - "docker"
+          - "singularity"
+        shard: ${{ fromJson(needs.nf-test-changes.outputs.shard) }}
+        isMaster:
+          - ${{ github.base_ref == 'master' }}
+        # Exclude conda and singularity on dev
+        exclude:
+          - isMaster: false
+            profile: "conda"
+          - isMaster: false
+            profile: "singularity"
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Run nf-test
+        uses: ./.github/actions/nf-test
+        with:
+          profile: ${{ matrix.profile }}
+          shard: ${{ matrix.shard }}
+          total_shards: ${{ needs.nf-test-changes.outputs.total_shards }}
+          paths: ""
+
+      - name: Annotate failed tests
+        if: failure()
+        run: |
+          # Report failed tests to workflow summary
+          if [ -f test.tap ]; then
+            echo "## Failed tests" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Status | Test | Profile | Shard |" >> $GITHUB_STEP_SUMMARY
+            echo "|:------:|------|---------|:-----:|" >> $GITHUB_STEP_SUMMARY
+            grep "^not ok" test.tap | while read -r line; do
+              test_name=$(echo "$line" | sed -E 's/not ok [0-9]+ (.+)/\1/')
+              echo "| :x: | $test_name | ${{ matrix.profile }} | ${{ matrix.shard }}/${{ needs.nf-test-changes.outputs.total_shards }} |" >> $GITHUB_STEP_SUMMARY
+            done
+          fi
+
+  confirm-pass:
+    runs-on: ubuntu-latest
+    needs: [nf-test-changes, nf-test]
+    if: always()
+    steps:
+      - name: All tests ok
+        if: ${{ success() || !contains(needs.*.result, 'failure') }}
+        run: exit 0
+
+      - name: One or more tests failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

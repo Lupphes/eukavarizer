@@ -1,0 +1,55 @@
+name: "Get number of shards"
+description: "Get the number of shards to use for nf-test"
+inputs:
+  max_shards:
+    description: "Maximum number of shards"
+    required: true
+  paths:
+    description: "Paths to search for nf-test files"
+    required: false
+    default: ""
+  tags:
+    description: "Tags to filter nf-test files"
+    required: false
+    default: ""
+outputs:
+  shard:
+    description: "Array of shard numbers"
+    value: ${{ steps.shards.outputs.shard }}
+  total_shards:
+    description: "Total number of shards"
+    value: ${{ steps.shards.outputs.total_shards }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get number of shards
+      id: shards
+      shell: bash
+      run: |
+        # Run nf-test to get the number of tests
+        nf-test list ${{ inputs.paths }} ${{ inputs.tags && format('--tag {0}', inputs.tags) || '' }} > /dev/null 2> test_count.log || true
+
+        # Extract test count from log
+        if grep -q "Found [0-9]* tests" test_count.log; then
+          test_count=$(grep "Found [0-9]* tests" test_count.log | sed -E 's/.*Found ([0-9]*) tests.*/\1/')
+        else
+          test_count=0
+        fi
+
+        # Calculate number of shards (minimum 1, maximum max_shards)
+        if [ "$test_count" -eq 0 ]; then
+          total_shards=0
+          shard="[]"
+        elif [ "$test_count" -le "${{ inputs.max_shards }}" ]; then
+          total_shards=$test_count
+          shard=$(seq 1 $total_shards | jq -sc '.')
+        else
+          total_shards=${{ inputs.max_shards }}
+          shard=$(seq 1 $total_shards | jq -sc '.')
+        fi
+
+        echo "total_shards=$total_shards" >> $GITHUB_OUTPUT
+        echo "shard=$shard" >> $GITHUB_OUTPUT
+
+        echo "Found $test_count tests, using $total_shards shards"

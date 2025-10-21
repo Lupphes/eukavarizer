@@ -23,7 +23,7 @@
     Output Channels (emit):
         bam_mapped                tuple(meta, bam)       Aligned BAM files grouped by sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

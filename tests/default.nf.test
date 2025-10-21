@@ -1,0 +1,51 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "main.nf"
+    tag "pipeline"
+
+    test("eukavarizer: test profile") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert snapshot(
+                path("$outputDir/multiqc/multiqc_report.html"),
+                path("$outputDir/multiqc/multiqc_data/multiqc_data.json"),
+                path("$outputDir/multiqc/multiqc_data/multiqc_general_stats.txt"),
+                path("$outputDir/multiqc/multiqc_data/multiqc_software_versions.txt"),
+                path("$outputDir/pipeline_info/software_versions.yml")
+            ).match()
+
+            // Check for presence of expected output directories
+            def expectedDirs = [
+                "multiqc",
+                "pipeline_info",
+                "fastqc"
+            ]
+            expectedDirs.each { dir ->
+                assert path("$outputDir/$dir").exists() : "Expected directory $dir not found"
+            }
+        }
+    }
+
+    test("eukavarizer: test profile - stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+}

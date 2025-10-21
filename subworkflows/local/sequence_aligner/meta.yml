@@ -9,9 +9,9 @@ keywords:
   - mapping
   - reads
 components:
-  - BWA_MEM
-  - BWAMEM2_MEM
-  - MINIMAP2_ALIGN
+  - bwa/mem
+  - bwamem2/mem
+  - minimap2/align
 input:
   - fastq_filtered:
       type: file

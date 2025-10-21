@@ -7,9 +7,9 @@ keywords:
   - delly
   - illumina
 components:
-  - DELLY_CALL
-  - SVYNC
-  - SAMPLE_REHEADER
+  - delly/call
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

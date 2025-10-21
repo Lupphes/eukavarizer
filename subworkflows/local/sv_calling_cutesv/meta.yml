@@ -9,9 +9,9 @@ keywords:
   - nanopore
   - ont
 components:
-  - CUTESV
-  - SVYNC
-  - SAMPLE_REHEADER
+  - cutesv
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

@@ -8,7 +8,7 @@ keywords:
   - varify
   - statistics
 components:
-  - VARIFY
+  - varify
 input:
   - taxonomy_id:
       type: string

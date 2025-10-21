@@ -20,7 +20,7 @@
     Output Channels (emit):
         multiqc_report            path(html)             Aggregated MultiQC report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,8 +31,8 @@ include { MULTIQC       } from '../../../modules/nf-core/multiqc/main'
 
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../../nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../..//nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../../local/utils_nfcore_eukavarizer_pipeline'
+include { softwareVersionsToYAML } from '../../nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText } from '../../local/pipeline_initialisation'
 
 workflow FASTQC_MULTIQC_ANALYSIS {
 
@@ -110,6 +110,7 @@ workflow FASTQC_MULTIQC_ANALYSIS {
                 [],
                 []
             )
+            ch_versions = ch_versions.mix(MULTIQC.out.versions.first())
         }
 
     emit:

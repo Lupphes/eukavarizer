@@ -8,10 +8,10 @@ keywords:
   - illumina
   - assembly
 components:
-  - SVABA
-  - SVABA_ANNOTATE
-  - SVYNC
-  - SAMPLE_REHEADER
+  - svaba
+  - svaba/annotate
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

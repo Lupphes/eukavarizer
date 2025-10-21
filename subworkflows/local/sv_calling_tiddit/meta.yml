@@ -7,9 +7,9 @@ keywords:
   - tiddit
   - illumina
 components:
-  - TIDDIT_SV
-  - SVYNC
-  - SAMPLE_REHEADER
+  - tiddit/sv
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

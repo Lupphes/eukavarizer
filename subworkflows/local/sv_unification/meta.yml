@@ -9,14 +9,13 @@ keywords:
   - bcftools
   - unification
 components:
-  - SURVIVOR_MERGE
-  - SURVIVOR_FILTER
-  - SURVIVOR_STATS
-  - BCFTOOLS_CONCAT
-  - BCFTOOLS_SORT
-  - BCFTOOLS_MERGE
-  - BCFTOOLS_FILTER
-  - BCFTOOLS_STATS
+  - survivor/merge
+  - survivor/filter
+  - survivor/stats
+  - bcftools/concat
+  - bcftools/sort
+  - bcftools/filter
+  - bcftools/stats
 input:
   - vcf_list:
       type: file

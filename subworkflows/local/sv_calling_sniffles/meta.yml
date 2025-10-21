@@ -9,9 +9,9 @@ keywords:
   - nanopore
   - ont
 components:
-  - SNIFFLES
-  - SVYNC
-  - SAMPLE_REHEADER
+  - sniffles
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

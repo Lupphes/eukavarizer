@@ -11,7 +11,7 @@
         through advanced algorithmic approaches and ML-based classification.
 
     Processing Steps:
-        1. DYSGU - Detects SVs using machine learning from BAM files
+        1. DYSGU_RUN - Detects SVs using machine learning from BAM files
         2. SVYNC - Synchronizes and refines SV calls to standard format
         3. SAMPLE_REHEADER - Reheaders and renames the output VCF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,7 +32,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { DYSGU             } from '../../../modules/nf-core/dysgu/main'
+include { DYSGU_RUN         } from '../../../modules/nf-core/dysgu/run/main'
 include { SVYNC             } from '../../../modules/nf-core/svync/main'
 include { SAMPLE_REHEADER   } from '../../../modules/local/sample_regen/main.nf'
 
@@ -46,20 +46,22 @@ workflow SV_CALLING_DYSGU {
         ch_versions = Channel.empty()
         name_dysgu = "dysgu"
 
-        DYSGU(
+        DYSGU_RUN(
             bam_inputs
-            .map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}-${name_dysgu}"], bam, bai)
-            },
-            reference_genome_unzipped
-            .combine(reference_genome_faidx)
-            .map { meta_fasta, fasta, _meta_fai, fai -> [meta_fasta, fasta, fai] }
-            .collect(),
+                .map { meta, bam, bai ->
+                    tuple(meta + [id: "${meta.id}-${name_dysgu}"], bam, bai)
+                },
+            reference_genome_unzipped,
+            reference_genome_faidx,
+            [[:], []],  // sites - optional
+            [[:], []],  // bed - optional
+            [[:], []],  // search_bed - optional
+            [[:], []]   // exclude_bed - optional
         )
 
         SVYNC(
-            DYSGU.out.vcf
-                .join(DYSGU.out.tbi, by: 0)
+            DYSGU_RUN.out.vcf
+                .join(DYSGU_RUN.out.tbi, by: 0)
                 .map { meta, vcf, tbi ->
                     tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
@@ -73,7 +75,7 @@ workflow SV_CALLING_DYSGU {
             name_dysgu
         )
 
-        ch_versions = ch_versions.mix(DYSGU.out.versions.first())
+        ch_versions = ch_versions.mix(DYSGU_RUN.out.versions.first())
         ch_versions = ch_versions.mix(SVYNC.out.versions.first())
         ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 

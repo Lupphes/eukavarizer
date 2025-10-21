@@ -1,14 +1,10 @@
 # nf-core/eukavarizer: Documentation
 
-The `nf-core/eukavarizer` documentation is divided into the following pages:
+The nf-core/eukavarizer documentation is split into the following pages:
 
-- 📦 [**Usage**](usage.md)
-  Learn how to run the pipeline, choose appropriate profiles, supply input data, and configure parameters. This section also describes how the pipeline behaves and how to customise it for different organisms and data types.
+- [Usage](usage.md)
+  - An overview of how the pipeline works, how to run it and a description of all of the different command-line flags.
+- [Output](output.md)
+  - An overview of the different results produced by the pipeline and how to interpret them.
 
-- 📊 [**Output**](output.md)
-  Understand the structure and contents of the results directory. This includes details about structural variant (SV) calling outputs, merged VCF files, quality control reports (e.g. MultiQC), and statistics relevant for interpretation and downstream analysis.
-
----
-
-For additional information about setting up and working with nf-core pipelines, visit the official nf-core documentation at:
-👉 [https://nf-co.re](https://nf-co.re)
+You can find a lot more documentation about installing, configuring and running nf-core pipelines on the website: [https://nf-co.re](https://nf-co.re)

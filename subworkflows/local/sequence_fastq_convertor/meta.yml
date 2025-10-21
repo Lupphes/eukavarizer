@@ -11,11 +11,11 @@ keywords:
   - ont
   - pacbio
 components:
-  - TABIX_BGZIP
-  - SEQKIT_SIZE
-  - SRATOOLS_FASTERQDUMP
-  - DORADO
-  - BAM_CONVERT_SAMTOOLS
+  - tabix/bgzip
+  - seqkit/size
+  - sratools/fasterqdump
+  - dorado
+  - bam/convert/samtools
 input:
   - samplesheet:
       type: file

@@ -29,7 +29,7 @@
         bcfmerge_tbi              tuple(meta, tbi)       BCFtools VCF index
         bcfmerge_stats            tuple(meta, stats)     BCFtools statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondrej Sloup (Lupphes)
+    Author:   Ondřej Sloup (Lupphes)
     Contact:  ondrej.sloup@protonmail.com
     GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -41,7 +41,6 @@ include { SURVIVOR_FILTER       } from '../../../modules/nf-core/survivor/filter
 
 include { BCFTOOLS_CONCAT       } from '../../../modules/nf-core/bcftools/concat/main'
 include { BCFTOOLS_SORT         } from '../../../modules/nf-core/bcftools/sort/main'
-include { BCFTOOLS_MERGE        } from '../../../modules/nf-core/bcftools/merge/main'
 include { BCFTOOLS_STATS        } from '../../../modules/nf-core/bcftools/stats/main'
 include { BCFTOOLS_FILTER       } from '../../../modules/nf-core/bcftools/filter/main'
 

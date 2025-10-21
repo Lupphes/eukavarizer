@@ -7,9 +7,9 @@ keywords:
   - short-read
   - long-read
 components:
-  - DYSGU
-  - SVYNC
-  - SAMPLE_REHEADER
+  - dysgu/run
+  - svync
+  - sample/reheader
 input:
   - bam_inputs:
       type: file

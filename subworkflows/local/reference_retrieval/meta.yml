@@ -9,13 +9,13 @@ keywords:
   - minimap2
   - refseq
 components:
-  - BIODBCORE_REFSEQ
-  - GUNZIP
-  - BWA_INDEX
-  - BWAMEM2_INDEX
-  - MINIMAP2_INDEX
-  - TABIX_BGZIP
-  - SAMTOOLS_FAIDX
+  - biodbcore/refseq
+  - gunzip
+  - bwa/index
+  - bwamem2/index
+  - minimap2/index
+  - tabix/bgzip
+  - samtools/faidx
 input:
   - taxonomy_id:
       type: string
