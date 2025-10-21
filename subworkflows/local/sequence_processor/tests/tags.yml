@@ -1,0 +1,7 @@
+subworkflows/sequence_processor:
+  - subworkflows/local/sequence_processor/**
+  - subworkflows/local/sequence_fastq_convertor/**
+  - subworkflows/local/quality_control/**
+  - subworkflows/local/sequence_aligner/**
+  - subworkflows/local/sequence_merger/**
+  - modules/nf-core/samtools/stats/**

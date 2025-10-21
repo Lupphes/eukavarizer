@@ -1,22 +1,36 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GRIDSS_GRIDSS WORKFLOW
+    SUBWORKFLOW: SV_CALLING_GRIDSS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow calls structural variants (SVs) using GRIDSS for germline
-    and somatic samples:
-    1. **GRIDSS_GRIDSS** – Detects SVs using local assembly.
-    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF file.
+    High-precision structural variant detection using local assembly with GRIDSS
+    Read type: short-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects structural variants using GRIDSS's local assembly approach for germline
+        and somatic samples. Provides highly accurate breakpoint detection through local
+        assembly and split-read analysis, with optional variant annotation.
 
-    Outputs:
-    - `vcf`           – Reheaded VCF file.
-    - `vcfgz`         – Gzipped reheaded VCF file.
-    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
-    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
-    - `svync_vcf`     – Decompressed synchronized VCF file.
-    - `svync_vcfgz`   – Gzipped synchronized VCF file.
-    - `svync_tbi`     – Tabix index for the synchronized VCF.
+    Processing Steps:
+        1. GRIDSS_GRIDSS - Detects SVs using local assembly from BAM files
+        2. GRIDSS_ANNOTATE (optional) - Annotates SVs with additional information
+        3. SVYNC - Synchronizes and refines SV calls to standard format
+        4. SAMPLE_REHEADER - Reheaders and renames the output VCF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_inputs                    [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_unzipped     [meta, fasta]         Reference genome FASTA
+        reference_genome_faidx        [meta, fai]           Reference genome index
+        reference_genome_bwa_index    [meta, index_dir]     BWA reference index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf                           [meta, vcf]           Reheaded VCF file
+        vcfgz                         [meta, vcf.gz]        Gzipped VCF file
+        tbi                           [meta, tbi]           Tabix index
+        csi                           [meta, csi]           CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -33,6 +47,7 @@ workflow SV_CALLING_GRIDSS {
         reference_genome_bwa_index
 
     main:
+        ch_versions = Channel.empty()
         name_gridss = "gridss"
 
         GRIDSS_GRIDSS(
@@ -71,13 +86,20 @@ workflow SV_CALLING_GRIDSS {
 
         SAMPLE_REHEADER(
             SVYNC.out.vcf,
-            name_gridss,
-            ""
+            name_gridss
         )
+
+        ch_versions = ch_versions.mix(GRIDSS_GRIDSS.out.versions.first())
+        if (params.gridss_annotate) {
+            ch_versions = ch_versions.mix(GRIDSS_ANNOTATE.out.versions.first())
+        }
+        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
         vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

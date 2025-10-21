@@ -1,0 +1,117 @@
+nextflow_workflow {
+
+    name "Test Workflow REFERENCE_RETRIEVAL"
+    script "../main.nf"
+    workflow "REFERENCE_RETRIEVAL"
+    config "subworkflows/local/reference_retrieval/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "reference_retrieval"
+
+    test("Download from RefSeq - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            workflow {
+                """
+                input[0] = 4932  // yeast taxonomy ID
+                input[1] = "$outputDir"
+                input[2] = []    // no user-provided reference
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.reference_genome != null },
+                { assert workflow.out.reference_genome_unzipped != null },
+                { assert workflow.out.reference_genome_bgzipped != null },
+                { assert workflow.out.reference_genome_bwa_index != null },
+                { assert workflow.out.reference_genome_faidx != null },
+                { assert workflow.out.reference_genome_bgzipped_faidx != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("User-provided reference - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            workflow {
+                """
+                input[0] = 4932
+                input[1] = "$outputDir"
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz')
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.reference_genome != null },
+                { assert workflow.out.reference_genome_unzipped != null },
+                { assert workflow.out.reference_genome_bgzipped != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("BWA indexing path - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bwamem2 = false  // Use BWA not BWAMEM2
+            }
+            workflow {
+                """
+                input[0] = 4932
+                input[1] = "$outputDir"
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.reference_genome_bwa_index != null }
+            )
+        }
+    }
+
+    test("BWAMEM2 indexing path - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bwamem2 = true  // Use BWAMEM2
+            }
+            workflow {
+                """
+                input[0] = 4932
+                input[1] = "$outputDir"
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.reference_genome_bwa_index != null }
+            )
+        }
+    }
+}

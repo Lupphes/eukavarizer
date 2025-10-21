@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "REPORT_GENERATION"
+description: Generates comprehensive HTML reports for structural variant analysis results
+keywords:
+  - report
+  - structural variants
+  - visualization
+  - varify
+  - statistics
+components:
+  - VARIFY
+input:
+  - taxonomy_id:
+      type: string
+      description: NCBI taxonomy identifier
+  - outdir:
+      type: directory
+      description: Output directory path
+  - survivor_vcf:
+      type: file
+      description: SURVIVOR merged VCF file
+      pattern: "*.vcf"
+  - survivor_stats:
+      type: file
+      description: SURVIVOR statistics file
+      pattern: "*.stats"
+  - bcfmerge_vcf:
+      type: file
+      description: BCFtools merged VCF file
+      pattern: "*.vcf.gz"
+  - bcfmerge_tbi:
+      type: file
+      description: BCFtools VCF tabix index
+      pattern: "*.tbi"
+  - bcfmerge_stats:
+      type: file
+      description: BCFtools statistics file
+      pattern: "*.stats"
+  - vcf_list:
+      type: file
+      description: Individual SV caller VCF files
+      pattern: "*.vcf"
+  - tbi_list:
+      type: file
+      description: Individual SV caller tabix indexes
+      pattern: "*.tbi"
+  - reference_genome:
+      type: file
+      description: Reference genome FASTA file
+      pattern: "*.{fa,fasta}"
+  - samtools_stats:
+      type: file
+      description: Samtools alignment statistics
+      pattern: "*.stats"
+output:
+  - report_file:
+      type: file
+      description: Main HTML analysis report with SV visualizations and statistics
+      pattern: "*.html"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

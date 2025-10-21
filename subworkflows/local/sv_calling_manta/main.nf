@@ -1,37 +1,42 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    MANTA_GERMLINE WORKFLOW
+    SUBWORKFLOW: SV_CALLING_MANTA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow calls structural variants (SVs) using MANTA for germline samples:
-    1. **MANTA_GERMLINE** – Detects large deletions, inversions, and duplications.
-    2. **SAMPLE_REHEADER** – Reheaders and renames output VCF files.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF files.
+    Germline structural variant detection using Manta for paired-end Illumina data
+    Read type: short-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects large structural variants including deletions, inversions, and duplications
+        from germline samples using Manta. Outputs three separate VCF streams for small
+        indels, candidate SVs, and diploid SVs, each synchronized and standardized.
 
-    Outputs:
-    - `small_vcf`              – Reheaded VCF file for small indels.
-    - `small_vcfgz`            – Gzipped VCF for small indels.
-    - `small_tbi`              – Tabix index for small VCF.
-    - `small_csi`              – CSI index for small VCF (if generated).
-    - `svync_small_vcf`        – Decompressed synchronized small VCF.
-    - `svync_small_vcfgz`      – Gzipped synchronized small VCF.
-    - `svync_small_tbi`        – Tabix index for synchronized small VCF.
-
-    - `candidate_vcf`          – Reheaded VCF file for candidate SVs.
-    - `candidate_vcfgz`        – Gzipped VCF for candidate SVs.
-    - `candidate_tbi`          – Tabix index for candidate VCF.
-    - `candidate_csi`          – CSI index for candidate VCF (if generated).
-    - `svync_candidate_vcf`    – Decompressed synchronized candidate VCF.
-    - `svync_candidate_vcfgz`  – Gzipped synchronized candidate VCF.
-    - `svync_candidate_tbi`    – Tabix index for synchronized candidate VCF.
-
-    - `diploid_vcf`            – Reheaded VCF file for diploid SVs.
-    - `diploid_vcfgz`          – Gzipped VCF for diploid SVs.
-    - `diploid_tbi`            – Tabix index for diploid VCF.
-    - `diploid_csi`            – CSI index for diploid VCF (if generated).
-    - `svync_diploid_vcf`      – Decompressed synchronized diploid VCF.
-    - `svync_diploid_vcfgz`    – Gzipped synchronized diploid VCF.
-    - `svync_diploid_tbi`      – Tabix index for synchronized diploid VCF.
+    Processing Steps:
+        1. MANTA_GERMLINE - Detects SVs from paired-end BAM files
+        2. SVYNC (3x) - Synchronizes small indels, candidate SVs, and diploid SVs
+        3. SAMPLE_REHEADER (3x) - Reheaders and renames output VCFs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_inputs                    [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_unzipped     [meta, fasta]         Reference genome FASTA
+        reference_genome_faidx        [meta, fai]           Reference genome index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        small_vcf                     [meta, vcf]           Small indels VCF
+        small_vcfgz                   [meta, vcf.gz]        Small indels gzipped VCF
+        small_tbi                     [meta, tbi]           Small indels tabix index
+        small_csi                     [meta, csi]           Small indels CSI index
+        candidate_vcf                 [meta, vcf]           Candidate SV VCF
+        candidate_vcfgz               [meta, vcf.gz]        Candidate SV gzipped VCF
+        candidate_tbi                 [meta, tbi]           Candidate SV tabix index
+        candidate_csi                 [meta, csi]           Candidate SV CSI index
+        diploid_vcf                   [meta, vcf]           Diploid SV VCF
+        diploid_vcfgz                 [meta, vcf.gz]        Diploid SV gzipped VCF
+        diploid_tbi                   [meta, tbi]           Diploid SV tabix index
+        diploid_csi                   [meta, csi]           Diploid SV CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -45,9 +50,6 @@ include { SVYNC as INDEL_SVYNC                          } from '../../../modules
 include { SVYNC as SV_SVYNC                             } from '../../../modules/nf-core/svync/main'
 include { SVYNC as DIPLOID_SVYNC                        } from '../../../modules/nf-core/svync/main'
 
-include { GUNZIP as INDEL_GUNZIP                        } from '../../../modules/nf-core/gunzip/main'
-include { GUNZIP as SV_GUNZIP                           } from '../../../modules/nf-core/gunzip/main'
-include { GUNZIP as DIPLOID_GUNZIP                      } from '../../../modules/nf-core/gunzip/main'
 
 workflow SV_CALLING_MANTA {
     take:
@@ -56,6 +58,7 @@ workflow SV_CALLING_MANTA {
         reference_genome_faidx
 
     main:
+        ch_versions = Channel.empty()
         name_manta = "manta"
         name_manta_small = "small"
         name_manta_candidate = "candidate"
@@ -80,30 +83,11 @@ workflow SV_CALLING_MANTA {
             []
         )
 
-        // TODO: Make proper fix fox manta when VCF file completelly empty and don't rely first on REHEADER
-        INDELS_SAMPLE_REHEADER(
-            MANTA_GERMLINE.out.candidate_small_indels_vcf,
-            name_manta,
-            "-${name_manta_small}"
-        )
-
-        SV_SAMPLE_REHEADER(
-            MANTA_GERMLINE.out.candidate_sv_vcf,
-            name_manta,
-            "-${name_manta_candidate}"
-        )
-
-        DIPLOID_SAMPLE_REHEADER(
-            MANTA_GERMLINE.out.diploid_sv_vcf,
-            name_manta,
-            "-${name_manta_diploid}"
-        )
-
         INDEL_SVYNC(
-            INDELS_SAMPLE_REHEADER.out.vcf
-                .join(INDELS_SAMPLE_REHEADER.out.tbi, by: 0)
+            MANTA_GERMLINE.out.candidate_small_indels_vcf
+                .join(MANTA_GERMLINE.out.candidate_small_indels_vcf_tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-${name_manta_small}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
@@ -111,10 +95,10 @@ workflow SV_CALLING_MANTA {
         )
 
         SV_SVYNC(
-            SV_SAMPLE_REHEADER.out.vcf
-                .join(SV_SAMPLE_REHEADER.out.tbi, by: 0)
+            MANTA_GERMLINE.out.candidate_sv_vcf
+                .join(MANTA_GERMLINE.out.candidate_sv_vcf_tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-${name_manta_candidate}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
@@ -122,41 +106,53 @@ workflow SV_CALLING_MANTA {
         )
 
         DIPLOID_SVYNC(
-            DIPLOID_SAMPLE_REHEADER.out.vcf
-                .join(DIPLOID_SAMPLE_REHEADER.out.tbi, by: 0)
+            MANTA_GERMLINE.out.diploid_sv_vcf
+                .join(MANTA_GERMLINE.out.diploid_sv_vcf_tbi, by: 0)
                 .map { meta, vcf, tbi ->
-                    tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
+                    tuple(meta + [id: "${meta.id}-${name_manta_diploid}-svync"], vcf, tbi)
                 }
                 .combine(
                     Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
-        INDEL_GUNZIP(
-            INDEL_SVYNC.out.vcf
+        INDELS_SAMPLE_REHEADER(
+            INDEL_SVYNC.out.vcf,
+            name_manta
         )
 
-        SV_GUNZIP(
-            SV_SVYNC.out.vcf
+        SV_SAMPLE_REHEADER(
+            SV_SVYNC.out.vcf,
+            name_manta
         )
 
-        DIPLOID_GUNZIP(
-            DIPLOID_SVYNC.out.vcf
+        DIPLOID_SAMPLE_REHEADER(
+            DIPLOID_SVYNC.out.vcf,
+            name_manta
         )
+
+        ch_versions = ch_versions.mix(MANTA_GERMLINE.out.versions.first())
+        ch_versions = ch_versions.mix(INDEL_SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SV_SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(DIPLOID_SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(INDELS_SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(SV_SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(DIPLOID_SAMPLE_REHEADER.out.versions.first())
 
     emit:
-        small_vcf = INDEL_GUNZIP.out.gunzip
-        small_vcfgz = INDEL_SVYNC.out.vcf
-        small_tbi = INDEL_SVYNC.out.tbi
+        small_vcf = INDELS_SAMPLE_REHEADER.out.vcf
+        small_vcfgz = INDELS_SAMPLE_REHEADER.out.vcfgz
+        small_tbi = INDELS_SAMPLE_REHEADER.out.tbi
         small_csi = INDELS_SAMPLE_REHEADER.out.csi
 
-        candidate_vcf = SV_GUNZIP.out.gunzip
-        candidate_vcfgz = SV_SVYNC.out.vcf
-        candidate_tbi = SV_SVYNC.out.tbi
+        candidate_vcf = SV_SAMPLE_REHEADER.out.vcf
+        candidate_vcfgz = SV_SAMPLE_REHEADER.out.vcfgz
+        candidate_tbi = SV_SAMPLE_REHEADER.out.tbi
         candidate_csi = SV_SAMPLE_REHEADER.out.csi
 
-        diploid_vcf = DIPLOID_GUNZIP.out.gunzip
-        diploid_vcfgz = DIPLOID_SVYNC.out.vcf
-        diploid_tbi = DIPLOID_SVYNC.out.tbi
+        diploid_vcf = DIPLOID_SAMPLE_REHEADER.out.vcf
+        diploid_vcfgz = DIPLOID_SAMPLE_REHEADER.out.vcfgz
+        diploid_tbi = DIPLOID_SAMPLE_REHEADER.out.tbi
         diploid_csi = DIPLOID_SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

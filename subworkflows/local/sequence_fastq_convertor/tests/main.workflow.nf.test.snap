@@ -1,0 +1,177 @@
+{
+    "SRA input - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "sra",
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "single_end": false,
+                            "read_group": "\"@RG\\tID:sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        [
+                            "test_1.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test_2.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "tagged_collected_fastqs": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "sra",
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "single_end": false,
+                            "read_group": "\"@RG\\tID:sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        [
+                            "test_1.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test_2.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-19T02:02:12.302806991"
+    },
+    "FASTQ.GZ input - paired end - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": false,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        [
+                            "test_1.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec",
+                            "test_2.fastq.gz:md5,2ebae722295ea66d84075a3b042e2b42"
+                        ]
+                    ]
+                ],
+                "tagged_collected_fastqs": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": false,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        [
+                            "test_1.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec",
+                            "test_2.fastq.gz:md5,2ebae722295ea66d84075a3b042e2b42"
+                        ]
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:58:57.412867116"
+    },
+    "CRAM input - stub": {
+        "content": [
+            {
+                "0": [
+                    
+                ],
+                "tagged_collected_fastqs": [
+                    
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-19T02:01:34.257683824"
+    },
+    "BAM input - stub": {
+        "content": [
+            {
+                "0": [
+                    
+                ],
+                "tagged_collected_fastqs": [
+                    
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-19T02:01:21.216510167"
+    },
+    "FASTQ.GZ input - single end - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        "test_1.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec"
+                    ]
+                ],
+                "tagged_collected_fastqs": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "flowcell": "FC1",
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\"",
+                            "median_bp": 0
+                        },
+                        "test_1.fastq.gz:md5,4161df271f9bfcd25d5845a1e220dbec"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:58:49.613050902"
+    }
+}

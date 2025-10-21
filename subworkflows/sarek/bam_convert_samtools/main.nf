@@ -45,7 +45,7 @@ workflow BAM_CONVERT_SAMTOOLS {
         .join(SAMTOOLS_VIEW_MAP_UNMAP.out.bam.mix(SAMTOOLS_VIEW_MAP_UNMAP.out.cram), failOnDuplicate: true, remainder: true)
         .map{ meta, unmap_unmap, unmap_map, map_unmap -> [ meta, [ unmap_unmap, unmap_map, map_unmap ] ] }
 
-    SAMTOOLS_MERGE_UNMAP(all_unmapped_bam, fasta, fasta_fai)
+    SAMTOOLS_MERGE_UNMAP(all_unmapped_bam, fasta, fasta_fai, [[],[]])
 
     // Collate & convert unmapped
     COLLATE_FASTQ_UNMAP(SAMTOOLS_MERGE_UNMAP.out.bam.mix(SAMTOOLS_MERGE_UNMAP.out.cram), fasta, interleaved)

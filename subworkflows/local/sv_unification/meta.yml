@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SV_UNIFICATION"
+description: Merges and unifies structural variant calls from multiple callers
+keywords:
+  - structural variants
+  - merging
+  - consensus
+  - survivor
+  - bcftools
+  - unification
+components:
+  - SURVIVOR_MERGE
+  - SURVIVOR_FILTER
+  - SURVIVOR_STATS
+  - BCFTOOLS_CONCAT
+  - BCFTOOLS_SORT
+  - BCFTOOLS_MERGE
+  - BCFTOOLS_FILTER
+  - BCFTOOLS_STATS
+input:
+  - vcf_list:
+      type: file
+      description: Individual SV caller VCF files
+      pattern: "*.vcf"
+  - vcfgz_list:
+      type: file
+      description: Compressed SV caller VCF files
+      pattern: "*.vcf.gz"
+  - tbi_list:
+      type: file
+      description: Tabix index files for VCF files
+      pattern: "*.tbi"
+  - reference_genome_bgzipped:
+      type: file
+      description: Bgzipped reference genome FASTA file
+      pattern: "*.fa.gz"
+output:
+  - survivor_vcf:
+      type: file
+      description: SURVIVOR merged and filtered VCF file
+      pattern: "*.vcf"
+  - survivor_stats:
+      type: file
+      description: SURVIVOR statistics file
+      pattern: "*.stats"
+  - bcfmerge_vcf:
+      type: file
+      description: BCFtools merged and filtered VCF file
+      pattern: "*.vcf.gz"
+  - bcfmerge_tbi:
+      type: file
+      description: Tabix index for BCFtools merged VCF
+      pattern: "*.tbi"
+  - bcfmerge_stats:
+      type: file
+      description: BCFtools statistics file
+      pattern: "*.stats"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

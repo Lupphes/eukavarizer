@@ -1,0 +1,115 @@
+nextflow_workflow {
+
+    name "Test Workflow SEQUENCE_FASTQ_CONVERTOR"
+    script "../main.nf"
+    workflow "SEQUENCE_FASTQ_CONVERTOR"
+    config "subworkflows/local/sequence_fastq_convertor/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sequence_fastq_convertor"
+
+    test("FASTQ.GZ input - single end - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: true, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true)
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.tagged_collected_fastqs != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("FASTQ.GZ input - paired end - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.tagged_collected_fastqs != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Uncompressed FASTQ input - paired end - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq', single_end: false, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.tagged_collected_fastqs != null }
+            )
+        }
+    }
+
+    test("SRA input - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'sra', sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/sra/SRR13255544.tar.gz', checkIfExists: true)
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.tagged_collected_fastqs != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

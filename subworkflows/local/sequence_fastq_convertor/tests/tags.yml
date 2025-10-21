@@ -1,0 +1,8 @@
+subworkflows/sequence_fastq_convertor:
+  - subworkflows/local/sequence_fastq_convertor/**
+  - modules/nf-core/tabix/bgzip/**
+  - modules/local/seqkit/size/**
+  - modules/nf-core/sratools/fasterqdump/**
+  - modules/local/dorado/**
+  - subworkflows/sarek/bam_convert_samtools/**
+  - modules/nf-core/samtools/collatefastq/**

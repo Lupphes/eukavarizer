@@ -1,0 +1,214 @@
+nextflow_workflow {
+
+    name "Test Workflow QUALITY_CONTROL"
+    script "../main.nf"
+    workflow "QUALITY_CONTROL"
+    config "subworkflows/local/quality_control/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "quality_control"
+
+    test("Short reads (Illumina) - FASTP + BBDUK - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = true
+                multiqc_flag = true
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.fastqc_report != null },
+                { assert workflow.out.multiqc_report != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Long reads (ONT) - FASTPLONG only - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = false
+                seqtk_flag = false
+                fastqc_flag = true
+                multiqc_flag = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_ont', single_end: true, platform: 'ont', median_bp: 5000],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Mixed platform data - FASTP and FASTPLONG - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'short_read', single_end: false, platform: 'illumina', median_bp: 150],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ],
+                    [
+                        [id: 'long_read', single_end: true, platform: 'ont', median_bp: 5000],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
+                    ]
+                )
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null }
+            )
+        }
+    }
+
+    test("SEQTK subsampling enabled - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = true
+                seqtk_size = 10000
+                fastqc_flag = true
+                multiqc_flag = true
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Platform detection by median_bp - short reads - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_short', single_end: false, median_bp: 150],  // No platform, should use FASTP
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null }
+            )
+        }
+    }
+
+    test("Platform detection by median_bp - long reads - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = false
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_long', single_end: true, median_bp: 5000],  // No platform, should use FASTPLONG
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null }
+            )
+        }
+    }
+}

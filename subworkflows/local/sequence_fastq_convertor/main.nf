@@ -1,3 +1,37 @@
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SUBWORKFLOW: SEQUENCE_FASTQ_CONVERTOR
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Converts various sequencing formats to compressed FASTQ format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This subworkflow handles conversion of multiple sequencing data formats into
+        standardized compressed FASTQ files. It processes FASTQ, BAM, CRAM, SRA, ONT,
+        and PacBio formats, adding read group information and calculating sequence statistics.
+
+    Processing Steps:
+        1. Branch input by data type (FASTQ, BAM, CRAM, SRA, FAST5, POD5, BAX.H5)
+        2. Compress uncompressed FASTQ files using bgzip
+        3. Convert BAM/CRAM to FASTQ using Samtools
+        4. Download and convert SRA files using SRA-tools
+        5. Basecall ONT data (FAST5/POD5) using Dorado
+        6. Calculate median read length using SeqKit
+        7. Add read group metadata to all outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        samplesheet               tuple(meta, files)     Input sequencing data
+        reference_genome_unzipped tuple(meta, fasta)     Reference genome for CRAM
+        reference_genome_bwa_index tuple(meta, fai)      FASTA index for CRAM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        tagged_collected_fastqs   tuple(meta, fastq)     Compressed FASTQ with metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondrej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 include { TABIX_BGZIP as TABIX_BGZIP_SINGLE_FASTQ               } from '../../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_DOUBLE_1                   } from '../../../modules/nf-core/tabix/bgzip/main'
 include { TABIX_BGZIP as TABIX_BGZIP_DOUBLE_2                   } from '../../../modules/nf-core/tabix/bgzip/main'
@@ -17,6 +51,8 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
         reference_genome_bwa_index
 
     main:
+    ch_versions = Channel.empty()
+
     input_sample_type = samplesheet.branch{
             fastq_gz:           it[0].data_type == "fastq_gz"
             fastq:              it[0].data_type == "fastq"
@@ -114,8 +150,15 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
             tuple(meta + [median_bp: length], fastq)
         }
 
+        ch_versions = ch_versions.mix(TABIX_BGZIP_SINGLE_FASTQ.out.versions.first())
+        ch_versions = ch_versions.mix(SEQKIT_SIZE.out.versions.first())
+        ch_versions = ch_versions.mix(SRATOOLS_FASTERQDUMP.out.versions.first())
+        ch_versions = ch_versions.mix(DORADO_FAST5.out.versions.first())
+        ch_versions = ch_versions.mix(BAM_SAMTOOLS_COLLATEFASTQ.out.versions.first())
+
     emit:
         tagged_collected_fastqs
+        versions = ch_versions
 }
 
 /*

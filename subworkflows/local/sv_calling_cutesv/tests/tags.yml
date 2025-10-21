@@ -1,0 +1,5 @@
+subworkflows/sv_calling_cutesv:
+  - subworkflows/local/sv_calling_cutesv/**
+  - modules/nf-core/cutesv/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

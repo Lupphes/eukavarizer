@@ -1,0 +1,10 @@
+subworkflows/sequence_merger:
+  - subworkflows/local/sequence_merger/**
+  - modules/nf-core/samtools/merge/**
+  - modules/nf-core/samtools/index/**
+  - modules/nf-core/gatk4/markduplicates/**
+  - modules/nf-core/gatk4/baserecalibrator/**
+  - modules/nf-core/gatk4/applybqsr/**
+  - modules/nf-core/gatk4spark/markduplicates/**
+  - modules/nf-core/gatk4spark/baserecalibrator/**
+  - modules/nf-core/gatk4spark/applybqsr/**

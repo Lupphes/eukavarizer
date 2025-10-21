@@ -1,0 +1,41 @@
+{
+    "Single BAM - no deduplication - no recalibration - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "single_end": false,
+                            "n_fastq": 1
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam",
+                        "test.paired_end.sorted.bam.bai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "bam_bai": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "platform": "illumina",
+                            "single_end": false,
+                            "n_fastq": 1
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam",
+                        "test.paired_end.sorted.bam.bai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:59:56.707118408"
+    }
+}

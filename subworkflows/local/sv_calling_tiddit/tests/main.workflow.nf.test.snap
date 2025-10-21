@@ -1,0 +1,117 @@
+{
+    "Illumina paired-end BAM input - BWA - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "csi": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbi": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcfgz": [
+                    [
+                        {
+                            "id": "test-tiddit-svync",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 150,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-illumina-false-tiddit.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-19T12:32:12.339937931"
+    }
+}

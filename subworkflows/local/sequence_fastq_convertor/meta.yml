@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SEQUENCE_FASTQ_CONVERTOR"
+description: Converts various sequencing formats to compressed FASTQ format
+keywords:
+  - conversion
+  - fastq
+  - bam
+  - cram
+  - sra
+  - basecalling
+  - ont
+  - pacbio
+components:
+  - TABIX_BGZIP
+  - SEQKIT_SIZE
+  - SRATOOLS_FASTERQDUMP
+  - DORADO
+  - BAM_CONVERT_SAMTOOLS
+input:
+  - samplesheet:
+      type: file
+      description: Input sequencing data in various formats
+      pattern: "*.{fastq,fq,bam,cram,sra,fast5,pod5}"
+  - reference_genome_unzipped:
+      type: file
+      description: Uncompressed reference genome for CRAM conversion
+      pattern: "*.{fa,fasta}"
+  - reference_genome_bwa_index:
+      type: file
+      description: FASTA index for CRAM conversion
+      pattern: "*.fai"
+output:
+  - tagged_collected_fastqs:
+      type: file
+      description: Compressed FASTQ files with metadata and read group information
+      pattern: "*.fastq.gz"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

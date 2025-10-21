@@ -1,0 +1,5 @@
+subworkflows/sv_calling_dysgu:
+  - subworkflows/local/sv_calling_dysgu/**
+  - modules/nf-core/dysgu/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

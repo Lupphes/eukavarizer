@@ -1,21 +1,33 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CUTESV WORKFLOW
+    SUBWORKFLOW: SV_CALLING_CUTESV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow calls structural variants (SVs) using CuteSV for long-read data:
-    1. **CUTESV** – Detects SVs using split-read and coverage-based methods.
-    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF file.
+    Fast and accurate long-read structural variant detection using cuteSV
+    Read type: long-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects structural variants from long-read sequencing data (PacBio/Nanopore)
+        using cuteSV's efficient signature-clustering algorithm. Provides fast and accurate
+        SV calling optimized for long-read data with low computational requirements.
 
-    Outputs:
-    - `vcf`           – Reheaded VCF file.
-    - `vcfgz`         – Gzipped reheaded VCF file.
-    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
-    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
-    - `svync_vcf`     – Decompressed synchronized VCF file.
-    - `svync_vcfgz`   – Gzipped synchronized VCF file.
-    - `svync_tbi`     – Tabix index for the synchronized VCF.
+    Processing Steps:
+        1. CUTESV - Calls SVs from long-read BAM files
+        2. SVYNC - Synchronizes and refines SV calls to standard format
+        3. SAMPLE_REHEADER - Reheaders and renames the output VCF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_inputs                    [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_bgzipped     [meta, fasta.gz]      Bgzipped reference genome
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf                           [meta, vcf]           Reheaded VCF file
+        vcfgz                         [meta, vcf.gz]        Gzipped VCF file
+        tbi                           [meta, tbi]           Tabix index
+        csi                           [meta, csi]           CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -29,6 +41,7 @@ workflow SV_CALLING_CUTESV {
         reference_genome_bgzipped
 
     main:
+        ch_versions = Channel.empty()
         name_cutesv = "cutesv"
 
         CUTESV(
@@ -50,13 +63,17 @@ workflow SV_CALLING_CUTESV {
 
         SAMPLE_REHEADER(
             SVYNC.out.vcf,
-            name_cutesv,
-            ""
+            name_cutesv
         )
+
+        ch_versions = ch_versions.mix(CUTESV.out.versions.first())
+        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
         vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

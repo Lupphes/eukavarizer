@@ -1,3 +1,34 @@
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    SUBWORKFLOW: SEQUENCE_ALIGNER
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Aligns filtered FASTQ reads to a reference genome using BWA, BWA-MEM2, or Minimap2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This subworkflow aligns sequencing reads to a reference genome using different
+        alignment tools based on configuration. It handles grouping of reads from the
+        same sample to prevent workflow stalling and supports multiple alignment strategies.
+
+    Processing Steps:
+        1. Calculate number of lanes per sample and create grouping keys
+        2. Branch reads to appropriate aligner (BWA, BWA-MEM2, or Minimap2)
+        3. Perform alignment with selected tool
+        4. Merge aligned BAM files and group by sample
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        fastq_filtered            tuple(meta, reads)     Filtered FASTQ files
+        reference_genome_unzipped tuple(meta, fasta)     Uncompressed reference genome
+        reference_genome_bwa_index tuple(meta, index)    BWA/BWA-MEM2 index files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        bam_mapped                tuple(meta, bam)       Aligned BAM files grouped by sample
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondrej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
 include { BWAMEM2_MEM           } from '../../../modules/nf-core/bwamem2/mem/main'
 include { BWA_MEM               } from '../../../modules/nf-core/bwa/mem/main'
@@ -9,6 +40,8 @@ workflow SEQUENCE_ALIGNER {
         reference_genome_bwa_index
 
     main:
+        ch_versions = Channel.empty()
+
         // THIS HAS BEEN ADAPTED FROM NF_CORE/SAREK
         // STEP 1: MAPPING READS TO REFERENCE GENOME
         // First, we must calculate number of lanes for each sample (meta.n_fastq)
@@ -61,6 +94,9 @@ workflow SEQUENCE_ALIGNER {
         )
 
         mixed_bam_inputs = BWA_MEM.out.bam.mix(BWAMEM2_MEM.out.bam).mix(MINIMAP2_ALIGN.out.bam)
+        ch_versions = ch_versions.mix(BWA_MEM.out.versions.first())
+        ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions.first())
+        ch_versions = ch_versions.mix(MINIMAP2_ALIGN.out.versions.first())
 
         // Grouping the bams from the same samples not to stall the workflow
         // Use groupKey to make sure that the correct group can advance as soon as it is complete
@@ -89,4 +125,5 @@ workflow SEQUENCE_ALIGNER {
 
     emit:
         bam_mapped = bam_mapped
+        versions = ch_versions
 }

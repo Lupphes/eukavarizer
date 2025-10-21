@@ -1,0 +1,5 @@
+subworkflows/sequence_aligner:
+  - subworkflows/local/sequence_aligner/**
+  - modules/nf-core/bwa/mem/**
+  - modules/nf-core/bwamem2/mem/**
+  - modules/nf-core/minimap2/align/**

@@ -1,0 +1,77 @@
+nextflow_workflow {
+
+    name "Test Workflow REPORT_GENERATION"
+    script "../main.nf"
+    workflow "REPORT_GENERATION"
+    config "subworkflows/local/report_generation/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "report_generation"
+
+    test("Generate report with merged VCFs - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = 4932  // Yeast taxonomy ID
+                input[1] = "$outputDir"
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[3] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[4] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)
+                input[5] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)
+                input[6] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[7] = Channel.of(
+                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)],
+                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test2.genome.vcf.gz', checkIfExists: true)]
+                )
+                input[8] = Channel.of(
+                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)],
+                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test2.genome.vcf.gz.tbi', checkIfExists: true)]
+                )
+                input[9] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[10] = Channel.of(
+                    [[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.stats', checkIfExists: true)]
+                )
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.report_file != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Generate report with minimal inputs - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = 4932
+                input[1] = "$outputDir"
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[3] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[4] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)
+                input[5] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)
+                input[6] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
+                input[7] = Channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)])
+                input[8] = Channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)])
+                input[9] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[10] = Channel.of([[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.stats', checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.report_file != null }
+            )
+        }
+    }
+}

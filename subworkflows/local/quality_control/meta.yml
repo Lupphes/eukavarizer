@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "QUALITY_CONTROL"
+description: Performs comprehensive quality control, trimming, and filtering of FASTQ files
+keywords:
+  - quality control
+  - trimming
+  - filtering
+  - fastp
+  - fastplong
+  - bbduk
+components:
+  - FASTQC_MULTIQC_ANALYSIS
+  - FASTP
+  - FASTPLONG
+  - BBMAP_BBDUK
+  - SEQTK_SAMPLE
+input:
+  - fastq_files:
+      type: file
+      description: Input FASTQ files for quality control
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+output:
+  - fastq_filtered:
+      type: file
+      description: Filtered and trimmed FASTQ files
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - fastqc_report:
+      type: file
+      description: FastQC quality control reports
+      pattern: "*.html"
+  - multiqc_report:
+      type: file
+      description: MultiQC aggregated quality control report
+      pattern: "multiqc_report.html"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

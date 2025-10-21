@@ -1,0 +1,5 @@
+subworkflows/sv_calling_tiddit:
+  - subworkflows/local/sv_calling_tiddit/**
+  - modules/nf-core/tiddit/sv/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

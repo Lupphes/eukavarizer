@@ -1,0 +1,101 @@
+{
+    "ONT BAM input - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "csi": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbi": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcfgz": [
+                    [
+                        {
+                            "id": "test-cutesv-svync",
+                            "single_end": true,
+                            "sample": "sample1",
+                            "patient": "patient1"
+                        },
+                        "re-sample1-null-true-cutesv.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-19T02:39:00.115927297"
+    }
+}

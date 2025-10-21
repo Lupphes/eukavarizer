@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SEQUENCE_PROCESSOR"
+description: Complete sequencing data processing pipeline from raw data to analysis-ready BAM files
+keywords:
+  - pipeline
+  - processing
+  - alignment
+  - quality control
+  - bam
+components:
+  - SEQUENCE_FASTQ_CONVERTOR
+  - QUALITY_CONTROL
+  - SEQUENCE_ALIGNER
+  - SEQUENCE_MERGER
+  - SAMTOOLS_STATS
+input:
+  - samplesheet:
+      type: file
+      description: Input sequencing data in various formats
+      pattern: "*.{fastq,fq,bam,cram,sra,fast5,pod5}"
+  - reference_genome_unzipped:
+      type: file
+      description: Uncompressed reference genome FASTA file
+      pattern: "*.{fa,fasta}"
+  - reference_genome_bwa_index:
+      type: file
+      description: BWA or BWA-MEM2 index files
+      pattern: "*.{amb,ann,bwt,pac,sa}"
+output:
+  - fastq_filtered:
+      type: file
+      description: Quality-filtered FASTQ files
+      pattern: "*.fastq.gz"
+  - bam_bai:
+      type: file
+      description: Sorted, deduplicated BAM files with index
+      pattern: "*.{bam,bai}"
+  - samtools_stats:
+      type: file
+      description: Samtools alignment statistics
+      pattern: "*.stats"
+  - multiqc_report:
+      type: file
+      description: MultiQC quality control report
+      pattern: "multiqc_report.html"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

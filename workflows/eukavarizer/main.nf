@@ -1,20 +1,42 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    EUKAVARIZER WORKFLOW
-    Structural Variant (SV) calling pipeline for short- and long-read sequencing data.
-    This workflow integrates multiple SV callers:
-    - Delly, Manta, GRIDSS, Dysgu, TIDDIT, SvABA – for short reads
-    - Sniffles, CuteSV – for long reads
-    - Delly, Dysgu can also be used for long reads
+    WORKFLOW: EUKAVARIZER
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Multi-caller structural variant (SV) detection pipeline for eukaryotic genomes.
+    Supports both short-read and long-read sequencing data.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This workflow orchestrates multiple SV calling algorithms and consolidates
+        their outputs into unified VCF files ready for downstream analysis.
 
-    The outputs of this workflow include all synchronized and filtered VCFs along with
-    their associated index files and metadata.
+    Supported SV Callers:
+        Short-read:  Delly, Manta, GRIDSS, Dysgu, TIDDIT, SvABA
+        Long-read:   Sniffles, CuteSV
+        Both:        Delly, Dysgu
 
-    Outputs:
-    - `vcf_list`     – List of synchronized VCF files (decompressed).
-    - `vcfgz_list`   – List of synchronized and compressed VCF files (.vcf.gz).
-    - `tbi_list`     – List of Tabix index files (.tbi) corresponding to the compressed VCFs.
-    - `meta_list`    – List of metadata maps for each variant call, used for downstream merging.
+    Processing Steps:
+        1. Conditionally execute SV callers based on pipeline parameters
+        2. Collect and synchronize VCF outputs from all enabled callers
+        3. Generate compressed VCF files with Tabix indices
+        4. Aggregate metadata for downstream merging and reporting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_bai                       [meta, bam, bai]  Aligned BAM + index
+        reference_genome_bgzipped     [path]            Bgzipped FASTA (*.fa.gz)
+        reference_genome_faidx        [path]            FASTA index (*.fai)
+        reference_genome_bwa_index    [path]            BWA/BWA-MEM2 indices
+        reference_genome_unzipped     [path]            Uncompressed FASTA
+        reference_genome_minimap_index[path]            Minimap2 index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf_list                      [meta, vcf]       Decompressed VCF files
+        vcfgz_list                    [meta, vcf.gz]    Compressed VCF files
+        tbi_list                      [meta, tbi]       Tabix indices
+        meta_list                     [meta]            Metadata for merging
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

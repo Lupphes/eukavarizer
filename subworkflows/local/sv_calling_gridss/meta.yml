@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SV_CALLING_GRIDSS"
+description: Short-read structural variant detection using GRIDSS with de Bruijn graph assembly
+keywords:
+  - structural variants
+  - short-read
+  - gridss
+  - illumina
+  - assembly
+components:
+  - GRIDSS_GRIDSS
+  - GRIDSS_ANNOTATE
+  - SVYNC
+  - SAMPLE_REHEADER
+input:
+  - bam_inputs:
+      type: file
+      description: Aligned BAM files with corresponding index files
+      pattern: "*.{bam,bai}"
+  - reference_genome_bgzipped:
+      type: file
+      description: Bgzipped reference genome FASTA file
+      pattern: "*.fa.gz"
+output:
+  - vcf:
+      type: file
+      description: Structural variant calls in VCF format
+      pattern: "*.vcf"
+  - vcfgz:
+      type: file
+      description: Compressed VCF file
+      pattern: "*.vcf.gz"
+  - tbi:
+      type: file
+      description: Tabix index for VCF
+      pattern: "*.tbi"
+  - csi:
+      type: file
+      description: CSI index for VCF
+      pattern: "*.csi"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

@@ -1,15 +1,28 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    FASTQC_MULTIQC_ANALYSIS WORKFLOW
+    SUBWORKFLOW: FASTQC_MULTIQC_ANALYSIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow runs quality control and summarises the results:
-    1. **FASTQC** – Runs FastQC on raw FASTQ files (if enabled).
-    2. **MULTIQC** – Aggregates reports from FastQC and other sources (if enabled).
+    Generates comprehensive quality control reports for sequencing data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This subworkflow runs FastQC on FASTQ files and aggregates results with MultiQC
+        to produce comprehensive quality control reports. It also collects software versions
+        for reproducibility tracking.
 
-    Outputs:
-    - `fastqc_report` – FastQC report (if enabled).
-    - `multiqc_report` – MultiQC report (if enabled).
-    - `versions` – Collected software versions for reproducibility.
+    Processing Steps:
+        1. Run FastQC on FASTQ files (if enabled)
+        2. Collect software versions for all tools
+        3. Aggregate FastQC and other tool reports with MultiQC (if enabled)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        fastq_files               tuple(meta, fastq)     Input FASTQ files for QC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        multiqc_report            path(html)             Aggregated MultiQC report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondrej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 

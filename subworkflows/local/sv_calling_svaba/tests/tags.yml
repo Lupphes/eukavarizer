@@ -1,0 +1,6 @@
+subworkflows/sv_calling_svaba:
+  - subworkflows/local/sv_calling_svaba/**
+  - modules/nf-core/svaba/**
+  - modules/local/svaba/annotate/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

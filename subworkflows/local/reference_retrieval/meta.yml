@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "REFERENCE_RETRIEVAL"
+description: Downloads, processes, and indexes reference genome files for alignment and variant calling
+keywords:
+  - reference genome
+  - fasta
+  - index
+  - bwa
+  - minimap2
+  - refseq
+components:
+  - BIODBCORE_REFSEQ
+  - GUNZIP
+  - BWA_INDEX
+  - BWAMEM2_INDEX
+  - MINIMAP2_INDEX
+  - TABIX_BGZIP
+  - SAMTOOLS_FAIDX
+input:
+  - taxonomy_id:
+      type: string
+      description: NCBI taxonomy identifier for genome retrieval
+  - outdir:
+      type: directory
+      description: Output directory path
+  - reference_genome:
+      type: file
+      description: Optional pre-downloaded reference genome FASTA file
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+output:
+  - reference_genome:
+      type: file
+      description: Original reference genome FASTA file
+      pattern: "*.{fa,fasta}.gz"
+  - reference_genome_unzipped:
+      type: file
+      description: Uncompressed reference genome FASTA file
+      pattern: "*.{fa,fasta}"
+  - reference_genome_bgzipped:
+      type: file
+      description: Bgzipped reference genome FASTA file
+      pattern: "*.{fa,fasta}.gz"
+  - reference_genome_bwa_index:
+      type: file
+      description: BWA or BWA-MEM2 alignment index files
+      pattern: "*.{amb,ann,bwt,pac,sa}"
+  - reference_genome_minimap_index:
+      type: file
+      description: Minimap2 alignment index file
+      pattern: "*.mmi"
+  - reference_genome_faidx:
+      type: file
+      description: FASTA index for uncompressed genome
+      pattern: "*.fai"
+  - reference_genome_bgzipped_faidx:
+      type: file
+      description: FASTA index for bgzipped genome
+      pattern: "*.fai"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

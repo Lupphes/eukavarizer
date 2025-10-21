@@ -1,21 +1,35 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    TIDDIT_SV WORKFLOW
+    SUBWORKFLOW: SV_CALLING_TIDDIT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow detects structural variants (SVs) using TIDDIT and processes the output:
-    1. **TIDDIT_SV** – Detects SVs from BAM files using a coverage-based approach.
-    2. **SAMPLE_REHEADER** – Renames and reheaders the VCF output.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF file.
+    Coverage-based structural variant detection using TIDDIT for paired-end reads
+    Read type: short-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects structural variants using TIDDIT's coverage-based approach combined with
+        paired-end and split-read analysis. Supports both BWA and Minimap2 aligned data
+        for paired-end Illumina sequencing.
 
-    Outputs:
-    - `vcf`           – Reheaded VCF file.
-    - `vcfgz`         – Gzipped reheaded VCF file.
-    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
-    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
-    - `svync_vcf`     – Decompressed synchronized VCF file.
-    - `svync_vcfgz`   – Gzipped synchronized VCF file.
-    - `svync_tbi`     – Tabix index for the synchronized VCF.
+    Processing Steps:
+        1. TIDDIT_SV (BWA/MAP) - Detects SVs from paired-end BAM files
+        2. SVYNC - Synchronizes and refines SV calls to standard format
+        3. SAMPLE_REHEADER - Reheaders and renames the output VCF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_inputs                    [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_bgzipped     [meta, fasta.gz]      Bgzipped reference genome
+        reference_genome_bwa_index    [meta, index_dir]     BWA reference index
+        reference_genome_minimap_index [meta, mmi]          Minimap2 reference index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf                           [meta, vcf]           Reheaded VCF file
+        vcfgz                         [meta, vcf.gz]        Gzipped VCF file
+        tbi                           [meta, tbi]           Tabix index
+        csi                           [meta, csi]           CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -32,6 +46,7 @@ workflow SV_CALLING_TIDDIT {
         reference_genome_minimap_index
 
     main:
+        ch_versions = Channel.empty()
         name_tiddit = "tiddit"
 
         TIDDIT_BWA(
@@ -85,13 +100,18 @@ workflow SV_CALLING_TIDDIT {
 
         SAMPLE_REHEADER(
             SVYNC.out.vcf,
-            name_tiddit,
-            ""
+            name_tiddit
         )
+
+        ch_versions = ch_versions.mix(TIDDIT_BWA.out.versions.first())
+        ch_versions = ch_versions.mix(TIDDIT_MAP.out.versions.first())
+        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
         vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

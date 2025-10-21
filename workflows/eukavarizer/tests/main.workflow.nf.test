@@ -1,0 +1,308 @@
+nextflow_workflow {
+
+    name "Test Workflow EUKAVARIZER"
+    script "../main.nf"
+    workflow "EUKAVARIZER"
+    config "workflows/eukavarizer/tests/nextflow.config"
+    tag "workflows"
+    tag "eukavarizer"
+
+    test("All SV callers enabled - Illumina - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = true
+                manta_flag = true
+                gridss_flag = true
+                dysgu_flag = true
+                tiddit_flag = true
+                svaba_flag = true
+                sniffles_flag = true
+                cutesv_flag = true
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+
+    test("Only short-read SV callers - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = true
+                manta_flag = true
+                gridss_flag = true
+                dysgu_flag = true
+                tiddit_flag = true
+                svaba_flag = true
+                sniffles_flag = false
+                cutesv_flag = false
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf_list != null },
+                { assert workflow.out.vcfgz_list != null },
+                { assert workflow.out.tbi_list != null }
+            )
+        }
+    }
+
+    test("Only long-read SV callers - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = false
+                manta_flag = false
+                gridss_flag = false
+                dysgu_flag = false
+                tiddit_flag = false
+                svaba_flag = false
+                sniffles_flag = true
+                cutesv_flag = true
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_ont', single_end: true, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf_list != null },
+                { assert workflow.out.vcfgz_list != null },
+                { assert workflow.out.tbi_list != null }
+            )
+        }
+    }
+
+    test("Single SV caller - DELLY only - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = true
+                manta_flag = false
+                gridss_flag = false
+                dysgu_flag = false
+                tiddit_flag = false
+                svaba_flag = false
+                sniffles_flag = false
+                cutesv_flag = false
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf_list != null },
+                { assert workflow.out.vcfgz_list != null },
+                { assert workflow.out.tbi_list != null }
+            )
+        }
+    }
+
+    test("SVABA filtered by BWAMEM2 - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = false
+                manta_flag = false
+                gridss_flag = false
+                dysgu_flag = false
+                tiddit_flag = false
+                svaba_flag = true
+                sniffles_flag = false
+                cutesv_flag = false
+                bwamem2 = true
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = true
+                manta_flag = true
+                gridss_flag = false
+                dysgu_flag = false
+                tiddit_flag = false
+                svaba_flag = false
+                sniffles_flag = false
+                cutesv_flag = false
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'sample1', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ],
+                    [
+                        [id: 'sample2', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample2', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf_list != null },
+                { assert workflow.out.vcfgz_list != null },
+                { assert workflow.out.tbi_list != null }
+            )
+        }
+    }
+
+    test("No SV callers enabled - empty output - stub") {
+        options '-stub'
+
+        when {
+            params {
+                delly_flag = false
+                manta_flag = false
+                gridss_flag = false
+                dysgu_flag = false
+                tiddit_flag = false
+                svaba_flag = false
+                sniffles_flag = false
+                cutesv_flag = false
+                bwamem2 = false
+                minimap2_flag = false
+                long_read_threshold = 300
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[], []])
+                input[4] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[5] = Channel.value([[], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+}

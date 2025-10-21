@@ -1,0 +1,192 @@
+nextflow_workflow {
+
+    name "Test Workflow SEQUENCE_MERGER"
+    script "../main.nf"
+    workflow "SEQUENCE_MERGER"
+    config "subworkflows/local/sequence_merger/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sequence_merger"
+
+    test("Single BAM - no deduplication - no recalibration - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = false
+                recalibrate_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Multiple BAMs - merge - no deduplication - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = false
+                recalibrate_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 2],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test2.paired_end.sorted.bam', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null }
+            )
+        }
+    }
+
+    test("Single BAM - with deduplication - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = true
+                recalibrate_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null }
+            )
+        }
+    }
+
+    test("Single BAM - with recalibration - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = false
+                recalibrate_flag = true
+                known_sites = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/vcf/dbsnp_146.hg38.vcf.gz', checkIfExists: true)
+                known_sites_tbi = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/vcf/dbsnp_146.hg38.vcf.gz.tbi', checkIfExists: true)
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null }
+            )
+        }
+    }
+
+    test("Single BAM - deduplication and recalibration - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = true
+                recalibrate_flag = true
+                known_sites = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/vcf/dbsnp_146.hg38.vcf.gz', checkIfExists: true)
+                known_sites_tbi = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/vcf/dbsnp_146.hg38.vcf.gz.tbi', checkIfExists: true)
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                    [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            params {
+                deduplicate_flag = true
+                recalibrate_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'sample1', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                        [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                    ],
+                    [
+                        [id: 'sample2', sample: 'sample2', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
+                        [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
+                    ]
+                )
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_bai != null }
+            )
+        }
+    }
+}

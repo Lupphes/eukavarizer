@@ -1,0 +1,6 @@
+subworkflows/sv_calling_manta:
+  - subworkflows/local/sv_calling_manta/**
+  - modules/nf-core/manta/germline/**
+  - modules/nf-core/svync/**
+  - modules/nf-core/gunzip/**
+  - modules/local/sample_regen/**

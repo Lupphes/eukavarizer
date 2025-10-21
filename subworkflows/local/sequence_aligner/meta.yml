@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SEQUENCE_ALIGNER"
+description: Aligns filtered FASTQ reads to a reference genome using BWA, BWA-MEM2, or Minimap2
+keywords:
+  - alignment
+  - bwa
+  - bwa-mem2
+  - minimap2
+  - mapping
+  - reads
+components:
+  - BWA_MEM
+  - BWAMEM2_MEM
+  - MINIMAP2_ALIGN
+input:
+  - fastq_filtered:
+      type: file
+      description: Filtered FASTQ files for alignment
+      pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+  - reference_genome_unzipped:
+      type: file
+      description: Uncompressed reference genome FASTA file
+      pattern: "*.{fa,fasta}"
+  - reference_genome_bwa_index:
+      type: file
+      description: BWA or BWA-MEM2 index files for the reference genome
+      pattern: "*.{amb,ann,bwt,pac,sa}"
+output:
+  - bam_mapped:
+      type: file
+      description: Aligned BAM files grouped by sample
+      pattern: "*.bam"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

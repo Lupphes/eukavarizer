@@ -1,0 +1,5 @@
+subworkflows/sv_calling_delly:
+  - subworkflows/local/sv_calling_delly/**
+  - modules/nf-core/delly/call/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

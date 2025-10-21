@@ -1,0 +1,2 @@
+subworkflows/reference_retrieval:
+  - subworkflows/local/reference_retrieval/**

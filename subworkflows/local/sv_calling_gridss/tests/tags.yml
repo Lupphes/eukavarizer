@@ -1,0 +1,6 @@
+subworkflows/sv_calling_gridss:
+  - subworkflows/local/sv_calling_gridss/**
+  - modules/nf-core/gridss/gridss/**
+  - modules/local/gridss/annotate/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

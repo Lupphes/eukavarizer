@@ -1,21 +1,34 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    DELLY_CALL WORKFLOW
+    SUBWORKFLOW: SV_CALLING_DELLY
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow calls structural variants (SVs) using Delly:
-    1. **DELLY_CALL** – Detects deletions, duplications, inversions, and translocations.
-    2. **SAMPLE_REHEADER** – Reheaders and renames the output VCF.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF file.
+    Structural variant detection using Delly for paired-end sequencing data
+    Read type: short-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects structural variants including deletions, duplications, inversions, and
+        translocations using Delly's split-read and paired-end mapping approach. The
+        workflow synchronizes and standardizes VCF output for downstream analysis.
 
-    Outputs:
-    - `vcf`           – Reheaded VCF file.
-    - `vcfgz`         – Gzipped reheaded VCF file.
-    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
-    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
-    - `svync_vcf`     – Decompressed synchronized VCF file.
-    - `svync_vcfgz`   – Gzipped synchronized VCF file.
-    - `svync_tbi`     – Tabix index for the synchronized VCF.
+    Processing Steps:
+        1. DELLY_CALL - Detects SVs from aligned BAM files
+        2. SVYNC - Synchronizes and refines SV calls to standard format
+        3. SAMPLE_REHEADER - Reheaders and renames the output VCF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_bai                       [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_unzipped     [meta, fasta]         Reference genome FASTA
+        reference_genome_faidx        [meta, fai]           Reference genome index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf                           [meta, vcf]           Reheaded VCF file
+        vcfgz                         [meta, vcf.gz]        Gzipped VCF file
+        tbi                           [meta, tbi]           Tabix index
+        csi                           [meta, csi]           CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -31,6 +44,7 @@ workflow SV_CALLING_DELLY {
         reference_genome_faidx
 
     main:
+        ch_versions = Channel.empty()
         name_delly = "delly"
 
         DELLY_CALL(
@@ -54,13 +68,17 @@ workflow SV_CALLING_DELLY {
 
         SAMPLE_REHEADER(
             SVYNC.out.vcf,
-            name_delly,
-            ""
+            name_delly
         )
+
+        ch_versions = ch_versions.mix(DELLY_CALL.out.versions.first())
+        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
         vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

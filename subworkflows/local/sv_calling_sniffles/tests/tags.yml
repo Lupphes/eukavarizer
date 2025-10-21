@@ -1,0 +1,5 @@
+subworkflows/sv_calling_sniffles:
+  - subworkflows/local/sv_calling_sniffles/**
+  - modules/nf-core/sniffles/**
+  - modules/nf-core/svync/**
+  - modules/local/sample_regen/**

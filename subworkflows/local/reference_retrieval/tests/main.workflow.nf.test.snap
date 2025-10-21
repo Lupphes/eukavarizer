@@ -1,0 +1,67 @@
+{
+    "Download from RefSeq - stub": {
+        "content": [
+            {
+                "0": [
+                    
+                ],
+                "1": [
+                    
+                ],
+                "2": [
+                    
+                ],
+                "3": [
+                    
+                ],
+                "4": [
+                    
+                ],
+                "5": [
+                    
+                ],
+                "6": [
+                    
+                ],
+                "7": [
+                    
+                ],
+                "8": [
+                    
+                ],
+                "reference_genome": [
+                    
+                ],
+                "reference_genome_bgzipped": [
+                    
+                ],
+                "reference_genome_bgzipped_faidx": [
+                    
+                ],
+                "reference_genome_bgzipped_index": [
+                    
+                ],
+                "reference_genome_bwa_index": [
+                    
+                ],
+                "reference_genome_faidx": [
+                    
+                ],
+                "reference_genome_minimap_index": [
+                    
+                ],
+                "reference_genome_ungapped_size": [
+                    
+                ],
+                "reference_genome_unzipped": [
+                    
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T23:24:27.914728307"
+    }
+}

@@ -1,0 +1,99 @@
+nextflow_workflow {
+
+    name "Test Workflow SV_CALLING_SNIFFLES"
+    script "../main.nf"
+    workflow "SV_CALLING_SNIFFLES"
+    config "subworkflows/local/sv_calling_sniffles/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sv_calling_sniffles"
+
+    test("ONT BAM input - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: true, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+                { assert workflow.out.csi != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("PacBio HiFi BAM input - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_pacbio', single_end: true, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/bam/test.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/pacbio/bam/test.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+                { assert workflow.out.csi != null }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'sample1', single_end: true, sample: 'sample1', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ],
+                    [
+                        [id: 'sample2', single_end: true, sample: 'sample2', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+                { assert workflow.out.csi != null }
+            )
+        }
+    }
+}

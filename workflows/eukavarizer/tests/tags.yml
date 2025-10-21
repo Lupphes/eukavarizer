@@ -1,0 +1,10 @@
+workflows/eukavarizer:
+  - workflows/eukavarizer/**
+  - subworkflows/local/sv_calling_delly/**
+  - subworkflows/local/sv_calling_manta/**
+  - subworkflows/local/sv_calling_gridss/**
+  - subworkflows/local/sv_calling_dysgu/**
+  - subworkflows/local/sv_calling_tiddit/**
+  - subworkflows/local/sv_calling_svaba/**
+  - subworkflows/local/sv_calling_sniffles/**
+  - subworkflows/local/sv_calling_cutesv/**

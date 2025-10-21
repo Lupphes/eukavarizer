@@ -1,25 +1,39 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    REFERENCE_RETRIEVAL WORKFLOW
+    SUBWORKFLOW: REFERENCE_RETRIEVAL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow retrieves and processes reference genomes:
-    1. **BIODBCORE_REFSEQ** – Downloads the reference genome from RefSeq.
-    2. **GUNZIP** – Decompresses the reference genome file.
-    3. **BWAMEM2_INDEX** or **BWA_INDEX** – Generates BWA or BWA-MEM2 index.
-    4. **MINIMAP2_INDEX** – Generates a MINIMAP2 index.
-    5. **TABIX_BGZIP** – Compresses the genome using bgzip.
-    6. **SAMTOOLS_FAIDX** – Creates a FASTA index for the uncompressed genome.
-    7. **SAMTOOLS_BGZIP_FAIDX** – Creates a FASTA index for the bgzipped genome.
+    Downloads, processes, and indexes reference genome files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This subworkflow retrieves reference genomes from RefSeq or uses provided files,
+        then prepares them for analysis by creating necessary indexes for alignment and
+        variant calling tools.
 
-    Outputs:
-    - `reference_genome` – Original reference genome file (input or downloaded).
-    - `reference_genome_unzipped` – Uncompressed FASTA file.
-    - `reference_genome_bgzipped` – bgzipped FASTA file.
-    - `reference_genome_bwa_index` – BWA or BWA-MEM2 index files.
-    - `reference_genome_minimap_index` – Minimap2 index files.
-    - `reference_genome_bgzipped_index` – bgzip `.gzi` index file.
-    - `reference_genome_faidx` – FASTA index for uncompressed FASTA.
-    - `reference_genome_bgzipped_faidx` – FASTA index for bgzipped FASTA.
+    Processing Steps:
+        1. Download reference genome from RefSeq (BIODBCORE_REFSEQ)
+        2. Decompress reference genome (GUNZIP)
+        3. Generate BWA or BWA-MEM2 alignment index
+        4. Generate Minimap2 alignment index (if enabled)
+        5. Compress genome with bgzip (TABIX_BGZIP)
+        6. Create FASTA indexes for both compressed and uncompressed versions (SAMTOOLS_FAIDX)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        taxonomy_id               val(id)                NCBI taxonomy identifier
+        outdir                    path(dir)              Output directory path
+        reference_genome          path(fasta)            Reference genome file (optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        reference_genome          path(fasta.gz)         Original reference genome
+        reference_genome_unzipped tuple(meta, fasta)     Uncompressed FASTA file
+        reference_genome_bgzipped tuple(meta, fasta.gz)  bgzipped FASTA file
+        reference_genome_bwa_index tuple(meta, index)    BWA/BWA-MEM2 index files
+        reference_genome_minimap_index tuple(meta, mmi)  Minimap2 index file
+        reference_genome_faidx    tuple(meta, fai)       FASTA index for uncompressed
+        reference_genome_bgzipped_faidx tuple(meta, fai) FASTA index for bgzipped
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondrej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -41,6 +55,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome
 
     main:
+        ch_versions = Channel.empty()
 
         BIODBCORE_REFSEQ(
             taxonomy_id,
@@ -88,6 +103,16 @@ workflow REFERENCE_RETRIEVAL {
         )
 
 
+        ch_versions = ch_versions.mix(BIODBCORE_REFSEQ.out.versions.first())
+        ch_versions = ch_versions.mix(GUNZIP.out.versions.first())
+        ch_versions = ch_versions.mix(bwa_index.versions.first())
+        if (params.minimap2_flag) {
+            ch_versions = ch_versions.mix(MINIMAP2_INDEX.out.versions.first())
+        }
+        ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions.first())
+        ch_versions = ch_versions.mix(SAMTOOLS_BGZIP_FAIDX.out.versions.first())
+        ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions.first())
+
     emit:
         reference_genome                        = reference_genome_input
         reference_genome_ungapped_size          = reference_genome_ungapped_size
@@ -98,6 +123,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_bgzipped_index         = TABIX_BGZIP.out.gzi
         reference_genome_bgzipped_faidx         = SAMTOOLS_BGZIP_FAIDX.out.fai
         reference_genome_faidx                  = SAMTOOLS_FAIDX.out.fai
+        versions                                = ch_versions
 }
 
 /*

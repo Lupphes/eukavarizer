@@ -1,0 +1,180 @@
+nextflow_workflow {
+
+    name "Test Workflow SV_CALLING_SVABA"
+    script "../main.nf"
+    workflow "SV_CALLING_SVABA"
+    config "subworkflows/local/sv_calling_svaba/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sv_calling_svaba"
+
+    test("Illumina BAM input - no annotation - stub") {
+        options '-stub'
+
+        when {
+            params {
+                svaba_annotate = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+                { assert workflow.out.csi != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Illumina BAM input - with annotation - stub") {
+        options '-stub'
+
+        when {
+            params {
+                svaba_annotate = true
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+            { assert workflow.out.csi != null }
+            )
+        }
+    }
+
+    test("BWAMEM2 filtered out - stub") {
+        options '-stub'
+
+        when {
+            params {
+                svaba_annotate = false
+                bwamem2 = true
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+
+    test("Long reads filtered out - stub") {
+        options '-stub'
+
+        when {
+            params {
+                svaba_annotate = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_ont', single_end: false, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            params {
+                svaba_annotate = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'sample1', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ],
+                    [
+                        [id: 'sample2', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample2', patient: 'patient1'],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.vcf != null },
+                { assert workflow.out.vcfgz != null },
+                { assert workflow.out.tbi != null },
+            { assert workflow.out.csi != null }
+            )
+        }
+    }
+}

@@ -1,21 +1,36 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    SVABA WORKFLOW
+    SUBWORKFLOW: SV_CALLING_SVABA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow detects structural variants (SVs) and indels using SVABA:
-    1. **SVABA** – Calls SVs and indels using local assembly.
-    2. **SAMPLE_REHEADER** – Renames and reheaders the VCF output.
-    3. **SVYNC** – Synchronizes and refines SV calls.
-    4. **GUNZIP** – Decompresses the final VCF file.
+    Local assembly-based SV and indel detection using SvABA for Illumina data
+    Read type: short-read
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        Detects structural variants and indels using SvABA's local assembly approach,
+        designed for Illumina paired-end data. Provides sensitive detection of complex
+        rearrangements through local micro-assembly and realignment.
 
-    Outputs:
-    - `vcf`           – Reheaded VCF file.
-    - `vcfgz`         – Gzipped reheaded VCF file.
-    - `tbi`           – Tabix index (.tbi) for the reheaded VCF.
-    - `csi`           – CSI index (.csi) for the reheaded VCF (if generated).
-    - `svync_vcf`     – Decompressed synchronized VCF file.
-    - `svync_vcfgz`   – Gzipped synchronized VCF file.
-    - `svync_tbi`     – Tabix index for the synchronized VCF.
+    Processing Steps:
+        1. SVABA - Calls SVs and indels using local assembly from BAM files
+        2. SVABA_ANNOTATE (optional) - Annotates SVs with additional information
+        3. SVYNC - Synchronizes and refines SV calls to standard format
+        4. SAMPLE_REHEADER - Reheaders and renames the output VCF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        bam_inputs                    [meta, bam, bai]      Aligned BAM files with index
+        reference_genome_unzipped     [meta, fasta]         Reference genome FASTA
+        reference_genome_faidx        [meta, fai]           Reference genome index
+        reference_genome_bwa_index    [meta, index_dir]     BWA reference index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        vcf                           [meta, vcf]           Reheaded VCF file
+        vcfgz                         [meta, vcf.gz]        Gzipped VCF file
+        tbi                           [meta, tbi]           Tabix index
+        csi                           [meta, csi]           CSI index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondřej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -32,6 +47,7 @@ workflow SV_CALLING_SVABA {
         reference_genome_bwa_index
 
     main:
+        ch_versions = Channel.empty()
         name_svaba = "svaba"
 
         SVABA(
@@ -43,7 +59,7 @@ workflow SV_CALLING_SVABA {
                     (!meta.platform && meta.median_bp <= params.long_read_threshold)
                 )
             }.map { meta, bam, bai ->
-                tuple(meta + [id: "${meta.id}"], bam, bai, [], [])
+                tuple(meta + [id: "${meta.id}-${name_svaba}"], bam, bai, [], [])
             },
             reference_genome_unzipped,
             reference_genome_faidx,
@@ -73,13 +89,20 @@ workflow SV_CALLING_SVABA {
 
         SAMPLE_REHEADER(
             SVYNC.out.vcf,
-            name_svaba,
-            ""
+            name_svaba
         )
+
+        ch_versions = ch_versions.mix(SVABA.out.versions.first())
+        if (params.svaba_annotate) {
+            ch_versions = ch_versions.mix(SVABA_ANNOTATE.out.versions.first())
+        }
+        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf
         vcfgz =  SAMPLE_REHEADER.out.vcfgz
         tbi = SAMPLE_REHEADER.out.tbi
         csi = SAMPLE_REHEADER.out.csi
+        versions = ch_versions
 }

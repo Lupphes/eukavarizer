@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "SEQUENCE_MERGER"
+description: Merges, deduplicates, and recalibrates aligned BAM files
+keywords:
+  - bam
+  - merge
+  - deduplication
+  - recalibration
+  - gatk
+  - bqsr
+components:
+  - SAMTOOLS_MERGE
+  - SAMTOOLS_INDEX
+  - GATK4_MARKDUPLICATES
+  - GATK4_BASERECALIBRATOR
+  - GATK4_APPLYBQSR
+  - GATK4SPARK_MARKDUPLICATES
+  - GATK4SPARK_BASERECALIBRATOR
+  - GATK4SPARK_APPLYBQSR
+input:
+  - bam_mapped:
+      type: file
+      description: Aligned BAM files from the same sample
+      pattern: "*.bam"
+  - reference_genome_unzipped:
+      type: file
+      description: Uncompressed reference genome FASTA file
+      pattern: "*.{fa,fasta}"
+  - reference_genome_bwa_index:
+      type: file
+      description: FASTA index file
+      pattern: "*.fai"
+output:
+  - bam_bai:
+      type: file
+      description: Processed BAM files with corresponding index files
+      pattern: "*.{bam,bai}"
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

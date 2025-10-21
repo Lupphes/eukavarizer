@@ -1,0 +1,126 @@
+nextflow_workflow {
+
+    name "Test Workflow FASTQC_MULTIQC_ANALYSIS"
+    script "../main.nf"
+    workflow "FASTQC_MULTIQC_ANALYSIS"
+    config "subworkflows/local/fastqc_multiqc_analysis/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "fastqc_multiqc_analysis"
+
+    test("FastQC only enabled") {
+
+        when {
+            params {
+                fastqc_flag = true
+                multiqc_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastqc_report != null },
+                { assert workflow.out.multiqc_report == [null] || workflow.out.multiqc_report == null }
+            )
+        }
+    }
+
+    test("MultiQC only enabled - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastqc_flag = false
+                multiqc_flag = true
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+    }
+
+    test("Both enabled - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastqc_flag = true
+                multiqc_flag = true
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastqc_report != null },
+                { assert workflow.out.multiqc_report != null }
+            )
+        }
+    }
+
+    test("Both disabled - skip") {
+
+        when {
+            params {
+                fastqc_flag = false
+                multiqc_flag = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', single_end: false],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastqc_report == [null] || workflow.out.fastqc_report == null },
+                { assert workflow.out.multiqc_report == [null] || workflow.out.multiqc_report == null }
+            )
+        }
+    }
+}

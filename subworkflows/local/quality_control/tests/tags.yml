@@ -1,0 +1,7 @@
+subworkflows/quality_control:
+  - subworkflows/local/quality_control/**
+  - modules/nf-core/fastp/**
+  - modules/nf-core/fastplong/**
+  - modules/nf-core/bbmap/bbduk/**
+  - modules/nf-core/seqtk/sample/**
+  - subworkflows/local/fastqc_multiqc_analysis/**

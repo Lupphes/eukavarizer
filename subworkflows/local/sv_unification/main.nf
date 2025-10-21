@@ -1,19 +1,37 @@
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    STRUCTURAL VARIANT (SV) MERGING WORKFLOW
+    SUBWORKFLOW: SV_UNIFICATION
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    This workflow merges structural variant (SV) calls from different tools:
-    1. **SURVIVOR_MERGE** – Merges VCF files and filters based on breakpoint distance,
-        caller support, SV type, and strand consistency.
-    2. **SURVIVOR_STATS** – Generates summary statistics from the merged VCF.
-    3. **BCFTOOLS_MERGE** – Combines compressed VCF files into a unified output.
+    Merges and unifies structural variant calls from multiple callers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Description:
+        This subworkflow combines structural variant calls from different tools using
+        two complementary approaches: SURVIVOR for consensus-based merging and BCFtools
+        for sample-based merging. Both outputs are filtered and annotated with statistics.
 
-    Outputs:
-    - `survivor_vcf`     – Filtered and merged VCF from SURVIVOR.
-    - `survivor_stats`   – Summary statistics from SURVIVOR.
-    - `bcfmerge_vcf`     – Filtered merged VCF from BCFTOOLS.
-    - `bcfmerge_tbi`     – Tabix index for the BCFTOOLS merged VCF.
-    - `bcfmerge_stats`   – Summary statistics from BCFTOOLS.
+    Processing Steps:
+        1. Merge VCF files using SURVIVOR based on breakpoint distance and caller support
+        2. Filter SURVIVOR merged VCF by size and quality thresholds
+        3. Generate statistics for SURVIVOR merged variants
+        4. Merge VCF files using BCFtools for sample-level consolidation
+        5. Filter BCFtools merged VCF and generate statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Input Channels (take):
+        vcf_list                  tuple(meta, vcf)       Individual caller VCF files
+        vcfgz_list                tuple(meta, vcf.gz)    Compressed caller VCF files
+        tbi_list                  tuple(meta, tbi)       VCF index files
+        reference_genome_bgzipped tuple(meta, fasta.gz)  Compressed reference genome
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Output Channels (emit):
+        survivor_vcf              tuple(meta, vcf)       SURVIVOR merged and filtered VCF
+        survivor_stats            tuple(meta, stats)     SURVIVOR statistics
+        bcfmerge_vcf              tuple(meta, vcf.gz)    BCFtools merged and filtered VCF
+        bcfmerge_tbi              tuple(meta, tbi)       BCFtools VCF index
+        bcfmerge_stats            tuple(meta, stats)     BCFtools statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Author:   Ondrej Sloup (Lupphes)
+    Contact:  ondrej.sloup@protonmail.com
+    GitHub:   @Lupphes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -36,6 +54,8 @@ workflow SV_UNIFICATION {
         reference_genome_bgzipped
 
     main:
+        ch_versions = Channel.empty()
+
         vcf_list_cleaned = vcf_list
             .filter { it != null }
             .map { it[1] }
@@ -122,10 +142,19 @@ workflow SV_UNIFICATION {
             reference_genome_bgzipped
         )
 
+        ch_versions = ch_versions.mix(SURVIVOR_MERGE.out.versions.first())
+        ch_versions = ch_versions.mix(SURVIVOR_FILTER.out.versions.first())
+        ch_versions = ch_versions.mix(SURVIVOR_STATS.out.versions.first())
+        ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions.first())
+        ch_versions = ch_versions.mix(BCFTOOLS_FILTER.out.versions.first())
+        ch_versions = ch_versions.mix(BCFTOOLS_SORT.out.versions.first())
+        ch_versions = ch_versions.mix(BCFTOOLS_STATS.out.versions.first())
+
     emit:
         survivor_vcf    = SURVIVOR_FILTER.out.vcf
         survivor_stats  = SURVIVOR_STATS.out.stats
         bcfmerge_vcf    = BCFTOOLS_SORT.out.vcf
         bcfmerge_tbi    = BCFTOOLS_SORT.out.tbi
         bcfmerge_stats  = BCFTOOLS_STATS.out.stats
+        versions        = ch_versions
 }

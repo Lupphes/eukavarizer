@@ -1,0 +1,181 @@
+nextflow_workflow {
+
+    name "Test Workflow SEQUENCE_ALIGNER"
+    script "../main.nf"
+    workflow "SEQUENCE_ALIGNER"
+    config "subworkflows/local/sequence_aligner/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sequence_aligner"
+
+    test("BWA alignment - Illumina paired-end - stub") {
+        options '-stub'
+
+        when {
+            params {
+                minimap2_flag = false
+                bwamem2 = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_mapped != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("BWAMEM2 alignment - Illumina paired-end - stub") {
+        options '-stub'
+
+        when {
+            params {
+                minimap2_flag = false
+                bwamem2 = true
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_mapped != null }
+            )
+        }
+    }
+
+    test("MINIMAP2 alignment - ONT long reads - stub") {
+        options '-stub'
+
+        when {
+            params {
+                minimap2_flag = true
+                bwamem2 = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_ont', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'ont', single_end: true, size: 1, num_lanes: 1],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
+                ])
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_mapped != null }
+            )
+        }
+    }
+
+    test("Multiple lanes - same sample - stub") {
+        options '-stub'
+
+        when {
+            params {
+                minimap2_flag = false
+                bwamem2 = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'test_L001', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 2],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ],
+                    [
+                        [id: 'test_L002', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 2],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ]
+                )
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_mapped != null }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            params {
+                minimap2_flag = false
+                bwamem2 = false
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'sample1', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ],
+                    [
+                        [id: 'sample2', patient: 'patient1', sample: 'sample2', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ]
+                )
+                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = Channel.value([[id: 'genome'], []])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bam_mapped != null }
+            )
+        }
+    }
+}

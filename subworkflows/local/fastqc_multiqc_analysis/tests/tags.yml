@@ -1,0 +1,4 @@
+subworkflows/fastqc_multiqc_analysis:
+  - subworkflows/local/fastqc_multiqc_analysis/**
+  - modules/nf-core/fastqc/**
+  - modules/nf-core/multiqc/**

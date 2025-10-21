@@ -1,0 +1,279 @@
+nextflow_workflow {
+
+    name "Test Workflow SEQUENCE_PROCESSOR"
+    script "../main.nf"
+    workflow "SEQUENCE_PROCESSOR"
+    config "subworkflows/local/sequence_processor/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "sequence_processor"
+
+    test("Complete pipeline - FASTQ.GZ paired end - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = true
+                multiqc_flag = true
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    test("Complete pipeline - BAM input - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'bam', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+
+    test("Complete pipeline - CRAM input - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = false
+                bbmap_bbduk_flag = false
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'cram', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/cram/test.paired_end.sorted.cram', checkIfExists: true)
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+
+    test("Complete pipeline - ONT long reads - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = false
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                bwamem2 = false
+                minimap2_flag = true
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test_ont', data_type: 'fastq_gz', single_end: true, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+
+    test("Complete pipeline - BWAMEM2 aligner - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                bwamem2 = true
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+
+    test("Complete pipeline - SEQTK subsampling - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = true
+                seqtk_flag = true
+                seqtk_size = 10000
+                fastqc_flag = true
+                multiqc_flag = true
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                    [
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                    ]
+                ])
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+
+    test("Multiple samples - stub") {
+        options '-stub'
+
+        when {
+            params {
+                fastp_flag = true
+                bbmap_bbduk_flag = false
+                seqtk_flag = false
+                fastqc_flag = false
+                multiqc_flag = false
+                bwamem2 = false
+                long_read_threshold = 1000
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [id: 'test1', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ],
+                    [
+                        [id: 'test2', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample2', patient: 'patient1', lane: 'L002', flowcell: 'FC1'],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ]
+                )
+                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                input[2] = []
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.fastq_filtered != null },
+                { assert workflow.out.bam_bai != null },
+                { assert workflow.out.samtools_stats != null }
+            )
+        }
+    }
+}
