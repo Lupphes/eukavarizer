@@ -4,4 +4,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - dysgu=1.6.5
+  - dysgu=1.8.7

@@ -11,8 +11,8 @@ process SVYNC {
     tuple val(meta), path(vcf), path(tbi), path(config)
 
     output:
-    tuple val(meta), path("*.vcf.gz"), emit: vcf
-    tuple val(meta), path("*.tbi")   , emit: tbi
+    tuple val(meta), path("*.vcf.gz"), emit: vcf, optional: true
+    tuple val(meta), path("*.tbi")   , emit: tbi, optional: true
     path "versions.yml"              , emit: versions
 
     when:
@@ -27,12 +27,42 @@ process SVYNC {
     if ("$vcf" == "${prefix}.vcf.gz") error "Input and output names are the same, set prefix in module configuration to disambiguate!"
 
     """
-    svync \\
-        $args \\
-        --config $config \\
-        --input $vcf \\
-        | bgzip --threads $task.cpus $args2 > ${prefix}.vcf.gz \\
-        && tabix $args3 ${prefix}.vcf.gz
+    # Function to read VCF (handles both compressed and uncompressed)
+    read_vcf() {
+        if [[ "$vcf" == *.gz ]]; then
+            zcat "\$1"
+        else
+            cat "\$1"
+        fi
+    }
+
+    # Check if VCF has samples by counting columns in #CHROM header
+    # Sites-only VCFs have 8 columns (no FORMAT/sample), sample VCFs have 9+ columns
+    HEADER_LINE=\$(read_vcf $vcf | grep "^#CHROM" | head -n 1)
+    COLUMN_COUNT=\$(echo "\$HEADER_LINE" | awk '{print NF}')
+
+    # Check if VCF has any variants (non-header lines)
+    VARIANT_COUNT=\$(read_vcf $vcf | grep -v "^#" | wc -l || echo "0")
+
+    if [[ "\$COLUMN_COUNT" -le 8 ]]; then
+        # Sites-only VCF (no sample columns) - svync cannot process these
+        # Do not create output files - flow will stop here (like SAMPLE_REHEADER does)
+        echo "WARNING: Input VCF is sites-only (no sample columns). Skipping svync processing." >&2
+
+    elif [[ "\$VARIANT_COUNT" -eq 0 ]]; then
+        # Empty VCF (no variants) - svync cannot process
+        # Do not create output files - flow will stop here
+        echo "WARNING: Input VCF has no variants. Skipping svync processing." >&2
+
+    else
+        # Normal VCF with samples and variants - process with svync
+        svync \\
+            $args \\
+            --config $config \\
+            --input $vcf \\
+            | bgzip --threads $task.cpus $args2 > ${prefix}.vcf.gz \\
+            && tabix $args3 ${prefix}.vcf.gz
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

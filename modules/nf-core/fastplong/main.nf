@@ -4,14 +4,14 @@ process FASTPLONG {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/fastplong:0.3.0--h224cc79_0':
-        'biocontainers/fastplong:0.3.0--h224cc79_0' }"
+        'https://depot.galaxyproject.org/singularity/fastplong:0.4.1--h224cc79_0':
+        'biocontainers/fastplong:0.4.1--h224cc79_0' }"
 
     input:
-    tuple val(meta), path(reads)
-    path  adapter_fasta
+    tuple val(meta), path(reads), path(adapter_fasta)
     val   discard_trimmed_pass
     val   save_trimmed_fail
+    val   save_merged
 
     output:
     tuple val(meta), path('*.fastplong.fastq.gz') , optional:true, emit: reads
