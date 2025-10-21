@@ -1,0 +1,67 @@
+nextflow_process {
+
+    name "Test Process SVABA_ANNOTATE"
+    script "../main.nf"
+    process "SVABA_ANNOTATE"
+    tag "svaba"
+    tag "svaba/annotate"
+    tag "modules"
+    tag "modules_local"
+
+    test("Annotate SVABA VCF - stub") {
+
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz')
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.vcf },
+                { assert process.out.vcf.get(0).get(1).toString().endsWith('.vcf') },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Annotate with different sample ID - stub") {
+
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'sample_123' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz')
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.vcf.get(0).get(1).toString().contains('sample_123') },
+                { assert process.out.versions }
+            )
+        }
+    }
+}

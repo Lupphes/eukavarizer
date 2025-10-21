@@ -1,0 +1,68 @@
+{
+    "Annotate SVABA VCF - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.reclassified.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,4c8c79218294527a4dff92866ce5de78"
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.reclassified.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,4c8c79218294527a4dff92866ce5de78"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:36:48.290011066"
+    },
+    "Annotate with different sample ID - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "sample_123"
+                        },
+                        "sample_123.reclassified.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,4c8c79218294527a4dff92866ce5de78"
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "sample_123"
+                        },
+                        "sample_123.reclassified.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,4c8c79218294527a4dff92866ce5de78"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:36:56.592645426"
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "Retrieve ENA data - yeast - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932_ena_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "4932_samplesheet.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "versions.yml:md5,952be6a4eef859dbe2e61621daa92e17"
+                ],
+                "ena_results": [
+                    "4932_ena_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "samplesheet": [
+                    "4932_samplesheet.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,952be6a4eef859dbe2e61621daa92e17"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:34:26.50433574"
+    },
+    "Retrieve ENA data with quality filter - stub": {
+        "content": [
+            {
+                "0": [
+                    "511145_ena_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "511145_samplesheet.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "versions.yml:md5,952be6a4eef859dbe2e61621daa92e17"
+                ],
+                "ena_results": [
+                    "511145_ena_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "samplesheet": [
+                    "511145_samplesheet.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,952be6a4eef859dbe2e61621daa92e17"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:34:35.026391177"
+    }
+}

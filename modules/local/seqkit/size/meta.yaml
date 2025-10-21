@@ -1,6 +1,50 @@
-name: seqkit
-channels:
-  - bioconda
-  - conda-forge
-dependencies:
-  - seqkit=2.9.0
+name: "seqkit_size"
+description: "Fast calculation of median/average read length from FASTQ files"
+keywords:
+  - fastq
+  - read-length
+  - statistics
+  - quality-control
+
+tools:
+  - awk:
+      description: "Text processing tool for calculating statistics"
+      documentation: "https://www.gnu.org/software/gawk/manual/gawk.html"
+      licence: "GPL-3.0"
+
+input:
+  - - meta:
+        type: map
+        description: "Groovy Map containing sample information (e.g., id, single_end)"
+    - reads:
+        type: file
+        description: "FASTQ file(s) - single or paired-end reads"
+        pattern: "*.{fastq,fq,fastq.gz,fq.gz}"
+
+output:
+  - median_bp:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - reads:
+          type: file
+          description: "Original input FASTQ file(s)"
+      - "*.txt":
+          type: file
+          description: "Text file containing calculated median/average read length (name configurable via task.ext.prefix)"
+          pattern: "*_median_size.txt"
+  - versions:
+      type: file
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

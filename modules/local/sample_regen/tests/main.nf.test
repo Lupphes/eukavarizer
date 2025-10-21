@@ -1,0 +1,93 @@
+nextflow_process {
+
+    name "Test Process SAMPLE_REHEADER"
+    script "../main.nf"
+    process "SAMPLE_REHEADER"
+    tag "sample_regen"
+    tag "modules"
+    tag "modules_local"
+
+    test("Reheader single-sample VCF - success") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test', sample: 'test_sample', platform: 'illumina', single_end: false ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')
+                ])
+                input[1] = "manta"
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.vcf || process.out.vcfgz },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Reheader compressed VCF with index") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test2', sample: 'sample2', platform: 'ont', single_end: true ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz')
+                ])
+                input[1] = "sniffles"
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.vcfgz },
+                { assert process.out.tbi },
+                { assert process.out.csi },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Stub test") {
+
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'stub', sample: 'stub_sample', platform: 'pacbio', single_end: false ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')
+                ])
+                input[1] = "delly"
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.versions }
+            )
+        }
+    }
+}

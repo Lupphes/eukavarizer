@@ -1,60 +1,98 @@
 name: "varify"
-description: "Generates an HTML report from a merged VCF file, individual VCF files, and SURVIVOR analysis."
+description: "Generates an HTML report from merged VCF files (SURVIVOR and BCFtools), individual VCF files, and associated statistics."
 keywords:
   - vcf
   - report
   - survivor
+  - bcftools
   - visualization
+  - structural variants
 input:
-  - - meta:
+  - taxonomy_id:
+      type: string
+      description: "Taxonomy ID for the sample"
+  - outdir:
+      type: string
+      description: "Output directory path"
+  - - meta1:
         type: map
-        description: "Sample metadata"
-    - merged_vcf:
-        type: file
-        description: "Merged VCF file"
-        pattern: "*.vcf"
-  - - meta:
-        type: map
-        description: "Sample metadata for comparison VCFs"
-    - other_vcfs:
-        type: list[file]
-        description: "List of individual VCF files for comparison"
-        pattern: "*.vcf"
-  - - meta:
-        type: map
-        description: "Sample metadata for SURVIVOR merged VCF"
+        description: "Metadata for SURVIVOR VCF"
     - survivor_vcf:
         type: file
         description: "SURVIVOR merged VCF file"
         pattern: "*.vcf"
-  - - meta:
+  - - meta2:
         type: map
-        description: "Sample metadata for SURVIVOR stats"
+        description: "Metadata for SURVIVOR stats"
     - survivor_stats:
         type: file
-        description: "SURVIVOR stats table"
+        description: "SURVIVOR statistics file"
         pattern: "*.tsv"
-  - taxonomy_id:
+  - - meta3:
+        type: map
+        description: "Metadata for BCFtools merged VCF"
+    - bcfmerge_vcf:
+        type: file
+        description: "BCFtools merged VCF file"
+        pattern: "*.vcf.gz"
+  - - meta4:
+        type: map
+        description: "Metadata for BCFtools VCF index"
+    - bcfmerge_tbi:
+        type: file
+        description: "BCFtools merged VCF index"
+        pattern: "*.tbi"
+  - - meta5:
+        type: map
+        description: "Metadata for BCFtools stats"
+    - bcfmerge_stats:
+        type: file
+        description: "BCFtools statistics file"
+        pattern: "*.txt"
+  - - meta6:
+        type: map
+        description: "Metadata for VCF list"
+    - vcf_list_cleaned:
+        type: file
+        description: "List of cleaned VCF files"
+        pattern: "*.txt"
+  - - meta7:
+        type: map
+        description: "Metadata for reference genome"
+    - reference_genome_bgzipped_index:
+        type: file
+        description: "Reference genome FASTA file (bgzipped and indexed)"
+        pattern: "*.fa.gz"
+  - profile:
       type: string
-      description: "Sample taxonomy ID"
-  - outdir:
-      type: file
-      description: "Output directory for reports"
+      description: "Execution profile (e.g., docker, singularity, test)"
+  - samtools_stats:
+      type: list[file]
+      description: "Optional list of samtools stats files"
+      pattern: "*.stats"
 output:
-  - index_html:
+  - report_file:
       type: file
-      description: "Generated index HTML report"
+      description: "Main HTML report file (name configurable via task.ext.prefix, defaults to taxonomy_id.html)"
       pattern: "*.html"
-  - merged_report:
+  - report_images:
+      type: list[file]
+      description: "Generated PNG plot images"
+      pattern: "plots/*.png"
+  - report_html:
+      type: list[file]
+      description: "Generated HTML plot files"
+      pattern: "plots/*.html"
+  - versions:
       type: file
-      description: "Generated merged report"
-      pattern: "*.html"
-  - survivor_report:
-      type: file
-      description: "Generated SURVIVOR report"
-      pattern: "*.html"
+      description: "File containing software versions"
+      pattern: "versions.yml"
 authors:
   - name: "Ondřej Sloup"
     email: "ondrej.sloup@protonmail.com"
     github: "Lupphes"
     affiliation: "MUNI"
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

@@ -1,0 +1,62 @@
+name: "biodbcore_refseq"
+description: "Downloads and processes reference genome files from NCBI RefSeq database."
+keywords:
+  - download
+  - reference-genome
+  - fasta
+  - ncbi
+  - refseq
+  - biodbcore
+
+tools:
+  - biodbcore:
+      description: "Python package to retrieve sequencing reads and reference genomes from public databases."
+      homepage: "https://github.com/Lupphes/biodbcore"
+      documentation: "https://github.com/Lupphes/biodbcore/blob/main/README.md"
+      licence: "MIT"
+
+input:
+  - taxonomy_id:
+      type: integer
+      description: "NCBI Taxonomy ID for the organism to retrieve reference genome for"
+      pattern: "^[0-9]+$"
+  - outdir:
+      type: string
+      description: "Output directory path"
+  - reference_genome:
+      type: file
+      description: "Optional existing reference genome file to avoid re-downloading"
+      pattern: "*.{fna,fa,fasta,fna.gz,fa.gz,fasta.gz}"
+
+output:
+  - json:
+      type: file
+      description: "JSON metadata file with genome retrieval results (name configurable via task.ext.prefix)"
+      pattern: "*_refseq_results.json"
+  - reference_genome:
+      type: file
+      description: "Downloaded reference genome file in FASTA format (compressed)"
+      pattern: "*.{fna.gz,fa.gz}"
+  - refseq_parquet:
+      type: file
+      description: "RefSeq assembly summary metadata in Parquet format"
+      pattern: "assembly_summary_refseq.parquet"
+  - refseq_summary:
+      type: file
+      description: "RefSeq assembly summary in text format"
+      pattern: "assembly_summary_refseq.txt"
+  - versions:
+      type: file
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

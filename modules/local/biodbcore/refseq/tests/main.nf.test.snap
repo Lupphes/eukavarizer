@@ -1,0 +1,84 @@
+{
+    "Download reference genome - yeast - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
+                ],
+                "2": [
+                    "assembly_summary_refseq.parquet:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    "assembly_summary_refseq.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "4": [
+                    "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
+                ],
+                "json": [
+                    "4932_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "reference_genome": [
+                    "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
+                ],
+                "refseq_parquet": [
+                    "assembly_summary_refseq.parquet:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "refseq_summary": [
+                    "assembly_summary_refseq.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:34:52.151545519"
+    },
+    "Use existing reference genome - stub": {
+        "content": [
+            {
+                "0": [
+                    "9606_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    
+                ],
+                "2": [
+                    "assembly_summary_refseq.parquet:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    "assembly_summary_refseq.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "4": [
+                    "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
+                ],
+                "json": [
+                    "9606_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "reference_genome": [
+                    
+                ],
+                "refseq_parquet": [
+                    "assembly_summary_refseq.parquet:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "refseq_summary": [
+                    "assembly_summary_refseq.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:34:59.060214499"
+    }
+}

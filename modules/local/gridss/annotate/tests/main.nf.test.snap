@@ -1,0 +1,80 @@
+{
+    "Annotate GRIDSS VCF - success": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.reclassified.vcf:md5,78d481b1ed492ccecd55e04eaeacfcad"
+                    ]
+                ],
+                "1": [
+                    "test.simple.bed:md5,23f7365dad53175bd052c2ea4a29106c"
+                ],
+                "2": [
+                    "versions.yml:md5,4116918df4efe8fb0febdefe97902d35"
+                ],
+                "bed": [
+                    "test.simple.bed:md5,23f7365dad53175bd052c2ea4a29106c"
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.reclassified.vcf:md5,78d481b1ed492ccecd55e04eaeacfcad"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,4116918df4efe8fb0febdefe97902d35"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:35:45.501180473"
+    },
+    "Annotate empty VCF - should handle gracefully": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "empty"
+                        },
+                        "empty.reclassified.vcf:md5,596e04275526577e5bf3724915160281"
+                    ]
+                ],
+                "1": [
+                    "empty.simple.bed:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "versions.yml:md5,4116918df4efe8fb0febdefe97902d35"
+                ],
+                "bed": [
+                    "empty.simple.bed:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "empty"
+                        },
+                        "empty.reclassified.vcf:md5,596e04275526577e5bf3724915160281"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,4116918df4efe8fb0febdefe97902d35"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:35:52.020024741"
+    }
+}

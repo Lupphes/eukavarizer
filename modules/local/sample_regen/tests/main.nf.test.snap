@@ -1,0 +1,317 @@
+{
+    "Stub test": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "csi": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbi": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "vcfgz": [
+                    [
+                        {
+                            "id": "stub",
+                            "sample": "stub_sample",
+                            "platform": "pacbio",
+                            "single_end": false
+                        },
+                        "re-stub_sample-pacbio-false-delly.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-18T23:10:52.734336894"
+    },
+    "Reheader compressed VCF with index": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf:md5,56ef861130b57aebdf42fc1afd7507a2"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz:md5,56ef861130b57aebdf42fc1afd7507a2"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz.tbi:md5,d71d6955f3d7b8b874de8b80690030eb"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz.csi:md5,5b108b4b1a6ab405cae4a1f960f5ce34"
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,a1ede0be0456a875fcae37e667abc2c6"
+                ],
+                "csi": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz.csi:md5,5b108b4b1a6ab405cae4a1f960f5ce34"
+                    ]
+                ],
+                "tbi": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz.tbi:md5,d71d6955f3d7b8b874de8b80690030eb"
+                    ]
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf:md5,56ef861130b57aebdf42fc1afd7507a2"
+                    ]
+                ],
+                "vcfgz": [
+                    [
+                        {
+                            "id": "test2",
+                            "sample": "sample2",
+                            "platform": "ont",
+                            "single_end": true
+                        },
+                        "re-sample2-ont-true-sniffles.vcf.gz:md5,56ef861130b57aebdf42fc1afd7507a2"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,a1ede0be0456a875fcae37e667abc2c6"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-18T23:03:57.837531726"
+    },
+    "Reheader single-sample VCF - success": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf:md5,395e8aae23869e2118229c8e4f869607"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz:md5,395e8aae23869e2118229c8e4f869607"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz.tbi:md5,af64b769e31b2c6d20dd1a9ca5b422dd"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz.csi:md5,1ccfe8edfdae619a9f98f91a27718608"
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,a1ede0be0456a875fcae37e667abc2c6"
+                ],
+                "csi": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz.csi:md5,1ccfe8edfdae619a9f98f91a27718608"
+                    ]
+                ],
+                "tbi": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz.tbi:md5,af64b769e31b2c6d20dd1a9ca5b422dd"
+                    ]
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf:md5,395e8aae23869e2118229c8e4f869607"
+                    ]
+                ],
+                "vcfgz": [
+                    [
+                        {
+                            "id": "test",
+                            "sample": "test_sample",
+                            "platform": "illumina",
+                            "single_end": false
+                        },
+                        "re-test_sample-illumina-false-manta.vcf.gz:md5,395e8aae23869e2118229c8e4f869607"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,a1ede0be0456a875fcae37e667abc2c6"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-18T23:03:48.608838479"
+    }
+}

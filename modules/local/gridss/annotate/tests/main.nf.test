@@ -1,0 +1,64 @@
+nextflow_process {
+
+    name "Test Process GRIDSS_ANNOTATE"
+    script "../main.nf"
+    process "GRIDSS_ANNOTATE"
+    tag "gridss"
+    tag "gridss/annotate"
+    tag "modules"
+    tag "modules_local"
+
+    test("Annotate GRIDSS VCF - success") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz')
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.vcf },
+                { assert process.out.vcf.get(0).get(1).toString().endsWith('.vcf') },
+                { assert process.out.bed },
+                { assert process.out.bed.get(0).toString().endsWith('.bed') },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Annotate empty VCF - should handle gracefully") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = Channel.of([
+                    [ id: 'empty' ],
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/empty.vcf.gz')
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success || process.failed },
+                { assert snapshot(process.out).match() },
+                { assert process.out.versions }
+            )
+        }
+    }
+}

@@ -1,0 +1,116 @@
+nextflow_process {
+
+    name "Test Process VARIFY"
+    script "../main.nf"
+    process "VARIFY"
+    tag "varify"
+    tag "modules"
+    tag "modules_local"
+
+    test("Generate report with samtools stats - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = 4932  // taxonomy_id
+                input[1] = "$outputDir"
+                input[2] = [ [id: 'survivor'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf') ]
+                input[3] = [ [id: 'survivor_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta') ]
+                input[4] = [ [id: 'bcfmerge'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz') ]
+                input[5] = [ [id: 'bcfmerge_tbi'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz.tbi') ]
+                input[6] = [ [id: 'bcfmerge_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai') ]
+                input[7] = [ [id: 'vcf_list'], [ file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz') ] ]
+                input[8] = [ [id: 'ref'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.dict') ]
+                input[9] = "test"  // profile
+                input[10] = [ file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.sizes') ]  // samtools_stats
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.report_file },
+                { assert process.out.report_file.get(0).toString().endsWith('.html') },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Generate report without samtools stats - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = 4932
+                input[1] = "$outputDir"
+                input[2] = [ [id: 'survivor'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf') ]
+                input[3] = [ [id: 'survivor_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta') ]
+                input[4] = [ [id: 'bcfmerge'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz') ]
+                input[5] = [ [id: 'bcfmerge_tbi'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz.tbi') ]
+                input[6] = [ [id: 'bcfmerge_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai') ]
+                input[7] = [ [id: 'vcf_list'], [ file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz') ] ]
+                input[8] = [ [id: 'ref'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.dict') ]
+                input[9] = "test"
+                input[10] = []  // No samtools_stats
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.report_file },
+                { assert process.out.report_images },
+                { assert process.out.report_html },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    test("Multiple samtools stats files - stub") {
+        options '-stub'
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = 9606
+                input[1] = "$outputDir"
+                input[2] = [ [id: 'survivor'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf') ]
+                input[3] = [ [id: 'survivor_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta') ]
+                input[4] = [ [id: 'bcfmerge'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz') ]
+                input[5] = [ [id: 'bcfmerge_tbi'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz.tbi') ]
+                input[6] = [ [id: 'bcfmerge_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai') ]
+                input[7] = [ [id: 'vcf_list'], [ file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz') ] ]
+                input[8] = [ [id: 'ref'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.dict') ]
+                input[9] = "docker"
+                input[10] = [
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.sizes'),
+                    file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.bed')
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert process.out.versions }
+            )
+        }
+    }
+}

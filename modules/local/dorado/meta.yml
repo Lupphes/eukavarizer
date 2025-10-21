@@ -1,30 +1,50 @@
-name: dorado
-description: Basecalling module using Dorado to convert FAST5 to FASTQ
+name: "dorado"
+description: "Basecalling module using Dorado to convert FAST5/POD5 to FASTQ"
 keywords:
   - basecalling
   - nanopore
   - fast5
+  - pod5
   - fastq
+  - oxford-nanopore
+
 tools:
   - dorado:
-      description: Oxford Nanopore Technologies' Dorado basecaller
-      homepage: https://github.com/nanoporetech/dorado
-      documentation: https://github.com/nanoporetech/dorado
-      licence: MPL-2.0
+      description: "Oxford Nanopore Technologies' Dorado basecaller"
+      homepage: "https://github.com/nanoporetech/dorado"
+      documentation: "https://github.com/nanoporetech/dorado"
+      licence: "Oxford Nanopore Technologies PLC. Public License Version 1.0"
+
 input:
-  - meta:
-      type: map
-      description: Metadata (e.g., sample name)
-  - fast5s:
-      type: file
-      description: Folder containing FAST5 files
-  - model:
-      type: file
-      description: Dorado model (.pt) to use for basecalling
+  - - meta:
+        type: map
+        description: "Groovy Map containing sample information (e.g., id)"
+    - fast5s:
+        type: file
+        description: "Directory or files containing FAST5/POD5 files"
+        pattern: "*.{fast5,pod5}"
+
 output:
   - fastq:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.fastq.gz":
+          type: file
+          description: "Basecalled FASTQ output file (gzipped, name configurable via task.ext.prefix)"
+          pattern: "*.fastq.gz"
+  - versions:
       type: file
-      description: Gzipped FASTQ output file
-      pattern: "*.fastq.gz"
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
 authors:
-  - yourname
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

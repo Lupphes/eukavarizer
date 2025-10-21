@@ -1,24 +1,50 @@
-name: svaba_annotate
-description: Classify BNDs from SVABA VCF into INV, DEL, INS, or DUP/INS using mate-pair analysis
+name: "svaba_annotate"
+description: "Classify BND records from SVABA VCF into INV, DEL, INS, or DUP/INS using mate-pair analysis"
 keywords:
   - svaba
-  - structural variants
-  - VCF
-  - BND
-  - conversion
+  - structural-variants
+  - vcf
+  - bnd
+  - reclassification
+  - annotation
+
 tools:
   - svaba_annotate:
-      description: "Custom script to reclassify SVABA BND records"
-      homepage: "https://your-repo-or-docs-if-any"
+      description: "Custom Python script to reclassify SVABA BND records into standard SV types"
+      homepage: "https://github.com/Lupphes/eukavarizer"
+      documentation: "https://github.com/Lupphes/eukavarizer"
       licence: "MIT"
+
 input:
-  - sample_id:
-      type: string
-      description: Sample identifier
-  - vcf:
-      type: file
-      description: VCF file with SVABA BNDs
+  - - meta:
+        type: map
+        description: "Groovy Map containing sample information (e.g., id)"
+    - vcf:
+        type: file
+        description: "VCF file with SVABA BND records"
+        pattern: "*.{vcf,vcf.gz}"
+
 output:
-  - reclassified_vcf:
+  - vcf:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.reclassified.vcf":
+          type: file
+          description: "VCF file with reclassified SV types (name configurable via task.ext.prefix)"
+          pattern: "*.reclassified.vcf"
+  - versions:
       type: file
-      description: VCF file with reclassified SVTYPEs
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

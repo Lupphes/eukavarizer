@@ -1,0 +1,68 @@
+{
+    "Basecall with custom model config - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "custom_model"
+                        },
+                        "custom_model.fastq.gz:md5,8773e2bde287287c737f0e4b1351c05c"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,f8f2bece6ba0760ba4c144d3d7ad468d"
+                ],
+                "fastq": [
+                    [
+                        {
+                            "id": "custom_model"
+                        },
+                        "custom_model.fastq.gz:md5,8773e2bde287287c737f0e4b1351c05c"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,f8f2bece6ba0760ba4c144d3d7ad468d"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:35:25.206315425"
+    },
+    "Basecall nanopore reads - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "nanopore_test"
+                        },
+                        "nanopore_test.fastq.gz:md5,8773e2bde287287c737f0e4b1351c05c"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,f8f2bece6ba0760ba4c144d3d7ad468d"
+                ],
+                "fastq": [
+                    [
+                        {
+                            "id": "nanopore_test"
+                        },
+                        "nanopore_test.fastq.gz:md5,8773e2bde287287c737f0e4b1351c05c"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,f8f2bece6ba0760ba4c144d3d7ad468d"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:35:17.713014003"
+    }
+}

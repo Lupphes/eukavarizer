@@ -1,27 +1,55 @@
-name: gridss_annotate
-description: Annotate GRIDSS breakend (BND) calls with simple structural variant types (DEL, DUP, INV, INS) using orientation and position logic, and generate BED file.
+name: "gridss_annotate"
+description: "Annotate GRIDSS breakend (BND) calls with simple structural variant types (DEL, DUP, INV, INS) using orientation and position logic, and generate BED file"
 keywords:
   - gridss
-  - structural variants
-  - SV annotation
-  - VCF
-  - BED
+  - structural-variants
+  - sv-annotation
+  - vcf
+  - bed
+  - bnd
+  - reclassification
+
 tools:
-  - gridss_annotate:
-      description: "Custom R script using StructuralVariantAnnotation to reclassify GRIDSS BND records and generate simplified BED"
-      homepage: "https://github.com/PapenfussLab/gridss"
+  - structuralvariantannotation:
+      description: "R/Bioconductor package for structural variant annotation using GRIDSS"
+      homepage: "https://github.com/PapenfussLab/StructuralVariantAnnotation"
+      documentation: "https://bioconductor.org/packages/release/bioc/html/StructuralVariantAnnotation.html"
       licence: "GPL-3.0"
+
 input:
-  - meta:
-      type: map
-      description: Groovy map containing sample information (e.g. id)
-  - vcf:
-      type: file
-      description: Gzipped VCF file with GRIDSS BND-formatted structural variants (.vcf.gz)
+  - - meta:
+        type: map
+        description: "Groovy Map containing sample information (e.g., id)"
+    - vcf:
+        type: file
+        description: "Gzipped VCF file with GRIDSS BND-formatted structural variants"
+        pattern: "*.vcf.gz"
+
 output:
   - vcf:
-      type: file
-      description: Annotated VCF file with SIMPLE_TYPE and SVLEN INFO fields
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.reclassified.vcf":
+          type: file
+          description: "Annotated VCF file with SIMPLE_TYPE and SVLEN INFO fields (name configurable via task.ext.prefix)"
+          pattern: "*.reclassified.vcf"
   - bed:
       type: file
-      description: BED file containing simplified PASS-filtered variants classified as DEL, DUP, INV, or INS
+      description: "BED file containing simplified PASS-filtered variants classified as DEL, DUP, INV, or INS (name configurable via task.ext.prefix)"
+      pattern: "*.simple.bed"
+  - versions:
+      type: file
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

@@ -1,0 +1,70 @@
+name: "biodbcore_ena"
+description: "Downloads sequencing reads from ENA based on taxonomy ID and filtering criteria."
+keywords:
+  - download
+  - fastq
+  - sequencing-data
+  - ENA
+  - biodbcore
+
+tools:
+  - biodbcore:
+      description: "Python package to retrieve sequencing reads and reference genomes from public databases."
+      homepage: "https://github.com/Lupphes/biodbcore"
+      documentation: "https://github.com/Lupphes/biodbcore/blob/main/README.md"
+      licence: "MIT"
+
+input:
+  - taxonomy_id:
+      type: integer
+      description: "NCBI Taxonomy ID for the organism to retrieve sequencing reads for"
+      pattern: "^[0-9]+$"
+  - genome_size_ungapped:
+      type: integer
+      description: "Ungapped genome size in base pairs for coverage calculation"
+  - outdir:
+      type: string
+      description: "Output directory path"
+  - library_strategy:
+      type: string
+      description: "Sequencing library strategy (e.g., WGS, RNA-Seq, Hi-C)"
+  - instrument_platform:
+      type: string
+      description: "Sequencing platform (e.g., ILLUMINA, OXFORD_NANOPORE, PACBIO_SMRT)"
+  - minimum_coverage:
+      type: integer
+      description: "Minimum sequencing coverage required"
+  - maximum_coverage:
+      type: integer
+      description: "Maximum sequencing coverage allowed"
+  - max_results:
+      type: integer
+      description: "Maximum number of sequencing runs to retrieve"
+  - assembly_quality:
+      type: string
+      description: "Optional assembly quality filter (e.g., 'high')"
+
+output:
+  - ena_results:
+      type: file
+      description: "JSON metadata file with sequencing data retrieval results (name configurable via task.ext.prefix)"
+      pattern: "*_ena_results.json"
+  - samplesheet:
+      type: file
+      description: "Samplesheet CSV file compatible with nf-core pipelines (name configurable via task.ext.prefix)"
+      pattern: "*_samplesheet.csv"
+  - versions:
+      type: file
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

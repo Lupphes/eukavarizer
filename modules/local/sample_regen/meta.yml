@@ -1,0 +1,82 @@
+name: "sample_reheader"
+description: "Reheaders VCF files to rename samples and add custom INFO fields (caller, platform, sequencing type)"
+keywords:
+  - vcf
+  - reheader
+  - bcftools
+  - sample-name
+  - annotation
+  - metadata
+
+tools:
+  - bcftools:
+      description: "Utilities for variant calling and manipulating VCF/BCF files"
+      homepage: "https://samtools.github.io/bcftools/"
+      documentation: "https://samtools.github.io/bcftools/bcftools.html"
+      licence: "MIT/Expat"
+  - tabix:
+      description: "Generic indexer for TAB-delimited genome position files"
+      homepage: "https://www.htslib.org/"
+      documentation: "https://www.htslib.org/doc/tabix.html"
+      licence: "MIT/Expat"
+
+input:
+  - - meta:
+        type: map
+        description: "Groovy Map containing sample information (sample, platform, single_end)"
+    - vcf:
+        type: file
+        description: "Input VCF file to be reheadered (compressed or uncompressed)"
+        pattern: "*.{vcf,vcf.gz}"
+  - algorithm:
+      type: string
+      description: "Name of the SV calling algorithm used (e.g., manta, sniffles, delly)"
+
+output:
+  - vcf:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.vcf":
+          type: file
+          description: "Reheadered VCF file (uncompressed)"
+          pattern: "*.vcf"
+  - vcfgz:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.vcf.gz":
+          type: file
+          description: "Reheadered VCF file (compressed)"
+          pattern: "*.vcf.gz"
+  - tbi:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.vcf.gz.tbi":
+          type: file
+          description: "Tabix index for compressed VCF"
+          pattern: "*.vcf.gz.tbi"
+  - csi:
+      - meta:
+          type: map
+          description: "Groovy Map containing sample information"
+      - "*.vcf.gz.csi":
+          type: file
+          description: "CSI index for compressed VCF"
+          pattern: "*.vcf.gz.csi"
+  - versions:
+      type: file
+      description: "File containing software versions"
+      pattern: "versions.yml"
+
+authors:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"
+    affiliation: "MUNI"
+
+maintainers:
+  - name: "Ondřej Sloup"
+    email: "ondrej.sloup@protonmail.com"
+    github: "Lupphes"

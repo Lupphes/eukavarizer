@@ -1,0 +1,107 @@
+{
+    "Multiple samtools stats files - stub": {
+        "content": [
+            {
+                "0": [
+                    "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ],
+                "report_file": [
+                    "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_html": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_images": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:37:30.744819548"
+    },
+    "Generate report with samtools stats - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_html": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_images": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:37:08.82982917"
+    },
+    "Generate report without samtools stats - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_html": [
+                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "report_images": [
+                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-20T22:37:19.230092226"
+    }
+}
