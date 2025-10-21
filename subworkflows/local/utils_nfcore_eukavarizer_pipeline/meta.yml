@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "UTILS_NFCORE_EUKAVARIZER_PIPELINE"
+description: Pipeline initialization and completion utilities for Eukavarizer
+keywords:
+  - utility
+  - pipeline
+  - initialisation
+  - completion
+  - eukavarizer
+components:
+  - BIODBCORE_ENA
+  - UTILS_NFSCHEMA_PLUGIN
+  - UTILS_NFCORE_PIPELINE
+  - UTILS_NEXTFLOW_PIPELINE
+input:
+  # PIPELINE_INITIALISATION inputs
+  - version:
+      type: boolean
+      description: Display version and exit
+  - validate_params:
+      type: boolean
+      description: Validate parameters against the schema at runtime
+  - monochrome_logs:
+      type: boolean
+      description: Disable colored log output
+  - nextflow_cli_args:
+      type: list
+      description: Positional Nextflow CLI arguments
+  - outdir:
+      type: string
+      description: Output directory path
+  - input:
+      type: string
+      description: Path to input samplesheet
+  # PIPELINE_COMPLETION inputs
+  - email:
+      type: string
+      description: Email address for notifications
+  - email_on_fail:
+      type: string
+      description: Email address for failure notifications
+  - plaintext_email:
+      type: boolean
+      description: Send plain-text email instead of HTML
+  - hook_url:
+      type: string
+      description: Webhook URL for IM notifications
+  - multiqc_report:
+      type: string
+      description: Path to MultiQC report
+output:
+  # PIPELINE_INITIALISATION outputs
+  - samplesheet:
+      type: channel
+      description: Processed samplesheet channel with metadata and file paths
+  - versions:
+      type: channel
+      description: Software versions channel
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"
