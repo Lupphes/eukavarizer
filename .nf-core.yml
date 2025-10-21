@@ -2,16 +2,95 @@ repository_type: pipeline
 
 nf_core_version: 3.2.0
 
+org_path: nf-core
+
 lint:
-  plugin_includes: False
+  # Linting configuration
+  plugin_includes: false
+
+  # Files to exclude from linting
+  files_exist:
+    - .editorconfig
+    - .gitattributes
+    - .github/.dockstore.yml
+    - .github/CONTRIBUTING.md
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting.yml
+    - .github/workflows/linting_comment.yml
+    - .gitignore
+    - .gitpod.yml
+    - .prettierignore
+    - .prettierrc.yml
+    - CHANGELOG.md
+    - CITATIONS.md
+    - CODE_OF_CONDUCT.md
+    - LICENSE
+    - README.md
+    - assets/email_template.html
+    - assets/email_template.txt
+    - assets/nf-core-eukavarizer_logo_light.png
+    - assets/sendmail_template.txt
+    - conf/modules.config
+    - conf/test.config
+    - conf/test_full.config
+    - docs/images/nf-core-eukavarizer_logo_dark.png
+    - docs/images/nf-core-eukavarizer_logo_light.png
+    - docs/output.md
+    - docs/usage.md
+    - lib/NfcoreTemplate.groovy
+    - lib/WorkflowEukavarizer.groovy
+    - lib/WorkflowMain.groovy
+    - nextflow.config
+    - nextflow_schema.json
+
+  # Files that can have outdated versions
+  files_unchanged: []
+
+  # Modules configuration
+  modules_config: true
+
+  # Nextflow config checks
+  nextflow_config:
+    - manifest.name
+    - manifest.description
+    - manifest.version
+    - manifest.nextflowVersion
+    - manifest.homePage
+    - manifest.author
+    - manifest.mainScript
+    - manifest.defaultBranch
+    - process.cpus
+    - process.memory
+    - process.time
+
+  # Pipeline todos - items that should be addressed
+  pipeline_todos: false
+
+  # Schema validation
+  schema_lint: true
+  schema_params: true
+
+bump_version:
+  # Version bump configuration
+  nextflow_config: true
 
 template:
   org: nf-core
   name: eukavarizer
-  description: Structural Variance for Eukaryotic Genomes
+  description: Structural variant detection and analysis pipeline for eukaryotic genomes
   author: Ondřej Sloup
-  version: 1.1.0dev
+  version: 1.0.0dev
   force: true
   outdir: .
-  skip_features: []
+  skip_features:
+    - fastqc
+    - multiqc
   is_nfcore: true
+
+  # Template customization
+  prefix: eukavarizer

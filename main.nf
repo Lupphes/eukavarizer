@@ -99,7 +99,8 @@ workflow NFCORE_EUKAVARIZER {
                 SV_UNIFICATION.out.bcfmerge_stats,
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.tbi_list,
-                REFERENCE_RETRIEVAL.out.reference_genome_unzipped
+                REFERENCE_RETRIEVAL.out.reference_genome_unzipped,
+                SEQUENCE_PROCESSOR.out.samtools_stats
             ).report_file
 
         }

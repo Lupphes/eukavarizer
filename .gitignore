@@ -5,6 +5,8 @@ results/
 .DS_Store
 testing/
 testing*
+.nf-test/
+.nf-test-*.nf
 *.pyc
 null/
 logs/
@@ -191,3 +193,4 @@ SRR8615297/
 HG002/
 HG002_reads/
 src/out/
+.history

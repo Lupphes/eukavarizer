@@ -1,12 +1,83 @@
 reports:
-  report.html:
-    display: "Eukavarizer Structural Variant Report"
+  # Main Pipeline Reports
+  multiqc/multiqc_report.html:
+    display: "MultiQC Quality Control Report"
     type: html
+    description: "Comprehensive quality control metrics across all samples and processing steps"
 
-  multiqc_report.html:
-    display: "MultiQC Report"
+  varify/report.html:
+    display: "Varify Structural Variant Report"
     type: html
+    description: "Interactive visualization and summary of detected structural variants"
 
-  plots/:
-    display: "Report Figures (PNG/HTML)"
+  # Pipeline Execution Information
+  pipeline_info/execution_report.html:
+    display: "Pipeline Execution Report"
+    type: html
+    description: "Detailed information about pipeline execution, resources, and timing"
+
+  pipeline_info/execution_timeline.html:
+    display: "Pipeline Timeline"
+    type: html
+    description: "Visual timeline of task execution and resource usage"
+
+  pipeline_info/execution_trace.txt:
+    display: "Execution Trace Log"
+    type: text
+    description: "Detailed trace of all executed tasks with resource metrics"
+
+  # Merged Structural Variant Results
+  sv_merged/survivor_merged.vcf:
+    display: "SURVIVOR Merged VCF"
+    type: text
+    description: "Merged structural variants across all enabled callers using SURVIVOR"
+
+  sv_merged/bcftools_merged.vcf.gz:
+    display: "BCFtools Merged VCF (Compressed)"
+    type: binary
+    description: "BCFtools merged and filtered structural variant calls"
+
+  sv_merged/survivor_merged.stats.txt:
+    display: "SURVIVOR Statistics"
+    type: text
+    description: "Summary statistics for SURVIVOR merged variants"
+
+  sv_merged/bcftools_merged.stats.txt:
+    display: "BCFtools Statistics"
+    type: text
+    description: "Detailed variant statistics from BCFtools"
+
+  # Per-Caller Results (optional, useful for debugging)
+  sv_calling/:
+    display: "Per-Caller SV Results"
     type: directory
+    description: "Individual VCF files and logs from each SV caller"
+
+  # Alignment Statistics
+  alignment/:
+    display: "Alignment Files and Statistics"
+    type: directory
+    description: "Processed BAM files with alignment and coverage statistics"
+
+  # Quality Control Outputs
+  preprocessing/fastqc/:
+    display: "FastQC Reports"
+    type: directory
+    description: "Per-sample FastQC quality control reports"
+
+  preprocessing/fastp/:
+    display: "Fastp Trimming Reports"
+    type: directory
+    description: "Adapter trimming and quality filtering statistics"
+
+  # Reference Genome Information
+  reference/:
+    display: "Reference Genome and Indices"
+    type: directory
+    description: "Reference genome files and aligner indices used in the analysis"
+
+  # Additional Visualizations
+  plots/:
+    display: "Additional Plots and Figures"
+    type: directory
+    description: "Supplementary visualizations including per-caller plots and statistics"

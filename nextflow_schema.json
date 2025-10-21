@@ -222,13 +222,6 @@
                     "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
                     "fa_icon": "fas fa-directions"
                 },
-                "minimap2_profile": {
-                    "type": "string",
-                    "default": "-ax sr",
-                    "description": "Minimap2 alignment profile to use.",
-                    "help_text": "Command-line profile option for minimap2 (e.g. -ax sr).",
-                    "fa_icon": "fas fa-sliders-h"
-                },
                 "long_read_threshold": {
                     "type": "integer",
                     "minimum": 0,
@@ -282,7 +275,8 @@
                     "default": true
                 },
                 "deduplicate_flag": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "default": true
                 },
                 "bbduk_trimq": {
                     "type": "integer",
@@ -389,7 +383,7 @@
                 "bcftools_filter_args": {
                     "type": "string",
                     "description": "Arguments to pass to bcftools filter.",
-                    "default": "--include \\'(SVLEN <= -50 || SVLEN >= 50 || SVLEN == 0) && QUAL>20 && GT!=\"0/0\" && FILTER==\"PASS\"\\'",
+                    "default": "--include \\'(SVLEN <= -50 || SVLEN >= 50 || SVLEN == 0) && QUAL>20 && GT!=\"0/0\" && FILTER==\"PASS\"\\",
                     "fa_icon": "fas fa-filter",
                     "help_text": "Custom filter expression for bcftools used in SV filtering."
                 },
@@ -704,5 +698,20 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "seq_center": {
+            "type": "string",
+            "default": "unspecified"
+        },
+        "recalibrate_flag": {
+            "type": "boolean"
+        },
+        "known_sites": {
+            "type": "string"
+        },
+        "known_sites_tbi": {
+            "type": "string"
+        }
+    }
 }
