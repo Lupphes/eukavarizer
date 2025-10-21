@@ -33,10 +33,7 @@ process SURVIVOR_MERGE {
         }
     }
 
-
     """
-    echo ${vcfs}
-    ls
     SURVIVOR merge \\
         <(ls *.vcf) \\
         ${max_distance_breakpoints} \\

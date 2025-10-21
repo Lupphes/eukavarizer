@@ -4,4 +4,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::svync=0.2.0
+  - bioconda::svync=0.3.0
