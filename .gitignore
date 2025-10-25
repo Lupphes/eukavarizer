@@ -181,6 +181,8 @@ cython_debug/
 *.parquet
 assembly_summary_refseq.txt
 *.gz
+# Allow test data files tracked by Git LFS
+!tests/*.gz
 *.log.*
 pipeline/.nextflow/*
 work/
