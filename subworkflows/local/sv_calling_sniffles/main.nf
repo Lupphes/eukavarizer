@@ -41,7 +41,7 @@ workflow SV_CALLING_SNIFFLES {
         reference_genome_bgzipped
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_sniffles = "sniffles"
 
         SNIFFLES(
@@ -62,7 +62,7 @@ workflow SV_CALLING_SNIFFLES {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_sniffles}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_sniffles}.yaml"))
                 )
         )
 
@@ -71,9 +71,9 @@ workflow SV_CALLING_SNIFFLES {
             name_sniffles
         )
 
-        ch_versions = ch_versions.mix(SNIFFLES.out.versions.first())
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(SNIFFLES.out.versions)
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

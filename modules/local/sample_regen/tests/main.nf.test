@@ -15,7 +15,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [ id: 'test', sample: 'test_sample', platform: 'illumina', single_end: false ],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')
                 ])
@@ -42,7 +42,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [ id: 'test2', sample: 'sample2', platform: 'ont', single_end: true ],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz')
                 ])
@@ -73,7 +73,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [ id: 'stub', sample: 'stub_sample', platform: 'pacbio', single_end: false ],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')
                 ])

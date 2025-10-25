@@ -46,6 +46,11 @@
                         "re-sample1-null-true-cutesv.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,11eaa29592db44c088a11b9d661cb85b",
+                    "versions.yml:md5,4bba47193cd559c26eb62cf3617caebc",
+                    "versions.yml:md5,cce40ef7e7e92877cb23d862f86b2e9e"
+                ],
                 "csi": [
                     [
                         {
@@ -89,6 +94,11 @@
                         },
                         "re-sample1-null-true-cutesv.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,11eaa29592db44c088a11b9d661cb85b",
+                    "versions.yml:md5,4bba47193cd559c26eb62cf3617caebc",
+                    "versions.yml:md5,cce40ef7e7e92877cb23d862f86b2e9e"
                 ]
             }
         ],
@@ -96,6 +106,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T02:39:00.115927297"
+        "timestamp": "2025-10-23T02:36:19.065201845"
     }
 }

@@ -1,0 +1,13 @@
+{
+    "eukavarizer: test profile": {
+        "content": [
+            "4932.html:md5,f35a56e70c2906b98fdb43bd7b974907",
+            "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548"
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-22T01:27:10.239872562"
+    }
+}

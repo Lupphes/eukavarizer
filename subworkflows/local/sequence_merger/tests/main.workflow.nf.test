@@ -1,3 +1,17 @@
+/*
+ * SEQUENCE_MERGER Workflow Tests
+ *
+ * This workflow handles merging of BAM files from multiple lanes, optional deduplication,
+ * and optional base quality score recalibration (BQSR).
+ * Key features:
+ * - Merges multiple BAM files from the same sample (e.g., different lanes) using samtools
+ * - Single BAM files pass through without merging
+ * - Optional deduplication: Removes PCR/optical duplicates using GATK MarkDuplicates
+ * - Optional BQSR: Recalibrates base quality scores using GATK BaseRecalibrator + ApplyBQSR
+ * - BQSR requires known variant sites (e.g., dbSNP) for recalibration
+ * Output: Merged, optionally deduplicated, and optionally recalibrated BAM + BAI files
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_MERGER"
@@ -8,6 +22,12 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sequence_merger"
 
+    /*
+     * Test scenario 1: Single BAM without deduplication or recalibration
+     * This test validates the minimal processing path - a single BAM file passes through.
+     * Expected behavior: The workflow should recognize there's only one BAM (n_fastq: 1),
+     * skip merging, skip deduplication, and skip recalibration, outputting the BAM + BAI directly.
+     */
     test("Single BAM - no deduplication - no recalibration - stub") {
         options '-stub'
 
@@ -18,12 +38,12 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
                     [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -37,6 +57,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Multiple BAMs require merging (no deduplication)
+     * This test validates BAM merging for a sample sequenced across multiple lanes.
+     * Expected behavior: The workflow should use samtools merge to combine multiple BAM files
+     * (n_fastq: 2) into a single BAM, then index it, without deduplication or recalibration.
+     */
     test("Multiple BAMs - merge - no deduplication - stub") {
         options '-stub'
 
@@ -47,15 +73,16 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // Multiple BAM files from different lanes that need merging
+                input[0] = channel.of([
                     [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 2],
                     [
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test2.paired_end.sorted.bam', checkIfExists: true)
                     ]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -68,6 +95,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Single BAM with deduplication enabled
+     * This test validates duplicate marking/removal using GATK MarkDuplicates.
+     * Expected behavior: The workflow should run GATK MarkDuplicates on the BAM file
+     * to identify and mark PCR/optical duplicates, improving downstream variant calling accuracy.
+     */
     test("Single BAM - with deduplication - stub") {
         options '-stub'
 
@@ -78,12 +111,12 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
                     [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -96,6 +129,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Single BAM with base quality score recalibration (BQSR)
+     * This test validates GATK BQSR for correcting systematic base quality score errors.
+     * Expected behavior: The workflow should run GATK BaseRecalibrator using known variant sites
+     * (dbSNP) to build a recalibration model, then ApplyBQSR to adjust quality scores, improving
+     * variant calling accuracy.
+     */
     test("Single BAM - with recalibration - stub") {
         options '-stub'
 
@@ -108,12 +148,12 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
                     [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -126,6 +166,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Single BAM with both deduplication and recalibration (full processing)
+     * This test validates the complete BAM processing pipeline with both optional steps enabled.
+     * Expected behavior: The workflow should first run GATK MarkDuplicates to remove duplicates,
+     * then run GATK BQSR to recalibrate base quality scores, producing a fully processed BAM
+     * optimized for accurate variant calling.
+     */
     test("Single BAM - deduplication and recalibration - stub") {
         options '-stub'
 
@@ -138,12 +185,12 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
                     [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -156,6 +203,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 6: Multiple samples processed in parallel
+     * This test validates batch processing of multiple samples with deduplication.
+     * Expected behavior: The workflow should process each sample (sample1, sample2) independently
+     * in parallel, applying deduplication to each, generating separate deduplicated BAM files.
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -166,7 +219,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two different samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', sample: 'sample1', patient: 'patient1', platform: 'illumina', single_end: false, n_fastq: 1],
                         [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
@@ -176,8 +230,8 @@ nextflow_workflow {
                         [file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)]
                     ]
                 )
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }

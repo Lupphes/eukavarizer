@@ -8,6 +8,13 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "fastqc_multiqc_analysis"
 
+    /*
+     * Test scenario 1: FastQC-only quality assessment
+     * This test validates the workflow behavior when only FastQC analysis is enabled.
+     * Expected behavior: The workflow should run FastQC to generate quality metrics and HTML reports
+     * for paired-end FASTQ files, while skipping MultiQC aggregation. This is useful when users want
+     * per-sample quality reports without aggregated summaries across multiple samples.
+     */
     test("FastQC only enabled") {
 
         when {
@@ -17,7 +24,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -37,6 +44,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: MultiQC-only aggregation mode
+     * This test validates the workflow when only MultiQC is enabled, skipping FastQC.
+     * Expected behavior: The workflow should run MultiQC to aggregate existing quality metrics
+     * (from other tools like FASTP, BBDuk, etc.) into a comprehensive HTML report, without
+     * running FastQC. This is useful when FastQC has already been run separately or when users
+     * only want aggregated summaries from other QC tools.
+     */
     test("MultiQC only enabled - stub") {
         options '-stub'
 
@@ -47,7 +62,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -65,6 +80,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Complete quality assessment with FastQC and MultiQC
+     * This test validates the full quality control workflow with both tools enabled.
+     * Expected behavior: The workflow should run FastQC to generate per-sample quality metrics,
+     * then aggregate all FastQC results along with other QC metrics into a comprehensive MultiQC
+     * HTML report. This provides both detailed per-sample reports and aggregated cross-sample
+     * summaries for complete quality assessment.
+     */
     test("Both enabled - stub") {
         options '-stub'
 
@@ -75,7 +98,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -95,6 +118,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Quality control disabled - skip all QC
+     * This test validates workflow behavior when both FastQC and MultiQC are disabled.
+     * Expected behavior: The workflow should skip all quality control steps and produce no
+     * FastQC or MultiQC reports. This is useful for re-analysis runs where QC has already been
+     * performed, or when users want to minimize compute time for testing or development.
+     */
     test("Both disabled - skip") {
 
         when {
@@ -104,7 +134,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),

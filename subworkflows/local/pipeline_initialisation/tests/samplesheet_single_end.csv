@@ -1,0 +1,2 @@
+patient,sample,sex,status,lane,platform,fastq_1
+patient1,sample1,XX,0,L001,illumina,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz

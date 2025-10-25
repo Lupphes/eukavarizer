@@ -24,8 +24,8 @@ include { SEQUENCE_PROCESSOR        } from './subworkflows/local/sequence_proces
 include { SV_UNIFICATION            } from './subworkflows/local/sv_unification'
 include { REPORT_GENERATION         } from './subworkflows/local/report_generation'
 
-include { PIPELINE_INITIALISATION   } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
-include { PIPELINE_COMPLETION       } from './subworkflows/local/utils_nfcore_eukavarizer_pipeline'
+include { PIPELINE_INITIALISATION   } from './subworkflows/local/pipeline_initialisation'
+include { PIPELINE_COMPLETION       } from './subworkflows/local/pipeline_initialisation'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +42,7 @@ workflow NFCORE_EUKAVARIZER {
         reference_genome
 
     main:
-        report = Channel.empty()
+        report = channel.empty()
         sv_callers_enabled =
             params.gridss_flag || params.delly_flag || params.manta_flag ||
             params.sniffles_flag || params.cutesv_flag || params.tiddit_flag ||
@@ -111,8 +111,8 @@ workflow NFCORE_EUKAVARIZER {
     log.info "📂 Results will be saved in: ${params.outdir}"
 
     emit:
-        multiqc_report      = Channel.empty()
-        report_file         = sv_callers_enabled ? report : Channel.empty()
+        multiqc_report      = channel.empty()
+        report_file         = sv_callers_enabled ? report : channel.empty()
 }
 
 /*
@@ -127,7 +127,7 @@ workflow {
         //
         // Input channels for the workflow
         //
-        reference_genome        = params.reference_genome ? Channel.fromPath(params.reference_genome, type: 'file', checkIfExists: true)  : []
+        reference_genome        = params.reference_genome ? file(params.reference_genome, checkIfExists: true)  : []
         //
         // SUBWORKFLOW: Run initialisation tasks
         //

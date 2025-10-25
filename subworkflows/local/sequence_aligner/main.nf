@@ -40,7 +40,7 @@ workflow SEQUENCE_ALIGNER {
         reference_genome_bwa_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         // THIS HAS BEEN ADAPTED FROM NF_CORE/SAREK
         // STEP 1: MAPPING READS TO REFERENCE GENOME
@@ -94,9 +94,9 @@ workflow SEQUENCE_ALIGNER {
         )
 
         mixed_bam_inputs = BWA_MEM.out.bam.mix(BWAMEM2_MEM.out.bam).mix(MINIMAP2_ALIGN.out.bam)
-        ch_versions = ch_versions.mix(BWA_MEM.out.versions.first())
-        ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions.first())
-        ch_versions = ch_versions.mix(MINIMAP2_ALIGN.out.versions.first())
+        ch_versions = ch_versions.mix(BWA_MEM.out.versions)
+        ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions)
+        ch_versions = ch_versions.mix(MINIMAP2_ALIGN.out.versions)
 
         // Grouping the bams from the same samples not to stall the workflow
         // Use groupKey to make sure that the correct group can advance as soon as it is complete

@@ -75,7 +75,7 @@ workflow PIPELINE_INITIALISATION {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -115,7 +115,7 @@ workflow PIPELINE_INITIALISATION {
 
     if (input) {
         // Adapted from nf-core/sarek
-        Channel
+        channel
             .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
             .map { meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5 ->
                 [ meta.patient + meta.sample, [meta, fastq_1, fastq_2, bam, cram, sra, bax_h5, fast5, pod5] ]
@@ -219,7 +219,7 @@ workflow PIPELINE_INITIALISATION {
         }.set { ch_samplesheet }
     } else {
         log.info "No samplesheet provided — will search for input FASTQs automatically"
-        Channel.empty().set { [] }
+        channel.empty().set { [] }
 
         //TODO: This should just return samplesheet
         BIODBCORE_ENA(
@@ -233,7 +233,7 @@ workflow PIPELINE_INITIALISATION {
             params.max_results,
             params.assembly_quality,
         )
-        ch_versions = ch_versions.mix(BIODBCORE_ENA.out.versions.first())
+        ch_versions = ch_versions.mix(BIODBCORE_ENA.out.versions)
     }
 
     emit:

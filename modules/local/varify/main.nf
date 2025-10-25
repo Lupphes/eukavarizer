@@ -31,7 +31,7 @@ process VARIFY {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${taxonomy_id}"
-    def samtools_stats_files = samtools_stats ? samtools_stats.collect { "--samtools-stats-file ${it}" }.join(' ') : ''
+    def samtools_stats_files = samtools_stats ? samtools_stats.collect { file -> "--samtools-stats-file ${file}" }.join(' ') : ''
     """
     varify \\
         --output-dir . \\

@@ -47,7 +47,7 @@ workflow SV_CALLING_GRIDSS {
         reference_genome_bwa_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_gridss = "gridss"
 
         GRIDSS_GRIDSS(
@@ -80,7 +80,7 @@ workflow SV_CALLING_GRIDSS {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, [])
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_gridss}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_gridss}.yaml"))
                 )
         )
 
@@ -89,12 +89,12 @@ workflow SV_CALLING_GRIDSS {
             name_gridss
         )
 
-        ch_versions = ch_versions.mix(GRIDSS_GRIDSS.out.versions.first())
+        ch_versions = ch_versions.mix(GRIDSS_GRIDSS.out.versions)
         if (params.gridss_annotate) {
-            ch_versions = ch_versions.mix(GRIDSS_ANNOTATE.out.versions.first())
+            ch_versions = ch_versions.mix(GRIDSS_ANNOTATE.out.versions)
         }
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

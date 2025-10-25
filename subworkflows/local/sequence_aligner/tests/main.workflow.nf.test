@@ -1,3 +1,16 @@
+/*
+ * SEQUENCE_ALIGNER Workflow Tests
+ *
+ * This workflow handles alignment of FASTQ reads to a reference genome using multiple aligners.
+ * Key features:
+ * - Supports three aligners: BWA-MEM, BWAMEM2, and minimap2
+ * - BWA-MEM/BWAMEM2: Optimized for Illumina short-read paired-end data
+ * - minimap2: Optimized for long-read data (ONT, PacBio)
+ * - Handles multiple lanes from the same sample (requires downstream merging)
+ * - Processes multiple samples in parallel
+ * Platform support: Illumina (BWA/BWAMEM2), ONT/PacBio (minimap2)
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_ALIGNER"
@@ -8,6 +21,12 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sequence_aligner"
 
+    /*
+     * Test scenario 1: BWA-MEM alignment with Illumina paired-end reads
+     * This test validates the standard BWA-MEM aligner with Illumina short-read data.
+     * Expected behavior: BWA-MEM should align paired-end FASTQ files to the reference genome,
+     * generating a sorted BAM file with mapped reads (bam_mapped output).
+     */
     test("BWA alignment - Illumina paired-end - stub") {
         options '-stub'
 
@@ -18,15 +37,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                     ]
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -40,6 +59,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: BWAMEM2 alignment with Illumina paired-end reads
+     * This test validates the BWAMEM2 aligner (improved version of BWA-MEM) with Illumina data.
+     * Expected behavior: BWAMEM2 should align paired-end FASTQ files to the reference genome,
+     * generating a sorted BAM file. BWAMEM2 offers better performance than BWA-MEM for longer reads.
+     */
     test("BWAMEM2 alignment - Illumina paired-end - stub") {
         options '-stub'
 
@@ -50,15 +75,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                     ]
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -71,6 +96,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: MINIMAP2 alignment with ONT long reads
+     * This test validates minimap2 aligner with Oxford Nanopore long-read sequencing data.
+     * Expected behavior: minimap2 should align single-end ONT FASTQ reads to the reference genome,
+     * generating a sorted BAM file. minimap2 is optimized for long-read alignment and handles
+     * the higher error rates typical of nanopore sequencing.
+     */
     test("MINIMAP2 alignment - ONT long reads - stub") {
         options '-stub'
 
@@ -81,12 +113,13 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // ONT long-read sample (single-end, typical for nanopore)
+                input[0] = channel.of([
                     [id: 'test_ont', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'ont', single_end: true, size: 1, num_lanes: 1],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -99,6 +132,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Multiple lanes from the same sample
+     * This test validates handling of multi-lane sequencing data for a single sample.
+     * Expected behavior: The workflow should process each lane independently, generating
+     * separate BAM files (test_L001, test_L002) that will need to be merged downstream
+     * in the sequence_merger subworkflow.
+     */
     test("Multiple lanes - same sample - stub") {
         options '-stub'
 
@@ -109,7 +149,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two lanes (L001, L002) from the same sample - requires merging downstream
+                input[0] = channel.of(
                     [
                         [id: 'test_L001', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 2],
                         [
@@ -125,8 +166,8 @@ nextflow_workflow {
                         ]
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -139,6 +180,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Multiple samples processed in parallel
+     * This test validates the workflow's ability to align multiple independent samples in batch.
+     * Expected behavior: BWA-MEM should process each sample (sample1, sample2) independently
+     * in parallel, generating separate BAM files for each sample.
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -149,7 +196,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two different samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', patient: 'patient1', sample: 'sample1', sex: 'XX', status: 0, platform: 'illumina', single_end: false, size: 1, num_lanes: 1],
                         [
@@ -165,8 +213,8 @@ nextflow_workflow {
                         ]
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }

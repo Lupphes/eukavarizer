@@ -8,6 +8,16 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "report_generation"
 
+    /*
+     * Test scenario 1: Comprehensive report generation with full inputs
+     * This test validates the complete report generation workflow including all optional inputs.
+     * Expected behavior: The workflow should generate an HTML report combining: quality control
+     * metrics from MultiQC, variant calling statistics from merged VCFs (input[2-3]), per-caller
+     * VCF statistics (input[7-8] for caller1 and caller2), genomic coverage analysis using the
+     * reference genome (input[9]), and alignment statistics from BAM files (input[10]). The report
+     * should provide a comprehensive overview of the entire pipeline execution including sequencing
+     * quality, alignment metrics, variant discovery rates, and caller concordance statistics.
+     */
     test("Generate report with merged VCFs - stub") {
         options '-stub'
 
@@ -16,22 +26,22 @@ nextflow_workflow {
                 """
                 input[0] = 4932  // Yeast taxonomy ID
                 input[1] = "$outputDir"
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[3] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[4] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)
-                input[5] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)
-                input[6] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[7] = Channel.of(
-                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)],
-                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test2.genome.vcf.gz', checkIfExists: true)]
+                input[2] = channel.value([[id: 'survivor'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/gridss.somatic.vcf')])
+                input[3] = channel.value([[id: 'survivor_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')])
+                input[4] = channel.value([[id: 'bcfmerge'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz')])
+                input[5] = channel.value([[id: 'bcfmerge_tbi'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf.gz.tbi')])
+                input[6] = channel.value([[id: 'bcfmerge_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_annotate.vcf.gz')])
+                input[7] = channel.of(
+                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome_21.somatic_sv.vcf.gz')],
+                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/sv_query.vcf.gz')]
                 )
-                input[8] = Channel.of(
-                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)],
-                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test2.genome.vcf.gz.tbi', checkIfExists: true)]
+                input[8] = channel.of(
+                    [[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome_21.somatic_sv.vcf.gz.tbi')],
+                    [[id: 'caller2'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/sv_query.vcf.gz.tbi')]
                 )
-                input[9] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[10] = Channel.of(
-                    [[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.stats', checkIfExists: true)]
+                input[9] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta')])
+                input[10] = channel.of(
+                    [[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/read_group_settings.txt', checkIfExists: true)]
                 )
                 """
             }
@@ -46,6 +56,17 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Basic report generation with minimal required inputs
+     * This test validates report generation when only essential inputs are provided.
+     * Expected behavior: The workflow should generate a basic HTML report using the minimum
+     * required inputs: merged VCF files for variant statistics (input[2-3]), at least one
+     * per-caller VCF (input[7-8] for caller1 only), reference genome for context (input[9]),
+     * and alignment statistics (input[10]). The report should gracefully handle missing optional
+     * inputs (like MultiQC reports or additional caller VCFs) and produce a functional summary
+     * focusing on core metrics: total variants called, variant types distribution, and basic
+     * quality metrics, demonstrating robustness when not all pipeline components are used.
+     */
     test("Generate report with minimal inputs - stub") {
         options '-stub'
 
@@ -54,15 +75,15 @@ nextflow_workflow {
                 """
                 input[0] = 4932
                 input[1] = "$outputDir"
-                input[2] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[3] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[4] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)
-                input[5] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)
-                input[6] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf', checkIfExists: true)
-                input[7] = Channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz', checkIfExists: true)])
-                input[8] = Channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.genome.vcf.gz.tbi', checkIfExists: true)])
-                input[9] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[10] = Channel.of([[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.stats', checkIfExists: true)])
+                input[2] = channel.value([[id: 'survivor'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/gridss.somatic.vcf')])
+                input[3] = channel.value([[id: 'survivor_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test.rnaseq.vcf')])
+                input[4] = channel.value([[id: 'bcfmerge'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/genmod.vcf.gz')])
+                input[5] = channel.value([[id: 'bcfmerge_tbi'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/NA12878_chrM.vcf.gz.tbi')])
+                input[6] = channel.value([[id: 'bcfmerge_stats'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/test_models.vcf.gz')])
+                input[7] = channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/NA24385_sv.vcf.gz')])
+                input[8] = channel.of([[id: 'caller1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/vcf/NA24385_sv.vcf.gz.tbi')])
+                input[9] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta')])
+                input[10] = channel.of([[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/read_group_settings.txt', checkIfExists: true)])
                 """
             }
         }

@@ -1,3 +1,16 @@
+/*
+ * SV_CALLING_MANTA Workflow Tests
+ *
+ * Manta is a structural variant caller optimized for Illumina paired-end and mate-pair reads.
+ * Key features:
+ * - Designed specifically for short-read Illumina sequencing data
+ * - Requires paired-end reads (filters out single-end data)
+ * - Optimized for reads shorter than the long_read_threshold (default 300bp)
+ * - Produces three VCF outputs: small variants, candidate SVs, and diploid SVs
+ * Platform support: Illumina paired-end reads only
+ * Read length filtering: Filters out reads >= long_read_threshold
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_MANTA"
@@ -8,6 +21,15 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_manta"
 
+    /*
+     * Test scenario 1: Standard Illumina paired-end BAM input
+     * This test validates Manta's basic SV calling with appropriate Illumina paired-end reads.
+     * Expected behavior: Manta should process the BAM and generate three types of VCF outputs:
+     * - small_vcf: Small variants and indels
+     * - candidate_vcf: Candidate structural variants
+     * - diploid_vcf: High-confidence diploid SVs
+     * Each VCF includes compressed (vcfgz), tabix index (tbi), and CSI index (csi) files.
+     */
     test("Illumina paired-end BAM input - stub") {
         options '-stub'
 
@@ -17,13 +39,13 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -48,6 +70,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Single-end reads are filtered out
+     * This test validates Manta's platform filtering logic - it should skip single-end data.
+     * Expected behavior: The workflow should succeed but produce no output, as Manta requires
+     * paired-end reads. Single-end reads (single_end: true) should be filtered before calling Manta.
+     */
     test("Single-end reads filtered out - stub") {
         options '-stub'
 
@@ -57,13 +85,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // Single-end sample that should be filtered out (Manta requires paired-end)
+                input[0] = channel.of([
                     [id: 'test_single', single_end: true, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -75,6 +104,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Long reads are filtered out
+     * This test validates Manta's read length filtering - it should skip long-read data.
+     * Expected behavior: The workflow should succeed but produce no output, as Manta is optimized
+     * for short reads. Reads with median_bp >= long_read_threshold (5000bp >= 1000bp) should be
+     * filtered before calling Manta.
+     */
     test("Long reads filtered out - stub") {
         options '-stub'
 
@@ -84,13 +120,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // ONT long-read sample (5000bp) that should be filtered out (threshold is 1000bp)
+                input[0] = channel.of([
                     [id: 'test_ont', single_end: false, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -102,6 +139,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Multiple samples processed in batch
+     * This test validates Manta's ability to process multiple Illumina paired-end samples in parallel.
+     * Expected behavior: Manta should successfully call SVs for each sample independently,
+     * generating separate VCF outputs for each sample (sample1 and sample2), including
+     * small variants, candidate SVs, and diploid SVs.
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -111,7 +155,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two Illumina paired-end samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -123,8 +168,8 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }

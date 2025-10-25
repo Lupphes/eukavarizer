@@ -1,3 +1,16 @@
+/*
+ * SV_CALLING_CUTESV Workflow Tests
+ *
+ * cuteSV is a structural variant caller optimized for long-read sequencing technologies.
+ * Key features:
+ * - Specialized for Oxford Nanopore (ONT) and PacBio long-read data
+ * - Uses signature-based detection with machine learning scoring
+ * - Fast and memory-efficient processing of long reads
+ * - Detects various SV types: deletions, insertions, inversions, duplications, translocations
+ * Platform support: ONT and PacBio long-read sequencing
+ * Single-end data: cuteSV works with single-end long reads (typical for ONT/PacBio)
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_CUTESV"
@@ -8,18 +21,25 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_cutesv"
 
+    /*
+     * Test scenario 1: Oxford Nanopore (ONT) BAM input
+     * This test validates cuteSV's SV calling with ONT long-read sequencing data.
+     * Expected behavior: cuteSV should process the BAM using signature-based detection
+     * to identify structural variants, generating VCF output along with compressed VCF (vcfgz),
+     * tabix index (tbi), and CSI index (csi) files.
+     */
     test("ONT BAM input - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: true, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
                 """
             }
         }
@@ -36,13 +56,20 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Multiple long-read samples processed in batch
+     * This test validates cuteSV's ability to process multiple long-read samples in parallel.
+     * Expected behavior: cuteSV should successfully call SVs for each sample independently,
+     * generating separate VCF outputs for each sample (sample1 and sample2).
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two long-read samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: true, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -54,7 +81,7 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
                 """
             }
         }

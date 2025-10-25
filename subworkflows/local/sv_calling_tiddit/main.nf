@@ -46,7 +46,7 @@ workflow SV_CALLING_TIDDIT {
         reference_genome_minimap_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_tiddit = "tiddit"
 
         TIDDIT_BWA(
@@ -94,7 +94,7 @@ workflow SV_CALLING_TIDDIT {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, [])
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_tiddit}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_tiddit}.yaml"))
                 )
         )
 
@@ -103,10 +103,10 @@ workflow SV_CALLING_TIDDIT {
             name_tiddit
         )
 
-        ch_versions = ch_versions.mix(TIDDIT_BWA.out.versions.first())
-        ch_versions = ch_versions.mix(TIDDIT_MAP.out.versions.first())
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(TIDDIT_BWA.out.versions)
+        ch_versions = ch_versions.mix(TIDDIT_MAP.out.versions)
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

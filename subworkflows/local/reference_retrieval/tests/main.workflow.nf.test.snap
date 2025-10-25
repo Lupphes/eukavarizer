@@ -1,60 +1,158 @@
 {
-    "Download from RefSeq - stub": {
+    "User-provided reference - stub": {
         "content": [
             {
                 "0": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta.gz"
+                    ]
                 ],
                 "1": [
-                    
+                    11500000
                 ],
                 "2": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "3": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
                 ],
                 "4": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        [
+                            "genome.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.bwt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.pac:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.sa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
                 ],
                 "5": [
                     
                 ],
                 "6": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz.gzi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "7": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "8": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "9": [
+                    "versions.yml:md5,30a796bf1aecaa7b9e1e1aecf6b12cf1",
+                    "versions.yml:md5,40ae2852da63320761867ee7ad4a7422",
+                    "versions.yml:md5,5d201558de0322e09ddfa0b20d2fe830",
+                    "versions.yml:md5,5da83aaa0fb4cc8aa467ca8ed243cb2a",
+                    "versions.yml:md5,db832dd890c09598f2a13fefd54f7e9b",
+                    "versions.yml:md5,e16e270dd930d692b460f333d951956c"
                 ],
                 "reference_genome": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/genome.fasta.gz"
+                    ]
                 ],
                 "reference_genome_bgzipped": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
                 ],
                 "reference_genome_bgzipped_faidx": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "reference_genome_bgzipped_index": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.gz.gzi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "reference_genome_bwa_index": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        [
+                            "genome.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.bwt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.pac:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome.sa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
                 ],
                 "reference_genome_faidx": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "reference_genome_minimap_index": [
                     
                 ],
                 "reference_genome_ungapped_size": [
-                    
+                    11500000
                 ],
                 "reference_genome_unzipped": [
-                    
+                    [
+                        {
+                            "id": "genome"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,30a796bf1aecaa7b9e1e1aecf6b12cf1",
+                    "versions.yml:md5,40ae2852da63320761867ee7ad4a7422",
+                    "versions.yml:md5,5d201558de0322e09ddfa0b20d2fe830",
+                    "versions.yml:md5,5da83aaa0fb4cc8aa467ca8ed243cb2a",
+                    "versions.yml:md5,db832dd890c09598f2a13fefd54f7e9b",
+                    "versions.yml:md5,e16e270dd930d692b460f333d951956c"
                 ]
             }
         ],
@@ -62,6 +160,169 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-20T23:24:27.914728307"
+        "timestamp": "2025-10-23T20:28:15.120572813"
+    },
+    "Download from RefSeq - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
+                    ]
+                ],
+                "1": [
+                    11500000
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "4": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        [
+                            "4932_mock_genome.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.bwt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.pac:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.sa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "5": [
+                    
+                ],
+                "6": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz.gzi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "7": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "8": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "9": [
+                    "versions.yml:md5,30a796bf1aecaa7b9e1e1aecf6b12cf1",
+                    "versions.yml:md5,40ae2852da63320761867ee7ad4a7422",
+                    "versions.yml:md5,5d201558de0322e09ddfa0b20d2fe830",
+                    "versions.yml:md5,5da83aaa0fb4cc8aa467ca8ed243cb2a",
+                    "versions.yml:md5,db832dd890c09598f2a13fefd54f7e9b",
+                    "versions.yml:md5,e16e270dd930d692b460f333d951956c"
+                ],
+                "reference_genome": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
+                    ]
+                ],
+                "reference_genome_bgzipped": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "reference_genome_bgzipped_faidx": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "reference_genome_bgzipped_index": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.gz.gzi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "reference_genome_bwa_index": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        [
+                            "4932_mock_genome.amb:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.ann:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.bwt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.pac:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "4932_mock_genome.sa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "reference_genome_faidx": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna.fai:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "reference_genome_minimap_index": [
+                    
+                ],
+                "reference_genome_ungapped_size": [
+                    11500000
+                ],
+                "reference_genome_unzipped": [
+                    [
+                        {
+                            "id": "4932_mock_genome"
+                        },
+                        "4932_mock_genome.fna:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,30a796bf1aecaa7b9e1e1aecf6b12cf1",
+                    "versions.yml:md5,40ae2852da63320761867ee7ad4a7422",
+                    "versions.yml:md5,5d201558de0322e09ddfa0b20d2fe830",
+                    "versions.yml:md5,5da83aaa0fb4cc8aa467ca8ed243cb2a",
+                    "versions.yml:md5,db832dd890c09598f2a13fefd54f7e9b",
+                    "versions.yml:md5,e16e270dd930d692b460f333d951956c"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-23T20:28:00.690627349"
     }
 }

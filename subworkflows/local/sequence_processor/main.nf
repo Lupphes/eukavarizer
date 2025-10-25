@@ -47,7 +47,7 @@ workflow SEQUENCE_PROCESSOR {
         reference_genome_bwa_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         SEQUENCE_FASTQ_CONVERTOR(
             samplesheet,
@@ -80,7 +80,7 @@ workflow SEQUENCE_PROCESSOR {
         ch_versions = ch_versions.mix(QUALITY_CONTROL.out.versions)
         ch_versions = ch_versions.mix(SEQUENCE_ALIGNER.out.versions)
         ch_versions = ch_versions.mix(SEQUENCE_MERGER.out.versions)
-        ch_versions = ch_versions.mix(SAMTOOLS_STATS.out.versions.first())
+        ch_versions = ch_versions.mix(SAMTOOLS_STATS.out.versions)
 
     emit:
         fastq_filtered              = QUALITY_CONTROL.out.fastq_filtered    // Filtered FASTQ files

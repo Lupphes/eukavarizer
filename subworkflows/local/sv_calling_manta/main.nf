@@ -58,7 +58,7 @@ workflow SV_CALLING_MANTA {
         reference_genome_faidx
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_manta = "manta"
         name_manta_small = "small"
         name_manta_candidate = "candidate"
@@ -90,7 +90,7 @@ workflow SV_CALLING_MANTA {
                     tuple(meta + [id: "${meta.id}-${name_manta_small}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
@@ -101,7 +101,7 @@ workflow SV_CALLING_MANTA {
                     tuple(meta + [id: "${meta.id}-${name_manta_candidate}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
@@ -112,7 +112,7 @@ workflow SV_CALLING_MANTA {
                     tuple(meta + [id: "${meta.id}-${name_manta_diploid}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_manta}.yaml"))
                 )
         )
 
@@ -131,13 +131,13 @@ workflow SV_CALLING_MANTA {
             name_manta
         )
 
-        ch_versions = ch_versions.mix(MANTA_GERMLINE.out.versions.first())
-        ch_versions = ch_versions.mix(INDEL_SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SV_SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(DIPLOID_SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(INDELS_SAMPLE_REHEADER.out.versions.first())
-        ch_versions = ch_versions.mix(SV_SAMPLE_REHEADER.out.versions.first())
-        ch_versions = ch_versions.mix(DIPLOID_SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(MANTA_GERMLINE.out.versions)
+        ch_versions = ch_versions.mix(INDEL_SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SV_SVYNC.out.versions)
+        ch_versions = ch_versions.mix(DIPLOID_SVYNC.out.versions)
+        ch_versions = ch_versions.mix(INDELS_SAMPLE_REHEADER.out.versions)
+        ch_versions = ch_versions.mix(SV_SAMPLE_REHEADER.out.versions)
+        ch_versions = ch_versions.mix(DIPLOID_SAMPLE_REHEADER.out.versions)
 
     emit:
         small_vcf = INDELS_SAMPLE_REHEADER.out.vcf

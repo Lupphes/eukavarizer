@@ -1,0 +1,7 @@
+bam_convert_samtools:
+  - subworkflows/sarek/bam_convert_samtools/**
+  - modules/nf-core/samtools/view/**
+  - modules/nf-core/samtools/merge/**
+  - modules/nf-core/samtools/index/**
+  - modules/nf-core/samtools/collatefastq/**
+  - modules/nf-core/cat/fastq/**

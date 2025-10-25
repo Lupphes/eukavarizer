@@ -20,7 +20,7 @@ nextflow_process {
             process {
                 """
                 // Note: Using stub mode since fast5 files are large and not in test data
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [ id: 'nanopore_test' ],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz')
                 ])
@@ -49,7 +49,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [ id: 'custom_model' ],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz')
                 ])

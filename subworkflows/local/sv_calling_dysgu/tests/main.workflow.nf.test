@@ -1,3 +1,17 @@
+/*
+ * SV_CALLING_DYSGU Workflow Tests
+ *
+ * Dysgu is a structural variant caller that uses machine learning for SV detection.
+ * Key features:
+ * - Machine learning-based classification for high-accuracy SV calling
+ * - Supports both short-read (Illumina) and long-read (ONT/PacBio) sequencing data
+ * - Uses paired-end and split-read evidence for short reads
+ * - Handles single-molecule long reads with alignment signatures
+ * - Produces high-confidence SV calls with quality scores
+ * Platform support: Illumina, ONT, and PacBio
+ * Flexibility: Works with paired-end short reads and single-end long reads
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_DYSGU"
@@ -8,19 +22,26 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_dysgu"
 
+    /*
+     * Test scenario 1: Illumina paired-end BAM input
+     * This test validates Dysgu's SV calling with Illumina short-read sequencing data.
+     * Expected behavior: Dysgu should use machine learning to classify SV candidates
+     * from paired-end and split-read evidence, generating VCF output with quality scores,
+     * along with compressed VCF (vcfgz), tabix index (tbi), and CSI index (csi) files.
+     */
     test("Illumina BAM input - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -37,13 +58,20 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Multiple samples processed in batch
+     * This test validates Dysgu's ability to process multiple samples in parallel.
+     * Expected behavior: Dysgu should successfully apply ML-based SV calling to each sample
+     * independently, generating separate VCF outputs for each sample (sample1 and sample2).
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two Illumina paired-end samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: false, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -55,8 +83,8 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }

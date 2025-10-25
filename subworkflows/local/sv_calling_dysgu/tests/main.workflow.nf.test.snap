@@ -46,6 +46,11 @@
                         "re-sample1-null-false-dysgu.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,680179fb3bbc64e30aba7df0036220cc",
+                    "versions.yml:md5,8c41f11c7f51793e9bf8b3b444eeb981",
+                    "versions.yml:md5,9e9afe482a958f1df073298d1c6e1702"
+                ],
                 "csi": [
                     [
                         {
@@ -89,6 +94,11 @@
                         },
                         "re-sample1-null-false-dysgu.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,680179fb3bbc64e30aba7df0036220cc",
+                    "versions.yml:md5,8c41f11c7f51793e9bf8b3b444eeb981",
+                    "versions.yml:md5,9e9afe482a958f1df073298d1c6e1702"
                 ]
             }
         ],
@@ -96,6 +106,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T02:50:06.28248063"
+        "timestamp": "2025-10-23T02:37:22.679729546"
     }
 }

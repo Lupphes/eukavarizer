@@ -1,3 +1,18 @@
+/*
+ * SV_CALLING_SVABA Workflow Tests
+ *
+ * SvABA (Structural Variation and Assembly) is an SV caller that uses genome-wide local assembly
+ * for high-resolution detection of structural variants and indels.
+ * Key features:
+ * - Uses local assembly approach for sensitive SV and indel detection
+ * - Optimized for Illumina short-read sequencing data
+ * - Optional integration with RepeatMasker for annotating variants in repetitive regions
+ * - Filters out BWAMEM2-aligned reads (currently incompatible)
+ * - Filters out long-read data (optimized for short reads)
+ * Platform support: Illumina paired-end reads (not BWAMEM2)
+ * Annotation: Optional repeat masking via svaba_annotate parameter
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_SVABA"
@@ -8,6 +23,12 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_svaba"
 
+    /*
+     * Test scenario 1: Illumina BAM input without repeat annotation
+     * This test validates SvABA's basic local assembly-based SV calling without annotation.
+     * Expected behavior: SvABA should perform local assembly to detect SVs and indels,
+     * generating VCF output along with compressed VCF (vcfgz), tabix index (tbi), and CSI index (csi) files.
+     */
     test("Illumina BAM input - no annotation - stub") {
         options '-stub'
 
@@ -19,14 +40,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -43,6 +64,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Illumina BAM input with RepeatMasker annotation
+     * This test validates SvABA with optional repeat masking annotation enabled.
+     * Expected behavior: SvABA should perform local assembly-based SV calling and then annotate
+     * the variants with repeat masker data, which helps identify SVs in repetitive genomic regions.
+     */
     test("Illumina BAM input - with annotation - stub") {
         options '-stub'
 
@@ -54,14 +81,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -77,6 +104,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: BWAMEM2-aligned reads are filtered out
+     * This test validates SvABA's aligner filtering - it should skip BWAMEM2-aligned data.
+     * Expected behavior: The workflow should succeed but produce no output, as SvABA is currently
+     * incompatible with BWAMEM2 alignments. Data aligned with BWAMEM2 (bwamem2: true) should be
+     * filtered before calling SvABA.
+     */
     test("BWAMEM2 filtered out - stub") {
         options '-stub'
 
@@ -88,14 +122,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // BWAMEM2-aligned sample that should be filtered out (SvABA incompatible)
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -107,6 +142,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Long reads are filtered out
+     * This test validates SvABA's read length filtering - it should skip long-read data.
+     * Expected behavior: The workflow should succeed but produce no output, as SvABA is optimized
+     * for short reads. Reads with median_bp >= long_read_threshold (5000bp >= 1000bp) should be
+     * filtered before calling SvABA.
+     */
     test("Long reads filtered out - stub") {
         options '-stub'
 
@@ -118,14 +160,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // ONT long-read sample (5000bp) that should be filtered out (threshold is 1000bp)
+                input[0] = channel.of([
                     [id: 'test_ont', single_end: false, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -137,6 +180,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Multiple samples processed in batch
+     * This test validates SvABA's ability to process multiple Illumina paired-end samples in parallel.
+     * Expected behavior: SvABA should successfully perform local assembly-based SV calling for each
+     * sample independently, generating separate VCF outputs for each sample (sample1 and sample2).
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -148,7 +197,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two Illumina paired-end samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -160,9 +210,9 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }

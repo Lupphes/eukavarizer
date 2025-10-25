@@ -8,6 +8,15 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "reference_retrieval"
 
+    /*
+     * Test scenario 1: Automatic reference genome download from NCBI RefSeq
+     * This test validates automatic retrieval of reference genomes using taxonomy IDs.
+     * Expected behavior: The workflow should query NCBI RefSeq using the provided taxonomy ID
+     * (4932 for Saccharomyces cerevisiae/yeast), download the reference genome FASTA file,
+     * decompress it, create both compressed (bgzip) and uncompressed versions, generate BWA
+     * indices for alignment, and produce FASTA index files (.fai) for both versions. This enables
+     * seamless reference setup without manual downloads when only an organism name is known.
+     */
     test("Download from RefSeq - stub") {
         options '-stub'
 
@@ -38,6 +47,15 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: User-provided reference genome processing
+     * This test validates workflow behavior when users supply their own reference genome file.
+     * Expected behavior: The workflow should skip the RefSeq download step and instead process
+     * the user-provided genome.fasta.gz file directly. It should decompress the file, create both
+     * bgzip-compressed and uncompressed versions, generate alignment indices (BWA), and produce
+     * FASTA index files. This supports custom genomes, specific strains, or modified references
+     * not available in public databases.
+     */
     test("User-provided reference - stub") {
         options '-stub'
 
@@ -65,6 +83,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: BWA-MEM index generation workflow
+     * This test validates the BWA-MEM indexing pathway for short-read alignment.
+     * Expected behavior: With bwamem2=false, the workflow should use the original BWA-MEM indexer
+     * to create index files (.amb, .ann, .bwt, .pac, .sa) required for BWA-MEM alignment. This
+     * ensures compatibility with the widely-adopted BWA-MEM aligner for Illumina short reads and
+     * validates correct index generation for downstream alignment processes.
+     */
     test("BWA indexing path - stub") {
         options '-stub'
 
@@ -90,6 +116,15 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: BWAMEM2 index generation workflow
+     * This test validates the BWAMEM2 indexing pathway as an alternative to BWA-MEM.
+     * Expected behavior: With bwamem2=true, the workflow should use the BWAMEM2 indexer instead
+     * of BWA-MEM to create index files optimized for faster alignment with BWAMEM2. BWAMEM2 offers
+     * improved performance for large genomes while maintaining BWA-MEM compatibility. This validates
+     * the conditional indexing logic and ensures correct index generation for users preferring
+     * BWAMEM2's performance benefits.
+     */
     test("BWAMEM2 indexing path - stub") {
         options '-stub'
 

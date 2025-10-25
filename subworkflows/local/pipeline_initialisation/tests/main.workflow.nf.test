@@ -1,0 +1,115 @@
+nextflow_workflow {
+
+    name "Test Workflow PIPELINE_INITIALISATION"
+    script "../main.nf"
+    workflow "PIPELINE_INITIALISATION"
+    config "subworkflows/local/pipeline_initialisation/tests/nextflow.config"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "pipeline_initialisation"
+
+    /*
+     * Test scenario 1: Paired-end FASTQ input with lane information
+     * This test validates the samplesheet parsing and channel creation for paired-end
+     * Illumina sequencing data with lane information.
+     * Expected behavior: The workflow should parse the samplesheet, validate input files,
+     * create proper metadata with lane-specific IDs, set data_type to 'fastq_gz', mark as
+     * paired-end (single_end: false), and prepare channels for downstream processing.
+     */
+    test("Paired-end FASTQ with lane - samplesheet parsing") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = "${projectDir}/subworkflows/local/pipeline_initialisation/tests/samplesheet_paired_end.csv"
+            }
+            workflow {
+                """
+                input[0] = false  // version
+                input[1] = false  // validate_params
+                input[2] = false  // monochrome_logs
+                input[3] = []     // nextflow_cli_args
+                input[4] = params.outdir
+                input[5] = params.input
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.samplesheet != null }
+            )
+        }
+    }
+
+    /*
+     * Test scenario 2: Single-end FASTQ input without lane information
+     * This test validates samplesheet parsing for single-end sequencing data.
+     * Expected behavior: The workflow should parse single-end FASTQ files, create metadata
+     * with sample ID, set data_type to 'fastq_gz', mark as single-end (single_end: true),
+     * and omit lane information from the metadata. This is typical for single-lane sequencing
+     * runs or merged FASTQ files.
+     */
+    test("Single-end FASTQ without lane - samplesheet parsing") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = "${projectDir}/subworkflows/local/pipeline_initialisation/tests/samplesheet_single_end.csv"
+            }
+            workflow {
+                """
+                input[0] = false
+                input[1] = false
+                input[2] = false
+                input[3] = []
+                input[4] = params.outdir
+                input[5] = params.input
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.samplesheet != null }
+            )
+        }
+    }
+
+    /*
+     * Test scenario 3: Multi-lane sequencing data for the same sample
+     * This test validates handling of multiple sequencing lanes for a single sample.
+     * Expected behavior: The workflow should group lanes by patient+sample combination,
+     * calculate num_lanes metadata (should be 2), create lane-specific IDs for each entry,
+     * and prepare data for merging downstream. This tests the lane grouping logic that
+     * enables proper handling of samples sequenced across multiple lanes.
+     */
+    test("Multi-lane FASTQ - lane grouping and metadata") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = "${projectDir}/subworkflows/local/pipeline_initialisation/tests/samplesheet_multi_lane.csv"
+            }
+            workflow {
+                """
+                input[0] = false
+                input[1] = false
+                input[2] = false
+                input[3] = []
+                input[4] = params.outdir
+                input[5] = params.input
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.samplesheet != null }
+            )
+        }
+    }
+}

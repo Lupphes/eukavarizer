@@ -44,21 +44,21 @@ workflow SEQUENCE_MERGER {
         reference_genome_bwa_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         if (params.deduplicate_flag) {
             // TODO: Explore why SPARK did not work
             GATK4_MARKDUPLICATES(
                 bam_mapped,
-                reference_genome_unzipped.map{ _meta, fasta -> [ fasta ] }.collect(),
-                reference_genome_bwa_index.map{ _meta, fasta_fai -> [ fasta_fai ] }.collect()
+                reference_genome_unzipped.map{ _meta, fasta -> fasta }.collect(),
+                reference_genome_bwa_index.map{ _meta, fasta_fai -> fasta_fai }.collect()
             )
 
             INDEX_MARKDUPLICATES(GATK4_MARKDUPLICATES.out.bam)
 
             bam_bai = GATK4_MARKDUPLICATES.out.bam.join(INDEX_MARKDUPLICATES.out.bai, failOnDuplicate: true, failOnMismatch: true)
-            ch_versions = ch_versions.mix(GATK4_MARKDUPLICATES.out.versions.first())
-            ch_versions = ch_versions.mix(INDEX_MARKDUPLICATES.out.versions.first())
+            ch_versions = ch_versions.mix(GATK4_MARKDUPLICATES.out.versions)
+            ch_versions = ch_versions.mix(INDEX_MARKDUPLICATES.out.versions)
         } else {
             bam_to_merge = bam_mapped.branch{ meta, bam ->
                 // bam is a list, so use bam.size() to asses number of intervals
@@ -77,8 +77,8 @@ workflow SEQUENCE_MERGER {
             INDEX_MERGE_BAM(bam_all)
 
             bam_bai = bam_all.join(INDEX_MERGE_BAM.out.bai, failOnDuplicate: true, failOnMismatch: true)
-            ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions.first())
-            ch_versions = ch_versions.mix(INDEX_MERGE_BAM.out.versions.first())
+            ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions)
+            ch_versions = ch_versions.mix(INDEX_MERGE_BAM.out.versions)
         }
 
         if (params.recalibrate_flag && params.known_sites && params.known_sites_tbi) {
@@ -95,14 +95,14 @@ workflow SEQUENCE_MERGER {
 
             GATK4_APPLYBQSR(
                 bam_bai_table.map{ meta, bam, bai, table -> tuple(meta, bam, bai, table, []) },
-                reference_genome_unzipped.map{ _meta, fasta -> [ fasta ] }.collect(),
-                reference_genome_bwa_index.map{ _meta, fasta_fai -> [ fasta_fai ] }.collect(),
+                reference_genome_unzipped.map{ _meta, fasta -> fasta }.collect(),
+                reference_genome_bwa_index.map{ _meta, fasta_fai -> fasta_fai }.collect(),
                 [ [ id:'dict' ], [] ],
             )
 
             re_bam_bai = GATK4_APPLYBQSR.out.bam
-            ch_versions = ch_versions.mix(GATK4_BASERECALIBRATOR.out.versions.first())
-            ch_versions = ch_versions.mix(GATK4_APPLYBQSR.out.versions.first())
+            ch_versions = ch_versions.mix(GATK4_BASERECALIBRATOR.out.versions)
+            ch_versions = ch_versions.mix(GATK4_APPLYBQSR.out.versions)
         } else {
             re_bam_bai = bam_bai
         }

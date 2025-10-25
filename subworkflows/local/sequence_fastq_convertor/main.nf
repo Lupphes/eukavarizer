@@ -51,22 +51,22 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
         reference_genome_bwa_index
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
-    input_sample_type = samplesheet.branch{
-            fastq_gz:           it[0].data_type == "fastq_gz"
-            fastq:              it[0].data_type == "fastq"
-            bam:                it[0].data_type == "bam"
-            cram:               it[0].data_type == "cram"
-            sra:                it[0].data_type == "sra"
-            fast5:              it[0].data_type == "fast5"
-            pod5:               it[0].data_type == "pod5"
-            bax_h5:             it[0].data_type == "bax_h5"
+    input_sample_type = samplesheet.branch{ meta, _files ->
+            fastq_gz:           meta.data_type == "fastq_gz"
+            fastq:              meta.data_type == "fastq"
+            bam:                meta.data_type == "bam"
+            cram:               meta.data_type == "cram"
+            sra:                meta.data_type == "sra"
+            fast5:              meta.data_type == "fast5"
+            pod5:               meta.data_type == "pod5"
+            bax_h5:             meta.data_type == "bax_h5"
         }
 
-        result = input_sample_type.fastq.branch{
-            fastq_single: it[1].size() == 1
-            fastq_double: it[1].size() > 1
+        result = input_sample_type.fastq.branch{ _meta, files ->
+            fastq_single: files.size() == 1
+            fastq_double: files.size() > 1
         }
 
         // Zip the uncompressed ones
@@ -82,7 +82,7 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
 
         TABIX_BGZIP_DOUBLE_2(
             result.fastq_double
-                .filter { _meta, fastq ->  fastq[1] }
+                .filter { _meta, fastq -> fastq[1] }
                 .map { meta, fastq -> tuple(meta, fastq[1]) }
         )
 
@@ -150,15 +150,15 @@ workflow SEQUENCE_FASTQ_CONVERTOR {
             tuple(meta + [median_bp: length], fastq)
         }
 
-        ch_versions = ch_versions.mix(TABIX_BGZIP_SINGLE_FASTQ.out.versions.first())
-        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_1.out.versions.first())
-        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_2.out.versions.first())
-        ch_versions = ch_versions.mix(SEQKIT_SIZE.out.versions.first())
-        ch_versions = ch_versions.mix(SRATOOLS_FASTERQDUMP.out.versions.first())
-        ch_versions = ch_versions.mix(DORADO_FAST5.out.versions.first())
-        ch_versions = ch_versions.mix(DORADO_POD5.out.versions.first())
-        ch_versions = ch_versions.mix(BAM_SAMTOOLS_COLLATEFASTQ.out.versions.first())
-        ch_versions = ch_versions.mix(CRAM_SAMTOOLS_COLLATEFASTQ.out.versions.first())
+        ch_versions = ch_versions.mix(TABIX_BGZIP_SINGLE_FASTQ.out.versions)
+        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_1.out.versions)
+        ch_versions = ch_versions.mix(TABIX_BGZIP_DOUBLE_2.out.versions)
+        ch_versions = ch_versions.mix(SEQKIT_SIZE.out.versions)
+        ch_versions = ch_versions.mix(SRATOOLS_FASTERQDUMP.out.versions)
+        ch_versions = ch_versions.mix(DORADO_FAST5.out.versions)
+        ch_versions = ch_versions.mix(DORADO_POD5.out.versions)
+        ch_versions = ch_versions.mix(BAM_SAMTOOLS_COLLATEFASTQ.out.versions)
+        ch_versions = ch_versions.mix(CRAM_SAMTOOLS_COLLATEFASTQ.out.versions)
 
     emit:
         tagged_collected_fastqs

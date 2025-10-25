@@ -55,7 +55,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         BIODBCORE_REFSEQ(
             taxonomy_id,
@@ -67,15 +67,30 @@ workflow REFERENCE_RETRIEVAL {
             .splitJson()
             .collect()
             .map { jsonList ->
-                def jsonMap = jsonList.collectEntries { [it.key, it.value] }
+                def jsonMap = jsonList.collectEntries { entry -> [entry.key, entry.value] }
                 return tuple(jsonMap['genome_size'] as Integer, jsonMap['genome_size_ungapped'] as Integer, file(jsonMap['reference_genome']))
             }
 
-        reference_genome_ungapped_size = biodbcore_json_result.map { it[1] }
-        reference_genome_input = (reference_genome != [] ? reference_genome : BIODBCORE_REFSEQ.out.reference_genome).collect().flatten()
+        reference_genome_ungapped_size = biodbcore_json_result.map { result -> result[1] }
+
+        if (reference_genome != []) {
+            // User provided reference
+            // In production: reference_genome is a channel from channel.fromPath()
+            // In tests: reference_genome is a file() object
+            // Solution: Use flatMap to handle both - it unwraps channels and works with single values
+            reference_genome_input = channel.from(reference_genome)
+                .flatMap { x -> (x instanceof Collection) ? x : [x] }
+                .map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
+        } else {
+            // BIODBCORE output - channel that needs collect/flatten/map
+            reference_genome_input = BIODBCORE_REFSEQ.out.reference_genome
+                .collect()
+                .flatten()
+                .map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
+        }
 
         GUNZIP(
-            reference_genome_input.map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }
+            reference_genome_input
         )
 
         bwa_index = (params.bwamem2 ? BWAMEM2_INDEX(GUNZIP.out.gunzip) : BWA_INDEX(GUNZIP.out.gunzip))
@@ -103,15 +118,15 @@ workflow REFERENCE_RETRIEVAL {
         )
 
 
-        ch_versions = ch_versions.mix(BIODBCORE_REFSEQ.out.versions.first())
-        ch_versions = ch_versions.mix(GUNZIP.out.versions.first())
-        ch_versions = ch_versions.mix(bwa_index.versions.first())
+        ch_versions = ch_versions.mix(BIODBCORE_REFSEQ.out.versions)
+        ch_versions = ch_versions.mix(GUNZIP.out.versions)
+        ch_versions = ch_versions.mix(bwa_index.versions)
         if (params.minimap2_flag) {
-            ch_versions = ch_versions.mix(MINIMAP2_INDEX.out.versions.first())
+            ch_versions = ch_versions.mix(MINIMAP2_INDEX.out.versions)
         }
-        ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions.first())
-        ch_versions = ch_versions.mix(SAMTOOLS_BGZIP_FAIDX.out.versions.first())
-        ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions.first())
+        ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
+        ch_versions = ch_versions.mix(SAMTOOLS_BGZIP_FAIDX.out.versions)
+        ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     emit:
         reference_genome                        = reference_genome_input
@@ -119,7 +134,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_unzipped               = GUNZIP.out.gunzip
         reference_genome_bgzipped               = TABIX_BGZIP.out.output
         reference_genome_bwa_index              = bwa_index.index
-        reference_genome_minimap_index          = params.minimap2_flag ? minimap_index_ch : Channel.empty()
+        reference_genome_minimap_index          = params.minimap2_flag ? minimap_index_ch : channel.empty()
         reference_genome_bgzipped_index         = TABIX_BGZIP.out.gzi
         reference_genome_bgzipped_faidx         = SAMTOOLS_BGZIP_FAIDX.out.fai
         reference_genome_faidx                  = SAMTOOLS_FAIDX.out.fai

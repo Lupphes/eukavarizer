@@ -8,6 +8,14 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "quality_control"
 
+    /*
+     * Test scenario 1: Short-read Illumina data with complete QC pipeline
+     * This test validates the full short-read quality control workflow combining adapter trimming,
+     * contamination removal, quality metrics, and comprehensive reporting.
+     * Expected behavior: The workflow should run FASTP for adapter trimming and base quality filtering,
+     * BBDUK for contamination removal (e.g., PhiX, adapters), FastQC for quality metrics generation,
+     * and MultiQC for aggregated quality reports, producing filtered FASTQ files suitable for alignment.
+     */
     test("Short reads (Illumina) - FASTP + BBDUK - stub") {
         options '-stub'
 
@@ -22,7 +30,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -44,6 +52,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Long-read ONT data with platform-specific QC
+     * This test validates long-read specific quality control using FASTPLONG instead of FASTP.
+     * Expected behavior: The workflow should detect long reads (median_bp > long_read_threshold)
+     * and automatically route them to FASTPLONG for long-read optimized adapter trimming and quality
+     * filtering, skipping short-read specific tools like BBDUK. FastQC generates quality metrics
+     * but MultiQC is disabled for minimal reporting.
+     */
     test("Long reads (ONT) - FASTPLONG only - stub") {
         options '-stub'
 
@@ -58,7 +74,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test_ont', single_end: true, platform: 'ont', median_bp: 5000],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
                 ])
@@ -75,6 +91,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Mixed platform data (both Illumina and ONT in same run)
+     * This test validates simultaneous processing of short and long reads in a single workflow run.
+     * Expected behavior: The workflow should correctly branch short reads (median_bp 150) to FASTP
+     * and long reads (median_bp 5000) to FASTPLONG based on read length thresholds, apply BBDUK
+     * only to short reads, and produce filtered outputs for both platforms without conflicts. QC
+     * reporting tools are disabled to focus on core filtering functionality.
+     */
     test("Mixed platform data - FASTP and FASTPLONG - stub") {
         options '-stub'
 
@@ -89,7 +113,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                input[0] = channel.of(
                     [
                         [id: 'short_read', single_end: false, platform: 'illumina', median_bp: 150],
                         [
@@ -114,6 +138,15 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: SEQTK subsampling for read count reduction
+     * This test validates optional subsampling functionality to reduce dataset size for testing
+     * or computational efficiency.
+     * Expected behavior: The workflow should first subsample the input FASTQ files to the specified
+     * number of reads (seqtk_size = 10000) using SEQTK, then process the subsampled data through
+     * the complete QC pipeline (FASTP, BBDUK, FastQC, MultiQC), enabling rapid testing with smaller
+     * datasets while maintaining representative quality metrics.
+     */
     test("SEQTK subsampling enabled - stub") {
         options '-stub'
 
@@ -129,7 +162,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -149,6 +182,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Automatic platform detection for short reads (no explicit platform specified)
+     * This test validates automatic read type classification when platform field is not provided.
+     * Expected behavior: The workflow should examine median_bp (150) and compare against
+     * long_read_threshold (1000), automatically classifying as short reads and routing to FASTP
+     * + BBDUK pipeline. This ensures the workflow works correctly even when platform metadata
+     * is missing from the samplesheet, relying solely on read length characteristics.
+     */
     test("Platform detection by median_bp - short reads - stub") {
         options '-stub'
 
@@ -163,7 +204,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test_short', single_end: false, median_bp: 150],  // No platform, should use FASTP
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -182,6 +223,14 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 6: Automatic platform detection for long reads (no explicit platform specified)
+     * This test validates automatic read type classification for long-read data without platform metadata.
+     * Expected behavior: The workflow should examine median_bp (5000) and compare against
+     * long_read_threshold (1000), automatically classifying as long reads and routing to FASTPLONG
+     * pipeline while skipping short-read tools. This ensures consistent processing for ONT/PacBio
+     * data even when platform field is absent, using read length as the sole discriminator.
+     */
     test("Platform detection by median_bp - long reads - stub") {
         options '-stub'
 
@@ -196,7 +245,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test_long', single_end: true, median_bp: 5000],  // No platform, should use FASTPLONG
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
                 ])

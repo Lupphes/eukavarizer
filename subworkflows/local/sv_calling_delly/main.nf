@@ -44,7 +44,7 @@ workflow SV_CALLING_DELLY {
         reference_genome_faidx
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_delly = "delly"
 
         DELLY_CALL(
@@ -62,7 +62,7 @@ workflow SV_CALLING_DELLY {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_delly}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_delly}.yaml"))
                 )
         )
 
@@ -71,9 +71,9 @@ workflow SV_CALLING_DELLY {
             name_delly
         )
 
-        ch_versions = ch_versions.mix(DELLY_CALL.out.versions.first())
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(DELLY_CALL.out.versions)
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

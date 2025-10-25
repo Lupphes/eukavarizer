@@ -46,6 +46,11 @@
                         "re-sample1-null-false-delly.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,690d84f8f6b4aaca2d9eb62915a2f740",
+                    "versions.yml:md5,6b501fc059038345ae10502dac38a845",
+                    "versions.yml:md5,827aade8bb469276a01a05e5234ef5a2"
+                ],
                 "csi": [
                     [
                         {
@@ -89,6 +94,11 @@
                         },
                         "re-sample1-null-false-delly.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,690d84f8f6b4aaca2d9eb62915a2f740",
+                    "versions.yml:md5,6b501fc059038345ae10502dac38a845",
+                    "versions.yml:md5,827aade8bb469276a01a05e5234ef5a2"
                 ]
             }
         ],
@@ -96,6 +106,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T02:54:54.534207341"
+        "timestamp": "2025-10-23T02:36:49.98040696"
     }
 }

@@ -53,19 +53,19 @@ workflow SV_UNIFICATION {
         reference_genome_bgzipped
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         vcf_list_cleaned = vcf_list
-            .filter { it != null }
-            .map { it[1] }
+            .filter { tuple -> tuple != null }
+            .map { tuple -> tuple[1] }
 
         vcfgz_list_cleaned = vcfgz_list
-            .filter { it != null }
-            .map { it[1] }
+            .filter { tuple -> tuple != null }
+            .map { tuple -> tuple[1] }
 
         tbi_list_cleaned = tbi_list
-            .filter { it != null }
-            .map { it[1] }
+            .filter { tuple -> tuple != null }
+            .map { tuple -> tuple[1] }
 
 
         /*
@@ -141,13 +141,13 @@ workflow SV_UNIFICATION {
             reference_genome_bgzipped
         )
 
-        ch_versions = ch_versions.mix(SURVIVOR_MERGE.out.versions.first())
-        ch_versions = ch_versions.mix(SURVIVOR_FILTER.out.versions.first())
-        ch_versions = ch_versions.mix(SURVIVOR_STATS.out.versions.first())
-        ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions.first())
-        ch_versions = ch_versions.mix(BCFTOOLS_FILTER.out.versions.first())
-        ch_versions = ch_versions.mix(BCFTOOLS_SORT.out.versions.first())
-        ch_versions = ch_versions.mix(BCFTOOLS_STATS.out.versions.first())
+        ch_versions = ch_versions.mix(SURVIVOR_MERGE.out.versions)
+        ch_versions = ch_versions.mix(SURVIVOR_FILTER.out.versions)
+        ch_versions = ch_versions.mix(SURVIVOR_STATS.out.versions)
+        ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions)
+        ch_versions = ch_versions.mix(BCFTOOLS_FILTER.out.versions)
+        ch_versions = ch_versions.mix(BCFTOOLS_SORT.out.versions)
+        ch_versions = ch_versions.mix(BCFTOOLS_STATS.out.versions)
 
     emit:
         survivor_vcf    = SURVIVOR_FILTER.out.vcf

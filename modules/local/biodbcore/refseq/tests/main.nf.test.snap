@@ -3,7 +3,7 @@
         "content": [
             {
                 "0": [
-                    "4932_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "4932_refseq_results.json:md5,6675d18854904d31b7a604c2dfef5880"
                 ],
                 "1": [
                     "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
@@ -18,7 +18,7 @@
                     "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
                 ],
                 "json": [
-                    "4932_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "4932_refseq_results.json:md5,6675d18854904d31b7a604c2dfef5880"
                 ],
                 "reference_genome": [
                     "4932_mock_genome.fna.gz:md5,166005cfb5760598d4a29700cdbe38ff"
@@ -38,13 +38,13 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-20T22:34:52.151545519"
+        "timestamp": "2025-10-23T01:19:14.954600511"
     },
     "Use existing reference genome - stub": {
         "content": [
             {
                 "0": [
-                    "9606_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "9606_refseq_results.json:md5,aecc507a4a9772d0538fc3f9159295b8"
                 ],
                 "1": [
                     
@@ -59,7 +59,7 @@
                     "versions.yml:md5,7042e555b1412d9a01791eeddc2b235b"
                 ],
                 "json": [
-                    "9606_refseq_results.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "9606_refseq_results.json:md5,aecc507a4a9772d0538fc3f9159295b8"
                 ],
                 "reference_genome": [
                     
@@ -79,6 +79,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-20T22:34:59.060214499"
+        "timestamp": "2025-10-23T01:19:34.845011462"
     }
 }

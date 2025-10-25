@@ -16,6 +16,9 @@
                         "test.paired_end.sorted.bam.bai:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "1": [
+                    "versions.yml:md5,caf286f12840a47a42e0de585f15006d"
+                ],
                 "bam_bai": [
                     [
                         {
@@ -29,6 +32,9 @@
                         "/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam",
                         "test.paired_end.sorted.bam.bai:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,caf286f12840a47a42e0de585f15006d"
                 ]
             }
         ],
@@ -36,6 +42,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-20T22:59:56.707118408"
+        "timestamp": "2025-10-22T22:40:09.509699715"
     }
 }

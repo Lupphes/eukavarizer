@@ -1,0 +1,29 @@
+{
+    "Generate report with merged VCFs - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e",
+                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e"
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e",
+                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-22T23:55:53.433314709"
+    }
+}

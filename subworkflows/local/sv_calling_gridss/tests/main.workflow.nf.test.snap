@@ -54,6 +54,11 @@
                         "re-sample1-illumina-false-gridss.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,1236b5bb110b075b93374c6872bdacaf",
+                    "versions.yml:md5,3c231d0a0ed544893133b04f4287f871",
+                    "versions.yml:md5,df40cdeae190bc8287bd86dc507dee9a"
+                ],
                 "csi": [
                     [
                         {
@@ -105,6 +110,11 @@
                         },
                         "re-sample1-illumina-false-gridss.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,1236b5bb110b075b93374c6872bdacaf",
+                    "versions.yml:md5,3c231d0a0ed544893133b04f4287f871",
+                    "versions.yml:md5,df40cdeae190bc8287bd86dc507dee9a"
                 ]
             }
         ],
@@ -112,6 +122,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T12:27:36.913285007"
+        "timestamp": "2025-10-23T02:37:59.929035733"
     }
 }

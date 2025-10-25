@@ -1,3 +1,18 @@
+/*
+ * SEQUENCE_PROCESSOR Workflow Tests
+ *
+ * This is the main sequence processing workflow that orchestrates format conversion, QC, filtering,
+ * alignment, and merging into a complete end-to-end pipeline.
+ * Key features:
+ * - Integrates SEQUENCE_FASTQ_CONVERTOR, SEQUENCE_ALIGNER, and SEQUENCE_MERGER subworkflows
+ * - Optional QC/filtering tools: fastp (adapter trimming/QC), bbmap bbduk (contamination removal), seqtk (subsampling)
+ * - Optional quality control: FastQC (read quality metrics), MultiQC (aggregated QC reports)
+ * - Supports multiple input formats: FASTQ.GZ, BAM, CRAM, SRA
+ * - Supports multiple aligners: BWA-MEM, BWAMEM2, minimap2 (for short/long reads)
+ * - Handles both Illumina short reads and ONT/PacBio long reads
+ * Output: Filtered FASTQ, aligned/merged BAM + BAI, samtools stats, optional QC reports
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_PROCESSOR"
@@ -8,6 +23,13 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sequence_processor"
 
+    /*
+     * Test scenario 1: Complete pipeline with all QC tools enabled (FASTQ.GZ paired-end)
+     * This test validates the full sequence processing pipeline with all optional tools enabled.
+     * Expected behavior: FASTQ.GZ input → fastp filtering → bbduk contamination removal →
+     * FastQC quality metrics → BWA-MEM alignment → BAM merging → MultiQC aggregated report.
+     * Outputs: filtered FASTQ, aligned BAM + BAI, samtools stats, and MultiQC HTML report.
+     */
     test("Complete pipeline - FASTQ.GZ paired end - stub") {
         options '-stub'
 
@@ -23,15 +45,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                input[0] = channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                     ]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -47,6 +69,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Complete pipeline with BAM input (minimal QC)
+     * This test validates the pipeline starting from BAM files instead of FASTQ.
+     * Expected behavior: BAM input → convert to FASTQ (FASTQ_CONVERTOR) → fastp/bbduk filtering →
+     * BWA-MEM re-alignment → BAM merging. FastQC and MultiQC are disabled for minimal processing.
+     * This scenario is useful for re-processing existing alignments with different parameters.
+     */
     test("Complete pipeline - BAM input - stub") {
         options '-stub'
 
@@ -62,12 +91,13 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test', data_type: 'bam', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                // BAM input that will be converted back to FASTQ for reprocessing
+                input[0] = channel.of([
+                    [id: 'test', data_type: 'bam', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -82,6 +112,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Complete pipeline with CRAM input (no QC/filtering)
+     * This test validates the pipeline with CRAM input and all optional processing disabled.
+     * Expected behavior: CRAM input → convert to FASTQ (FASTQ_CONVERTOR) → direct BWA-MEM alignment →
+     * BAM merging. No filtering or QC steps enabled for minimal processing overhead.
+     * This scenario tests the essential conversion-alignment-merge pipeline without extras.
+     */
     test("Complete pipeline - CRAM input - stub") {
         options '-stub'
 
@@ -97,12 +134,13 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test', data_type: 'cram', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                // CRAM input (compressed alternative to BAM)
+                input[0] = channel.of([
+                    [id: 'test', data_type: 'cram', single_end: false, platform: 'illumina', sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/cram/test.paired_end.sorted.cram', checkIfExists: true)
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -117,6 +155,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Complete pipeline with ONT long reads and minimap2 aligner
+     * This test validates the pipeline for Oxford Nanopore long-read sequencing data.
+     * Expected behavior: ONT FASTQ.GZ input (median_bp: 5000) → fastp filtering (long-read mode) →
+     * minimap2 alignment (optimized for long reads) → BAM merging. bbduk is skipped (not suitable
+     * for long reads). This tests the long-read processing path with minimap2 instead of BWA.
+     */
     test("Complete pipeline - ONT long reads - stub") {
         options '-stub'
 
@@ -133,12 +178,13 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test_ont', data_type: 'fastq_gz', single_end: true, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                // ONT long-read sample (5000bp median, exceeds long_read_threshold)
+                input[0] = channel.of([
+                    [id: 'test_ont', data_type: 'fastq_gz', single_end: true, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/nanopore/fastq/test.fastq.gz', checkIfExists: true)
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -153,6 +199,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Complete pipeline with BWAMEM2 aligner (improved BWA version)
+     * This test validates the pipeline using BWAMEM2 instead of standard BWA-MEM.
+     * Expected behavior: FASTQ.GZ input → fastp/bbduk filtering → BWAMEM2 alignment (improved
+     * performance over BWA-MEM for longer reads) → BAM merging. This tests the BWAMEM2 aligner
+     * option while keeping the rest of the pipeline the same.
+     */
     test("Complete pipeline - BWAMEM2 aligner - stub") {
         options '-stub'
 
@@ -168,15 +221,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                input[0] = channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                     ]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -191,6 +244,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 6: Complete pipeline with SEQTK subsampling enabled
+     * This test validates the optional seqtk subsampling feature for reducing read depth.
+     * Expected behavior: FASTQ.GZ input → fastp/bbduk filtering → seqtk subsampling to 10,000 reads →
+     * FastQC/MultiQC → BWA-MEM alignment → BAM merging. This is useful for testing/development with
+     * smaller datasets or for downsampling high-coverage data.
+     */
     test("Complete pipeline - SEQTK subsampling - stub") {
         options '-stub'
 
@@ -207,15 +267,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
-                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                input[0] = channel.of([
+                    [id: 'test', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                     ]
                 ])
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -230,6 +290,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 7: Multiple samples processed in parallel
+     * This test validates the pipeline's ability to process multiple independent samples in batch.
+     * Expected behavior: Two samples (sample1, sample2) → each processed through fastp filtering →
+     * BWA-MEM alignment → BAM merging independently and in parallel. No QC to focus on core
+     * processing performance.
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -245,24 +312,25 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two different samples from the same patient
+                input[0] = channel.of(
                     [
-                        [id: 'test1', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1'],
+                        [id: 'test1', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1', lane: 'L001', flowcell: 'FC1', size: 1, num_lanes: 1],
                         [
                             file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                             file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                         ]
                     ],
                     [
-                        [id: 'test2', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample2', patient: 'patient1', lane: 'L002', flowcell: 'FC1'],
+                        [id: 'test2', data_type: 'fastq_gz', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample2', patient: 'patient1', lane: 'L002', flowcell: 'FC1', size: 1, num_lanes: 1],
                         [
                             file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
                             file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
                         ]
                     ]
                 )
-                input[1] = file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
-                input[2] = []
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
                 """
             }
         }

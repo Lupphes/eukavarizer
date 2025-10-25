@@ -1,7 +1,11 @@
 //
-// BAM/CRAM to FASTQ conversion, paired end only
-// This workflow is a subworkflow of the main Sarek pipeline.
-// https://raw.githubusercontent.com/nf-core/sarek/refs/heads/master/subworkflows/local/bam_convert_samtools/main.nf
+// BAM/CRAM to FASTQ conversion, supports both single-end and paired-end data
+// This workflow is adapted from the Sarek pipeline with modifications to support single-end data.
+// Original Sarek version: https://raw.githubusercontent.com/nf-core/sarek/refs/heads/master/subworkflows/local/bam_convert_samtools/main.nf
+//
+// MODIFICATIONS FROM UPSTREAM:
+// - Added conditional logic to handle single-end data (line 60-72)
+// - Original Sarek version only supported paired-end data
 //
 
 include { SAMTOOLS_VIEW         as SAMTOOLS_VIEW_MAP_MAP     } from '../../../modules/nf-core/samtools/view/main'
@@ -22,7 +26,7 @@ workflow BAM_CONVERT_SAMTOOLS {
     interleaved // value: true/false
 
     main:
-    versions = Channel.empty()
+    versions = channel.empty()
 
     SAMTOOLS_INDEX(input)
     bam_bai = input.join(SAMTOOLS_INDEX.out.bai.mix(SAMTOOLS_INDEX.out.crai), by: 0)
@@ -57,7 +61,28 @@ workflow BAM_CONVERT_SAMTOOLS {
 
     reads_to_concat = COLLATE_FASTQ_MAP.out.fastq
         .join(COLLATE_FASTQ_UNMAP.out.fastq, failOnDuplicate: true, failOnMismatch: true)
-        .map{ meta, mapped_reads, unmapped_reads -> [ meta, [ mapped_reads, mapped_reads, unmapped_reads, unmapped_reads ] ] }
+        .map{ meta, mapped_reads, unmapped_reads ->
+            // Handle both single-end and paired-end data
+            // COLLATE_FASTQ outputs: paired-end = [R1, R2], single-end = single file
+            // CAT_FASTQ expects: paired-end = [file1_R1, file1_R2, file2_R1, file2_R2, ...]
+            //                   single-end = [file1, file2, file3, ...]
+
+            if (meta.single_end) {
+                // Single-end: Flatten arrays into single list
+                def mapped = mapped_reads instanceof List ? mapped_reads : [mapped_reads]
+                def unmapped = unmapped_reads instanceof List ? unmapped_reads : [unmapped_reads]
+                [ meta, (mapped + unmapped).flatten() ]
+            } else {
+                // Paired-end: Interleave R1 and R2 files properly
+                // Ensure we have arrays (defensive programming)
+                def mapped = mapped_reads instanceof List ? mapped_reads : [mapped_reads]
+                def unmapped = unmapped_reads instanceof List ? unmapped_reads : [unmapped_reads]
+
+                // For paired-end, we expect [R1, R2] from each COLLATE_FASTQ
+                // Output should be: [mapped_R1, mapped_R2, unmapped_R1, unmapped_R2]
+                [ meta, [ mapped[0], mapped[1], unmapped[0], unmapped[1] ] ]
+            }
+        }
 
     // Concatenate Mapped_R1 with Unmapped_R1 and Mapped_R2 with Unmapped_R2
     CAT_FASTQ(reads_to_concat)

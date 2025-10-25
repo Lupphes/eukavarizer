@@ -47,7 +47,7 @@ workflow SV_CALLING_SVABA {
         reference_genome_bwa_index
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_svaba = "svaba"
 
         SVABA(
@@ -83,7 +83,7 @@ workflow SV_CALLING_SVABA {
                     tuple(meta + [id: "${meta.id}-${name_svaba}-svync"], vcf, [])
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_svaba}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_svaba}.yaml"))
                 )
         )
 
@@ -92,12 +92,12 @@ workflow SV_CALLING_SVABA {
             name_svaba
         )
 
-        ch_versions = ch_versions.mix(SVABA.out.versions.first())
+        ch_versions = ch_versions.mix(SVABA.out.versions)
         if (params.svaba_annotate) {
-            ch_versions = ch_versions.mix(SVABA_ANNOTATE.out.versions.first())
+            ch_versions = ch_versions.mix(SVABA_ANNOTATE.out.versions)
         }
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

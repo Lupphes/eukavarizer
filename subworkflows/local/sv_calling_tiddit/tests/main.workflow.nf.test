@@ -1,3 +1,17 @@
+/*
+ * SV_CALLING_TIDDIT Workflow Tests
+ *
+ * TIDDIT (Transient Insertions and Deletions Detection and Identification Tool) is a structural
+ * variant caller that detects SVs using discordant read pairs and split reads.
+ * Key features:
+ * - Detects deletions, duplications, inversions, and translocations
+ * - Works with BWA-MEM or minimap2 aligned reads (requires alignment index awareness)
+ * - Optimized for Illumina paired-end short-read data
+ * - Filters out single-end and long-read data (designed for paired-end short reads)
+ * Platform support: Illumina paired-end reads only
+ * Aligner support: Works with both BWA and minimap2 alignments
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_TIDDIT"
@@ -8,6 +22,12 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_tiddit"
 
+    /*
+     * Test scenario 1: Illumina paired-end BAM with BWA alignment
+     * This test validates TIDDIT's SV calling using reads aligned with BWA-MEM.
+     * Expected behavior: TIDDIT should detect SVs using discordant pairs and split reads,
+     * generating VCF output along with compressed VCF (vcfgz), tabix index (tbi), and CSI index (csi) files.
+     */
     test("Illumina paired-end BAM input - BWA - stub") {
         options '-stub'
 
@@ -18,14 +38,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -42,6 +62,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Illumina paired-end BAM with minimap2 alignment
+     * This test validates TIDDIT's SV calling using reads aligned with minimap2.
+     * Expected behavior: TIDDIT should process minimap2-aligned BAMs correctly,
+     * detecting SVs using the same discordant pair and split-read logic.
+     */
     test("Illumina paired-end BAM input - minimap2 - stub") {
         options '-stub'
 
@@ -52,14 +78,14 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -75,6 +101,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Single-end reads are filtered out
+     * This test validates TIDDIT's platform filtering - it should skip single-end data.
+     * Expected behavior: The workflow should succeed but produce no output, as TIDDIT requires
+     * paired-end reads for discordant pair analysis. Single-end reads (single_end: true) should
+     * be filtered before calling TIDDIT.
+     */
     test("Single-end reads filtered out - stub") {
         options '-stub'
 
@@ -85,14 +118,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // Single-end sample that should be filtered out (TIDDIT requires paired-end)
+                input[0] = channel.of([
                     [id: 'test_single', single_end: true, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -104,6 +138,13 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: Long reads are filtered out
+     * This test validates TIDDIT's read length filtering - it should skip long-read data.
+     * Expected behavior: The workflow should succeed but produce no output, as TIDDIT is optimized
+     * for short reads. Reads with median_bp >= long_read_threshold (5000bp >= 1000bp) should be
+     * filtered before calling TIDDIT.
+     */
     test("Long reads filtered out - stub") {
         options '-stub'
 
@@ -114,14 +155,15 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of([
+                // ONT long-read sample (5000bp) that should be filtered out (threshold is 1000bp)
+                input[0] = channel.of([
                     [id: 'test_ont', single_end: false, platform: 'ont', median_bp: 5000, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }
@@ -133,6 +175,12 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 5: Multiple samples processed in batch
+     * This test validates TIDDIT's ability to process multiple Illumina paired-end samples in parallel.
+     * Expected behavior: TIDDIT should successfully call SVs for each sample independently,
+     * generating separate VCF outputs for each sample (sample1 and sample2).
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
@@ -143,7 +191,8 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two Illumina paired-end samples from the same patient
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: false, platform: 'illumina', median_bp: 150, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -155,9 +204,9 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], []])
-                input[3] = Channel.value([[id: 'genome'], []])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], []])
+                input[3] = channel.value([[id: 'genome'], []])
                 """
             }
         }

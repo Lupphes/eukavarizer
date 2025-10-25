@@ -1,0 +1,37 @@
+{
+    "BAM to FASTQ - paired end - stub": {
+        "content": [
+            {
+                "0": [
+                    
+                ],
+                "1": [
+                    "versions.yml:md5,046b30344f9a090d641ff7f591b0ee50",
+                    "versions.yml:md5,3ec86bd3456e93b6fba8f3ee9c1d127e",
+                    "versions.yml:md5,4db4e520adf0ec14c0428d440d72d0b3",
+                    "versions.yml:md5,78e78e1ece80eef67ae4fbca2fdfbb70",
+                    "versions.yml:md5,8a3063fe8a5ecf5275b33d92003b5508",
+                    "versions.yml:md5,b97473987bd71717f820aa380ed74e70",
+                    "versions.yml:md5,ca2df4d2c212dad9ab2a8d50c45b35c8"
+                ],
+                "reads": [
+                    
+                ],
+                "versions": [
+                    "versions.yml:md5,046b30344f9a090d641ff7f591b0ee50",
+                    "versions.yml:md5,3ec86bd3456e93b6fba8f3ee9c1d127e",
+                    "versions.yml:md5,4db4e520adf0ec14c0428d440d72d0b3",
+                    "versions.yml:md5,78e78e1ece80eef67ae4fbca2fdfbb70",
+                    "versions.yml:md5,8a3063fe8a5ecf5275b33d92003b5508",
+                    "versions.yml:md5,b97473987bd71717f820aa380ed74e70",
+                    "versions.yml:md5,ca2df4d2c212dad9ab2a8d50c45b35c8"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-22T01:43:55.749869932"
+    }
+}

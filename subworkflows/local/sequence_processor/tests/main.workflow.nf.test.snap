@@ -1,0 +1,101 @@
+{
+    "Complete pipeline - FASTQ.GZ paired end - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 0,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "flowcell": "FC1",
+                            "size": 1,
+                            "num_lanes": 1,
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\""
+                        },
+                        [
+                            "test.trim_1.fastq.gz:md5,68b329da9893e34099c7d8ad5cb9c940",
+                            "test.trim_2.fastq.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        ]
+                    ]
+                ],
+                "1": [
+                    
+                ],
+                "2": [
+                    
+                ],
+                "3": [
+                    [
+                        [
+                            "multiqc_report.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "4": [
+                    "versions.yml:md5,42c78df2681d6a66477f64a86a8444b8",
+                    "versions.yml:md5,431212cda36c81a293905bb779840258",
+                    "versions.yml:md5,4747ebd461d6939f5b92e6f3daf1ad83",
+                    "versions.yml:md5,560a52df8f36b63fbf7d78adf3a2adf7",
+                    "versions.yml:md5,79008d4871df83e94f728f61b389cd39",
+                    "versions.yml:md5,81a6370a65ba0d905262e01ee5a1d287",
+                    "versions.yml:md5,938ca7a71ce7882eb9c59e5a3018feeb",
+                    "versions.yml:md5,a7bd1bcf107320bc92db5f547bf94cfb"
+                ],
+                "bam_bai": [
+                    
+                ],
+                "fastq_filtered": [
+                    [
+                        {
+                            "id": "test",
+                            "data_type": "fastq_gz",
+                            "single_end": false,
+                            "platform": "illumina",
+                            "median_bp": 0,
+                            "sample": "sample1",
+                            "patient": "patient1",
+                            "flowcell": "FC1",
+                            "size": 1,
+                            "num_lanes": 1,
+                            "read_group": "\"@RG\\tID:FC1.sample1.L001\\tPU:L001\\tSM:patient1_sample1\\tLB:sample1\\tPL:illumina\""
+                        },
+                        [
+                            "test.trim_1.fastq.gz:md5,68b329da9893e34099c7d8ad5cb9c940",
+                            "test.trim_2.fastq.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        ]
+                    ]
+                ],
+                "multiqc_report": [
+                    [
+                        [
+                            "multiqc_report.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "samtools_stats": [
+                    
+                ],
+                "versions": [
+                    "versions.yml:md5,42c78df2681d6a66477f64a86a8444b8",
+                    "versions.yml:md5,431212cda36c81a293905bb779840258",
+                    "versions.yml:md5,4747ebd461d6939f5b92e6f3daf1ad83",
+                    "versions.yml:md5,560a52df8f36b63fbf7d78adf3a2adf7",
+                    "versions.yml:md5,79008d4871df83e94f728f61b389cd39",
+                    "versions.yml:md5,81a6370a65ba0d905262e01ee5a1d287",
+                    "versions.yml:md5,938ca7a71ce7882eb9c59e5a3018feeb",
+                    "versions.yml:md5,a7bd1bcf107320bc92db5f547bf94cfb"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.8"
+        },
+        "timestamp": "2025-10-22T23:07:45.593644463"
+    }
+}

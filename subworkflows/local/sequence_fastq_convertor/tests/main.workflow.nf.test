@@ -1,3 +1,16 @@
+/*
+ * SEQUENCE_FASTQ_CONVERTOR Workflow Tests
+ *
+ * This workflow converts various sequence file formats to standardized FASTQ format for downstream processing.
+ * Key features:
+ * - Supports multiple input formats: FASTQ.GZ (compressed), FASTQ (uncompressed), SRA archives, BAM, CRAM
+ * - Handles both single-end and paired-end data
+ * - Converts SRA files using sra-tools (fasterq-dump)
+ * - Converts BAM/CRAM files to FASTQ using samtools
+ * - Tags and collects FASTQ files with sample metadata
+ * Output: Standardized tagged_collected_fastqs for downstream QC and alignment
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_FASTQ_CONVERTOR"
@@ -8,13 +21,19 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sequence_fastq_convertor"
 
+    /*
+     * Test scenario 1: Compressed FASTQ.GZ input - single-end
+     * This test validates handling of standard compressed FASTQ files for single-end reads.
+     * Expected behavior: The workflow should recognize the FASTQ.GZ format and pass it through
+     * without conversion, tagging it with sample metadata for downstream processing.
+     */
     test("FASTQ.GZ input - single end - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', data_type: 'fastq_gz', single_end: true, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true)
                 ])
@@ -33,13 +52,19 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Compressed FASTQ.GZ input - paired-end
+     * This test validates handling of standard compressed FASTQ files for paired-end reads.
+     * Expected behavior: The workflow should recognize the FASTQ.GZ format for both R1 and R2 files,
+     * pass them through without conversion, and tag them with sample metadata.
+     */
     test("FASTQ.GZ input - paired end - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', data_type: 'fastq_gz', single_end: false, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -61,13 +86,19 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 3: Uncompressed FASTQ input - paired-end
+     * This test validates handling of uncompressed FASTQ files (data_type: 'fastq').
+     * Expected behavior: The workflow should compress uncompressed FASTQ files to FASTQ.GZ format
+     * for standardization and efficient storage, then tag them with sample metadata.
+     */
     test("Uncompressed FASTQ input - paired end - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', data_type: 'fastq', single_end: false, sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
                     [
                         file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
@@ -88,13 +119,21 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 4: SRA archive input
+     * This test validates conversion of SRA (Sequence Read Archive) files to FASTQ format.
+     * Expected behavior: The workflow should use sra-tools (fasterq-dump) to extract FASTQ files
+     * from the SRA archive, compress them to FASTQ.GZ, and tag them with sample metadata.
+     * This enables processing of public sequencing data from NCBI SRA database.
+     */
     test("SRA input - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                // SRA archive file that needs conversion to FASTQ
+                input[0] = channel.of([
                     [id: 'test', data_type: 'sra', sample: 'sample1', patient: 'patient1', lane: 'L001', platform: 'illumina', flowcell: 'FC1'],
                     file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/sra/SRR13255544.tar.gz', checkIfExists: true)
                 ])

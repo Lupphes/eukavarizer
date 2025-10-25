@@ -60,10 +60,10 @@ workflow EUKAVARIZER {
         reference_genome_minimap_index      // REFERENCE_RETRIEVAL.out.reference_genome_minimap_index
 
     main:
-        vcf_list    = Channel.value([])
-        vcfgz_list  = Channel.value([])
-        tbi_list    = Channel.value([])
-        meta_list   = Channel.value([])
+        vcf_list    = channel.empty()
+        vcfgz_list  = channel.empty()
+        tbi_list    = channel.empty()
+        meta_list   = channel.empty()
 
         /*
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

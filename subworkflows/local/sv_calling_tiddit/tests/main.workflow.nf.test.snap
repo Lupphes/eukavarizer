@@ -54,6 +54,11 @@
                         "re-sample1-illumina-false-tiddit.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,3c89fee2500102ec13db36a14691a809",
+                    "versions.yml:md5,4ef7ced495d8e3f57f81bf74ff840880",
+                    "versions.yml:md5,791ae1fba49804a9ecdc07cc51816e5f"
+                ],
                 "csi": [
                     [
                         {
@@ -105,6 +110,11 @@
                         },
                         "re-sample1-illumina-false-tiddit.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,3c89fee2500102ec13db36a14691a809",
+                    "versions.yml:md5,4ef7ced495d8e3f57f81bf74ff840880",
+                    "versions.yml:md5,791ae1fba49804a9ecdc07cc51816e5f"
                 ]
             }
         ],
@@ -112,6 +122,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T12:32:12.339937931"
+        "timestamp": "2025-10-23T02:41:31.274420563"
     }
 }

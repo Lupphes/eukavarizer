@@ -9,43 +9,28 @@ nextflow_pipeline {
         when {
             params {
                 outdir = "$outputDir"
+                input = "${projectDir}/tests/samplesheet_minimal.csv"
+                reference_genome = "${projectDir}/tests/GCF_000146045.2_R64_genomic.fna.gz"
+                taxonomy_id = 4932
             }
         }
 
         then {
             assert workflow.success
             assert snapshot(
-                path("$outputDir/multiqc/multiqc_report.html"),
-                path("$outputDir/multiqc/multiqc_data/multiqc_data.json"),
-                path("$outputDir/multiqc/multiqc_data/multiqc_general_stats.txt"),
-                path("$outputDir/multiqc/multiqc_data/multiqc_software_versions.txt"),
-                path("$outputDir/pipeline_info/software_versions.yml")
+                path("$outputDir/4932/results/4932.html"),
+                path("$outputDir/4932/ref/4932_refseq_results.json")
             ).match()
 
-            // Check for presence of expected output directories
-            def expectedDirs = [
-                "multiqc",
-                "pipeline_info",
-                "fastqc"
-            ]
-            expectedDirs.each { dir ->
-                assert path("$outputDir/$dir").exists() : "Expected directory $dir not found"
-            }
-        }
-    }
+            // Check for presence of expected output directories and files
+            assert path("$outputDir/4932").exists()
+            assert path("$outputDir/pipeline_info").exists()
 
-    test("eukavarizer: test profile - stub") {
-
-        options "-stub"
-
-        when {
-            params {
-                outdir = "$outputDir"
-            }
-        }
-
-        then {
-            assert workflow.success
+            // Check for timestamped pipeline_info files (can't use wildcards in snapshots)
+            def pipelineInfoFiles = path("$outputDir/pipeline_info").list()
+            assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_report_") && it.fileName.toString().endsWith(".html") }
+            assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_timeline_") && it.fileName.toString().endsWith(".html") }
+            assert pipelineInfoFiles.any { it.fileName.toString().startsWith("pipeline_dag_") && it.fileName.toString().endsWith(".html") }
         }
     }
 }

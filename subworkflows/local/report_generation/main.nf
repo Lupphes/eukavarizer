@@ -54,21 +54,21 @@ workflow REPORT_GENERATION {
         samtools_stats
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         vcf_list_cleaned = vcf_list
-            .filter { it != null }
-            .map { it[1] }
+            .filter { tuple -> tuple != null }
+            .map { tuple -> tuple[1] }
 
-        tbi_list_cleaned = tbi_list
-            .filter { it != null }
-            .map { it[1] }
+        _tbi_list_cleaned = tbi_list
+            .filter { tuple -> tuple != null }
+            .map { tuple -> tuple[1] }
 
         samtools_stats_cleaned = samtools_stats
-            .map { it[1] }
+            .map { tuple -> tuple[1] }
             .collect()
 
-        varify_meta = Channel.value([id: "varify_merge"])
+        varify_meta = channel.value([id: "varify_merge"])
         varify_input = varify_meta.combine(vcf_list_cleaned)
 
         VARIFY(

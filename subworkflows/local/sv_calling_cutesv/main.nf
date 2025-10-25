@@ -41,7 +41,7 @@ workflow SV_CALLING_CUTESV {
         reference_genome_bgzipped
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_cutesv = "cutesv"
 
         CUTESV(
@@ -57,7 +57,7 @@ workflow SV_CALLING_CUTESV {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, [])
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_cutesv}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_cutesv}.yaml"))
                 )
         )
 
@@ -66,9 +66,9 @@ workflow SV_CALLING_CUTESV {
             name_cutesv
         )
 
-        ch_versions = ch_versions.mix(CUTESV.out.versions.first())
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(CUTESV.out.versions)
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

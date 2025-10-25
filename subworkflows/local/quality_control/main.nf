@@ -43,7 +43,7 @@ workflow QUALITY_CONTROL {
         fastq_files
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
 
         PRE_FASTQC_MULTIQC_ANALYSIS(
             fastq_files
@@ -152,14 +152,14 @@ workflow QUALITY_CONTROL {
         ch_versions = ch_versions.mix(PRE_FASTQC_MULTIQC_ANALYSIS.out.versions)
         ch_versions = ch_versions.mix(AFTER_FASTQC_MULTIQC_ANALYSIS.out.versions)
         if (params.fastp_flag) {
-            ch_versions = ch_versions.mix(FASTP.out.versions.first())
-            ch_versions = ch_versions.mix(FASTPLONG.out.versions.first())
+            ch_versions = ch_versions.mix(FASTP.out.versions)
+            ch_versions = ch_versions.mix(FASTPLONG.out.versions)
         }
         if (params.bbmap_bbduk_flag) {
-            ch_versions = ch_versions.mix(BBMAP_BBDUK.out.versions.first())
+            ch_versions = ch_versions.mix(BBMAP_BBDUK.out.versions)
         }
         if (params.seqtk_flag) {
-            ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions.first())
+            ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions)
         }
 
     emit:

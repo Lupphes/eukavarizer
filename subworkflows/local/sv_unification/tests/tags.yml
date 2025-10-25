@@ -1,0 +1,9 @@
+sv_unification:
+  - subworkflows/local/sv_unification/**
+  - modules/nf-core/survivor/merge/**
+  - modules/nf-core/survivor/stats/**
+  - modules/nf-core/survivor/filter/**
+  - modules/nf-core/bcftools/concat/**
+  - modules/nf-core/bcftools/sort/**
+  - modules/nf-core/bcftools/stats/**
+  - modules/nf-core/bcftools/filter/**

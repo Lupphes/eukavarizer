@@ -43,7 +43,7 @@ workflow SV_CALLING_DYSGU {
         reference_genome_faidx
 
     main:
-        ch_versions = Channel.empty()
+        ch_versions = channel.empty()
         name_dysgu = "dysgu"
 
         DYSGU_RUN(
@@ -66,7 +66,7 @@ workflow SV_CALLING_DYSGU {
                     tuple(meta + [id: "${meta.id}-svync"], vcf, tbi)
                 }
                 .combine(
-                    Channel.value(file("${projectDir}/assets/svync/${name_dysgu}.yaml"))
+                    channel.value(file("${projectDir}/assets/svync/${name_dysgu}.yaml"))
                 )
         )
 
@@ -75,9 +75,9 @@ workflow SV_CALLING_DYSGU {
             name_dysgu
         )
 
-        ch_versions = ch_versions.mix(DYSGU_RUN.out.versions.first())
-        ch_versions = ch_versions.mix(SVYNC.out.versions.first())
-        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions.first())
+        ch_versions = ch_versions.mix(DYSGU_RUN.out.versions)
+        ch_versions = ch_versions.mix(SVYNC.out.versions)
+        ch_versions = ch_versions.mix(SAMPLE_REHEADER.out.versions)
 
     emit:
         vcf = SAMPLE_REHEADER.out.vcf

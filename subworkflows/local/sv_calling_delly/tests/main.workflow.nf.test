@@ -1,3 +1,15 @@
+/*
+ * SV_CALLING_DELLY Workflow Tests
+ *
+ * DELLY is a structural variant caller that uses paired-end and split-read analysis
+ * to detect deletions, duplications, inversions, and translocations.
+ * Key features:
+ * - Optimized for Illumina short-read sequencing data
+ * - Uses integrated paired-end and split-read analysis
+ * - Supports germline and somatic SV detection
+ * Platform support: Illumina paired-end reads
+ */
+
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_DELLY"
@@ -8,19 +20,25 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "sv_calling_delly"
 
+    /*
+     * Test scenario 1: Single sample with Illumina paired-end BAM input
+     * This test validates the basic DELLY SV calling functionality with a single paired-end sample.
+     * Expected behavior: DELLY should process the BAM file and generate VCF output with detected SVs,
+     * along with compressed VCF (vcfgz), tabix index (tbi), and CSI index (csi) files.
+     */
     test("Illumina paired-end BAM input - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of([
+                input[0] = channel.of([
                     [id: 'test', single_end: false, sample: 'sample1', patient: 'patient1'],
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
                     file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                 ])
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }
@@ -37,13 +55,20 @@ nextflow_workflow {
         }
     }
 
+    /*
+     * Test scenario 2: Multiple samples processed in batch
+     * This test validates DELLY's ability to process multiple samples in parallel.
+     * Expected behavior: DELLY should successfully call SVs for each sample independently,
+     * generating separate VCF outputs for each sample (sample1 and sample2).
+     */
     test("Multiple samples - stub") {
         options '-stub'
 
         when {
             workflow {
                 """
-                input[0] = Channel.of(
+                // Two paired-end samples from the same patient for batch processing
+                input[0] = channel.of(
                     [
                         [id: 'sample1', single_end: false, sample: 'sample1', patient: 'patient1'],
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true),
@@ -55,8 +80,8 @@ nextflow_workflow {
                         file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/bam/test.paired_end.sorted.bam.bai', checkIfExists: true)
                     ]
                 )
-                input[1] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
-                input[2] = Channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
+                input[1] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)])
+                input[2] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.fai', checkIfExists: true)])
                 """
             }
         }

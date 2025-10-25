@@ -108,6 +108,11 @@ EOF
     echo -n | gzip > ${prefix}.vcf.gz
     touch ${prefix}.vcf.gz.tbi
     touch ${prefix}.vcf.gz.csi
-    touch versions.yml
+
+    cat <<-END_VERSIONS > versions.yml
+\t"${task.process}":
+\t    bcftools: \$(bcftools --version 2>&1 | head -n 1 | sed 's/^.*bcftools //')
+\t    tabix: \$(tabix --version 2>&1 | head -n 1 | sed 's/^.*tabix (htslib) //' | sed 's/ .*//')
+\tEND_VERSIONS
     """
 }

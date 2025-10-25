@@ -54,6 +54,11 @@
                         "re-sample1-illumina-false-svaba.vcf.gz.csi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "4": [
+                    "versions.yml:md5,0caececd827c7ceeaa2c0c2debe30dd4",
+                    "versions.yml:md5,6841e78e25491ab5de6fe547e09dd26c",
+                    "versions.yml:md5,e25c053707b231e6883fb15a0dc77360"
+                ],
                 "csi": [
                     [
                         {
@@ -105,6 +110,11 @@
                         },
                         "re-sample1-illumina-false-svaba.vcf.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
+                ],
+                "versions": [
+                    "versions.yml:md5,0caececd827c7ceeaa2c0c2debe30dd4",
+                    "versions.yml:md5,6841e78e25491ab5de6fe547e09dd26c",
+                    "versions.yml:md5,e25c053707b231e6883fb15a0dc77360"
                 ]
             }
         ],
@@ -112,6 +122,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.8"
         },
-        "timestamp": "2025-10-19T12:33:45.899553893"
+        "timestamp": "2025-10-23T02:40:36.159468649"
     }
 }

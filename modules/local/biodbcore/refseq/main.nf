@@ -52,11 +52,12 @@ process BIODBCORE_REFSEQ {
     stub:
     def prefix = task.ext.prefix ?: "${taxonomy_id}"
     """
-    touch ${prefix}_refseq_results.json
-
     # Create mock reference genome if not provided
     if [ -z "${reference_genome}" ]; then
         echo ">mock_chromosome_1" | gzip > ${prefix}_mock_genome.fna.gz
+        echo '{"genome_size": 12000000, "genome_size_ungapped": 11500000, "reference_genome": "'${prefix}'_mock_genome.fna.gz"}' > ${prefix}_refseq_results.json
+    else
+        echo '{"genome_size": 12000000, "genome_size_ungapped": 11500000, "reference_genome": "'${reference_genome}'"}' > ${prefix}_refseq_results.json
     fi
 
     # Create mock assembly files
