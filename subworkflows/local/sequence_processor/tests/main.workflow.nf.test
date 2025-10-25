@@ -1,18 +1,3 @@
-/*
- * SEQUENCE_PROCESSOR Workflow Tests
- *
- * This is the main sequence processing workflow that orchestrates format conversion, QC, filtering,
- * alignment, and merging into a complete end-to-end pipeline.
- * Key features:
- * - Integrates SEQUENCE_FASTQ_CONVERTOR, SEQUENCE_ALIGNER, and SEQUENCE_MERGER subworkflows
- * - Optional QC/filtering tools: fastp (adapter trimming/QC), bbmap bbduk (contamination removal), seqtk (subsampling)
- * - Optional quality control: FastQC (read quality metrics), MultiQC (aggregated QC reports)
- * - Supports multiple input formats: FASTQ.GZ, BAM, CRAM, SRA
- * - Supports multiple aligners: BWA-MEM, BWAMEM2, minimap2 (for short/long reads)
- * - Handles both Illumina short reads and ONT/PacBio long reads
- * Output: Filtered FASTQ, aligned/merged BAM + BAI, samtools stats, optional QC reports
- */
-
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_PROCESSOR"

@@ -45,10 +45,6 @@
     Output Channels (emit) - PIPELINE_COMPLETION:
         [No explicit output channels - handles workflow.onComplete and workflow.onError events]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondřej Sloup (Lupphes)
-    Contact:  ondrej.sloup@protonmail.com
-    GitHub:   @Lupphes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { BIODBCORE_ENA         } from '../../../modules/local/biodbcore/ena/main'
 
@@ -226,8 +222,8 @@ workflow PIPELINE_INITIALISATION {
             params.taxonomy_id,
             params.reference_genome,
             outdir,
-            params.library_strategy.map     { it.join(' ').trim() },
-            params.instrument_platform.map  { it.join(' ').trim() },
+            params.library_strategy.map     { list -> list.join(' ').trim() },
+            params.instrument_platform.map  { list -> list.join(' ').trim() },
             params.minimum_coverage,
             params.maximum_coverage,
             params.max_results,
@@ -440,4 +436,10 @@ def methodsDescriptionText(mqc_methods_yaml) {
 
     return description_html.toString()
 }
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    THE END
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 

@@ -11,7 +11,8 @@
 <!-- [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.2-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A5v24.04.2-23aa62.svg)](https://www.nextflow.io/)
+[![run with nf-core template](https://img.shields.io/badge/nf--core%20template-3.4.1-brightgreen.svg)](https://nf-co.re/tools)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 
@@ -41,42 +42,13 @@
 
 ## Workflow Overview
 
-1. **Reference genome retrieval** or usage of user-provided genome
-   - Automatic download from RefSeq using BioDbCore
-   - Generates BWA/BWA-MEM2/Minimap2 indices
-   - Creates bgzipped and indexed FASTA files
+The pipeline processes data through these main stages:
 
-2. **Read QC and preprocessing**
-   - Quality control with FastQC and MultiQC
-   - Adapter trimming and filtering (Fastp for short reads, fastplong for long reads)
-   - Optional downsampling (Seqtk) and basecalling (Dorado for Nanopore)
-
-3. **Read alignment**
-   - BWA-MEM (default for short reads)
-   - BWA-MEM2 (faster alternative)
-   - Minimap2 (optimized for long reads)
-
-4. **BAM processing**
-   - Multi-lane merging (Samtools)
-   - Duplicate marking (GATK4 MarkDuplicates)
-   - Optional base quality score recalibration (GATK4 BQSR)
-
-5. **SV calling** via one or more tools:
-   - **Short-read**: DELLY, Manta, GRIDSS, SVABA, TIDDIT, DYSGU
-   - **Long-read**: Sniffles, CuteSV, DYSGU
-
-6. **VCF standardization**
-   - SVYNC normalization
-   - StructuralVariantAnnotation for breakpoint refinement
-
-7. **SV merging & filtering**
-   - SURVIVOR for cross-caller merging
-   - BCFtools for concatenation and filtering
-
-8. **Report generation**
-   - MultiQC for aggregated QC metrics
-   - Varify for interactive SV visualization
-   - BCFtools stats for variant statistics
+1. **Input & Reference** → Retrieve or use provided reference genome; process input data (FASTQ/BAM/CRAM/raw formats)
+2. **QC & Alignment** → Quality control, trimming, and alignment (BWA-MEM/BWA-MEM2/Minimap2)
+3. **SV Calling** → Multi-caller structural variant detection (DELLY, Manta, GRIDSS, Sniffles, CuteSV, etc.)
+4. **Merging & Filtering** → Unify and filter variants using SURVIVOR and BCFtools
+5. **Reporting** → Generate interactive Varify report and MultiQC quality metrics
 
 ## Usage
 
@@ -84,6 +56,12 @@
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
 ## Quick Start
+
+### Test the pipeline
+
+```bash
+nextflow run nf-core/eukavarizer -profile docker,test --resume
+```
 
 ### Automatic data retrieval (minimal example)
 
@@ -94,7 +72,7 @@ nextflow run nf-core/eukavarizer \
    --outdir results/yeast_test
 ```
 
-This automatically downloads the reference genome for *S. cerevisiae* (taxonomy ID 4932) and retrieves sequencing data from ENA.
+This automatically downloads the reference genome for *S. cerevisiae* (taxonomy ID 4932) and retrieves sequencing data from ENA using BioDbCore.
 
 ### Local input with samplesheet
 
@@ -119,102 +97,66 @@ nextflow run nf-core/eukavarizer \
    --outdir results/
 ```
 
+### HPC/Cluster execution
+
+Example PBS/SLURM job scripts are provided in `run_scripts/` for different scenarios:
+- Short-read analysis: `run_scripts/eukavarizer_job_short.sh`
+- Long-read (PacBio): `run_scripts/eukavarizer_job_pac.sh`
+- Long-read (Nanopore): `run_scripts/eukavarizer_job_nano.sh`
+
+See [docs/usage.md](docs/usage.md) for detailed HPC deployment instructions.
+
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
 
-## Profiles and Parameters
+## Key Parameters
 
-The pipeline provides several pre-defined profiles to optimise analysis based on input read types and analysis depth. Combine these with a compute environment profile such as `docker`, `conda`, or `mamba`.
+| Parameter | Description | Required |
+| --------- | ----------- | -------- |
+| `--taxonomy_id` | NCBI Taxonomy ID (e.g., 4932 for yeast, 9606 for human) | Yes |
+| `--outdir` | Output directory | Yes |
+| `--input` | Samplesheet CSV file | No* |
+| `--reference_genome` | Reference FASTA file | No* |
 
-### Read Type and Analysis Depth Profiles
+*If `--input` is not provided, BioDbCore automatically retrieves data from ENA/SRA
 
-| Profile | Read Type | Enabled Callers | Use Case |
-|---------|-----------|----------------|----------|
-| `short_quick` | Short reads | DELLY, Manta | Quick tests, small genomes |
-| `short_medium` | Short reads | DELLY, Manta, GRIDSS, TIDDIT | Balanced analysis |
-| `short_full` | Short reads | All short-read callers | Comprehensive detection |
-| `long_quick` | Long reads | Sniffles | Quick tests |
-| `long_medium` | Long reads | Sniffles, CuteSV | Balanced analysis |
-| `long_full` | Long reads | Sniffles, CuteSV, DYSGU | Comprehensive detection |
-| `mix_quick` | Hybrid | DELLY, Sniffles | Quick hybrid analysis |
-| `mix_medium` | Hybrid | DELLY, Manta, Sniffles, CuteSV | Balanced hybrid |
-| `mix_full` | Hybrid | All compatible callers | Maximum sensitivity |
+### Analysis Profiles
 
-Each profile adjusts:
-- Enabled SV callers
-- Tool-specific arguments and parameters
-- Filtering thresholds for SURVIVOR and BCFtools
+Combine read type with compute environment: `-profile docker,short_full`
 
-### Compute Environment Profiles
+| Profile | Read Type | SV Callers |
+|---------|-----------|------------|
+| `short_quick/medium/full` | Short reads | DELLY, Manta, GRIDSS, TIDDIT, SVABA, DYSGU |
+| `long_quick/medium/full` | Long reads | Sniffles, CuteSV, DYSGU |
+| `mix_quick/medium/full` | Hybrid | Combined callers |
+| `test` | Test data | Minimal yeast test |
 
-- `docker`: Uses Docker containers (recommended)
-- `conda` / `mamba`: Uses Conda or Mamba for software installation
-- `test`: Runs with minimal test dataset
+**Compute profiles**: `docker` (recommended), `singularity`, `conda`, `mamba`
 
-**Example**: Use `-profile docker,short_full` for a comprehensive analysis on short-read data with Docker.
+For all parameters: `nextflow run nf-core/eukavarizer --help` or see [docs/usage.md](docs/usage.md)
 
-### Important Parameters
+## Documentation
 
-#### Required Parameters
+- **[Usage Guide](docs/usage.md)** - Detailed instructions, input formats, parameters, and HPC deployment
+- **[Output Documentation](docs/output.md)** - Complete output file descriptions and directory structure
+- **[Parameter Reference](https://nf-co.re/eukavarizer/parameters)** - Full parameter documentation
 
-| Parameter | Description |
-| --------- | ----------- |
-| `--taxonomy_id` | NCBI Taxonomy ID for reference retrieval (e.g., 4932 for *S. cerevisiae*) |
-| `--outdir` | Output directory for results |
-
-#### Input Options
-
-| Parameter | Description |
-| --------- | ----------- |
-| `--input` | Path to samplesheet CSV file |
-| `--reference_genome` | Path to reference FASTA file (if not auto-downloading) |
-
-#### Alignment Options
-
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `--bwamem2` | Use BWA-MEM2 instead of BWA-MEM | `false` |
-| `--minimap2_flag` | Use Minimap2 for long reads | `false` |
-
-#### SV Caller Flags
-
-| Parameter | Description |
-| --------- | ----------- |
-| `--delly_flag` | Enable DELLY caller |
-| `--manta_flag` | Enable Manta caller |
-| `--gridss_flag` | Enable GRIDSS caller |
-| `--svaba_flag` | Enable SVABA caller (requires BWA, not BWA-MEM2) |
-| `--tiddit_flag` | Enable TIDDIT caller |
-| `--dysgu_flag` | Enable DYSGU caller |
-| `--sniffles_flag` | Enable Sniffles caller |
-| `--cutesv_flag` | Enable CuteSV caller |
-
-For a complete list of parameters, run:
-```bash
-nextflow run nf-core/eukavarizer --help
-```
+For samplesheet format and examples, see [docs/usage.md](docs/usage.md#samplesheet-input).
 
 ---
 
 ## Pipeline output
 
-The pipeline produces the following main outputs in the specified `--outdir`:
+Primary outputs in `--outdir`:
 
-### Main Output Files
+- **`{taxonomy_id}/results/{taxonomy_id}.html`** - Varify interactive report with SV visualizations
+- **`{taxonomy_id}/qc/after_multiqc/multiqc_report.html`** - Comprehensive QC metrics
+- **`{taxonomy_id}/results/vcf/`** - Merged and filtered structural variants (SURVIVOR and BCFtools strategies)
+- **`{taxonomy_id}/{caller}/`** - Individual SV caller outputs (DELLY, Manta, GRIDSS, Sniffles, CuteSV, etc.)
+- **`{taxonomy_id}/ref/`** - Reference genome and indices
+- **`pipeline_info/`** - Execution reports (timeline, trace, software versions)
 
-| File/Directory | Description |
-| -------------- | ----------- |
-| `multiqc/multiqc_report.html` | Comprehensive quality control summary across all samples and tools |
-| `varify/report.html` | Interactive HTML report with SV visualizations and summary statistics |
-| `sv_merged/*.vcf.gz` | Final merged and filtered structural variant calls |
-| `sv_calling/*/` | Per-caller VCF files and logs |
-| `alignment/*.bam` | Processed BAM files (duplicate-marked, optionally BQSR) |
-| `pipeline_info/` | Execution reports, timeline, and resource usage |
-
-**Compatibility Notes**:
-- SVABA requires BWA indices (not compatible with `--bwamem2`)
-- DYSGU supports both short and long reads
-- Minimap2 is recommended for long-read data (enable with `--minimap2_flag`)
+See [docs/output.md](docs/output.md) for complete output documentation and directory structure
 
 ## Credits
 

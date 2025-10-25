@@ -1,17 +1,3 @@
-/*
- * SV_CALLING_DYSGU Workflow Tests
- *
- * Dysgu is a structural variant caller that uses machine learning for SV detection.
- * Key features:
- * - Machine learning-based classification for high-accuracy SV calling
- * - Supports both short-read (Illumina) and long-read (ONT/PacBio) sequencing data
- * - Uses paired-end and split-read evidence for short reads
- * - Handles single-molecule long reads with alignment signatures
- * - Produces high-confidence SV calls with quality scores
- * Platform support: Illumina, ONT, and PacBio
- * Flexibility: Works with paired-end short reads and single-end long reads
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_DYSGU"

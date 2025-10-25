@@ -1,13 +1,26 @@
 {
     "eukavarizer: test profile": {
         "content": [
-            "4932.html:md5,f35a56e70c2906b98fdb43bd7b974907",
-            "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548"
+            "4932.html:md5,f8f6759006dfb9737346537ac28d013b",
+            "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548",
+            "nf_core_eukavarizer_software_mqc_versions.yml:md5,01db1fc45ce48e99372b12d5e8ff35a3"
         ],
         "meta": {
             "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
+            "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-22T01:27:10.239872562"
+        "timestamp": "2025-10-25T23:06:19.695490574"
+    },
+    "eukavarizer: all callers enabled": {
+        "content": [
+            "4932.html:md5,1201ee4ce24d068690951870a178465c",
+            "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548",
+            "nf_core_eukavarizer_software_mqc_versions.yml:md5,01db1fc45ce48e99372b12d5e8ff35a3"
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-10-25T23:11:45.461999259"
     }
 }

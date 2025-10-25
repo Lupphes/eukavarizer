@@ -26,10 +26,6 @@
     Output Channels (emit):
         tagged_collected_fastqs   tuple(meta, fastq)     Compressed FASTQ with metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondřej Sloup (Lupphes)
-    Contact:  ondrej.sloup@protonmail.com
-    GitHub:   @Lupphes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 include { TABIX_BGZIP as TABIX_BGZIP_SINGLE_FASTQ               } from '../../../modules/nf-core/tabix/bgzip/main'
@@ -253,3 +249,9 @@ def readFirstLineOfFastq(path) {
     }
     return line
 }
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    THE END
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/

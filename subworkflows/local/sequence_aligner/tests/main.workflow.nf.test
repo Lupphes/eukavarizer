@@ -1,16 +1,3 @@
-/*
- * SEQUENCE_ALIGNER Workflow Tests
- *
- * This workflow handles alignment of FASTQ reads to a reference genome using multiple aligners.
- * Key features:
- * - Supports three aligners: BWA-MEM, BWAMEM2, and minimap2
- * - BWA-MEM/BWAMEM2: Optimized for Illumina short-read paired-end data
- * - minimap2: Optimized for long-read data (ONT, PacBio)
- * - Handles multiple lanes from the same sample (requires downstream merging)
- * - Processes multiple samples in parallel
- * Platform support: Illumina (BWA/BWAMEM2), ONT/PacBio (minimap2)
- */
-
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_ALIGNER"
@@ -61,7 +48,7 @@ nextflow_workflow {
 
     /*
      * Test scenario 2: BWAMEM2 alignment with Illumina paired-end reads
-     * This test validates the BWAMEM2 aligner (improved version of BWA-MEM) with Illumina data.
+     * This test validates the BWAMEM2 aligner with Illumina data.
      * Expected behavior: BWAMEM2 should align paired-end FASTQ files to the reference genome,
      * generating a sorted BAM file. BWAMEM2 offers better performance than BWA-MEM for longer reads.
      */

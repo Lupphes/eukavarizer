@@ -81,7 +81,6 @@ nextflow_process {
         }
 
         then {
-            // This test documents expected behavior - may succeed or fail depending on biodbcore implementation
             assertAll(
                 { assert process.out.json },
                 { assert process.out.versions }

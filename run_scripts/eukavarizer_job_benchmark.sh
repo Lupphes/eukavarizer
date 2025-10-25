@@ -1,19 +1,19 @@
 #!/bin/bash
-#PBS -N eukavarizer_job_short_rice_indica
-#PBS -l select=1:ncpus=16:mem=256gb:scratch_local=2000gb
+#PBS -N eukavarizer_job_benchmark
+#PBS -l select=1:ncpus=64:mem=768gb:scratch_local=1000gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_short_rice_indica.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_benchmark.log
 
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/short_job_rice_indica/logs/eukavarizer_job_short_rice_indica_sad.log"
+LOGFILE="$DATADIR/benchmark_job/logs/eukavarizer_job_benchmark_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
-echo "=== Job EUKAVARIZER_JOB_SHORT started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
+echo "=== Job eukavarizer_job_benchmark started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
 # Load required modules
@@ -26,7 +26,6 @@ module add mambaforge
 # conda config --add channels bioconda
 # conda config --add channels conda-forge
 
-echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 # Move to scratch space
 cd "$SCRATCH"
 
@@ -44,8 +43,8 @@ export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK=$DATADIR/short_job_rice_indica/work
-export NXF_LOG_FILE=$DATADIR/short_job_rice_indica/logs/.nextflow_short.log
+export NXF_WORK=$DATADIR/benchmark_job/work
+export NXF_LOG_FILE=$DATADIR/benchmark_job/logs/.nextflow_benchmark.log
 export NXF_HOME="$SCRATCH/.nextflow"
 
 # Enter pipeline directory
@@ -53,20 +52,19 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
-sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_rice_indica.csv" > "$SCRATCH/samplesheet_formatted.csv"
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_human_pacbio.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,rice_indica,qc_off \
-    --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_034140825.1_ASM3414082v1_genomic.fna.gz" \
+../nextflow run main.nf -profile mamba,long_full,qc_off \
+    --taxonomy_id 9606 \
+    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz " \
     --input "$SCRATCH/samplesheet_formatted.csv" \
-    --outdir "$DATADIR/short_job_rice_indica/out" | tee -a "$LOGFILE"
+    --outdir "$DATADIR/benchmark_job/out" --seqtk_size 1.0 --seqtk_flag false --minimap2_flag true | tee -a "$LOGFILE"
+
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch
 
 echo "=== Job $PBS_JOBID completed at $(date) ===" | tee -a "$LOGFILE"
-
-# GCA_001623345.3_ZS97RS3_genomic.fna.gz # INDICA
-# GCF_034140825.1_ASM3414082v1_genomic.fna.gz # JAPONICA

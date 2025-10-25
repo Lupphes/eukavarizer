@@ -1,17 +1,3 @@
-/*
- * SV_CALLING_GRIDSS Workflow Tests
- *
- * GRIDSS (Genomic Rearrangement IDentification Software Suite) is a structural variant caller
- * that uses split-read and read-pair evidence to detect SVs.
- * Key features:
- * - High-sensitivity SV detection using paired-end and split-read evidence
- * - Optional integration with RepeatMasker for annotating variants in repetitive regions
- * - Produces detailed breakpoint assembly information
- * - Optimized for Illumina short-read data
- * Platform support: Illumina paired-end reads
- * Annotation: Optional repeat masking via gridss_annotate parameter
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_GRIDSS"

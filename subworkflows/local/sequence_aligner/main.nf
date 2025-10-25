@@ -23,10 +23,6 @@
     Output Channels (emit):
         bam_mapped                tuple(meta, bam)       Aligned BAM files grouped by sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondřej Sloup (Lupphes)
-    Contact:  ondrej.sloup@protonmail.com
-    GitHub:   @Lupphes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 include { MINIMAP2_ALIGN        } from '../../../modules/nf-core/minimap2/align/main'
@@ -120,10 +116,15 @@ workflow SEQUENCE_ALIGNER {
             .map { meta, bam ->
                 [ groupKey( meta, meta.n_fastq), bam ]
             }
-            // Group
             .groupTuple()
 
     emit:
         bam_mapped = bam_mapped
         versions = ch_versions
 }
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    THE END
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/

@@ -6,7 +6,7 @@
     Supports both short-read and long-read sequencing data.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Description:
-        This workflow orchestrates multiple SV calling algorithms and consolidates
+        This workflow uses multiple SV calling algorithms and merges
         their outputs into unified VCF files ready for downstream analysis.
 
     Supported SV Callers:

@@ -9,14 +9,14 @@ nextflow_workflow {
     tag "report_generation"
 
     /*
-     * Test scenario 1: Comprehensive report generation with full inputs
+     * Test scenario 1: Report generation with full inputs
      * This test validates the complete report generation workflow including all optional inputs.
      * Expected behavior: The workflow should generate an HTML report combining: quality control
      * metrics from MultiQC, variant calling statistics from merged VCFs (input[2-3]), per-caller
      * VCF statistics (input[7-8] for caller1 and caller2), genomic coverage analysis using the
      * reference genome (input[9]), and alignment statistics from BAM files (input[10]). The report
-     * should provide a comprehensive overview of the entire pipeline execution including sequencing
-     * quality, alignment metrics, variant discovery rates, and caller concordance statistics.
+     * should provide an overview of the entire pipeline execution including sequencing
+     * quality, alignment metrics, variant discovery rates, and caller create statistics.
      */
     test("Generate report with merged VCFs - stub") {
         options '-stub'

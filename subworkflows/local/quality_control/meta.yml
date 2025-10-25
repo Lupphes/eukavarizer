@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
 name: "QUALITY_CONTROL"
-description: Performs comprehensive quality control, trimming, and filtering of FASTQ files
+description: Performs quality control, trimming, and filtering of FASTQ files
 keywords:
   - quality control
   - trimming

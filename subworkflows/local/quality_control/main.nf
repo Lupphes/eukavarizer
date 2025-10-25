@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     SUBWORKFLOW: QUALITY_CONTROL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Performs comprehensive quality control, trimming, and filtering of FASTQ files
+    Performs quality control, trimming, and filtering of FASTQ files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Description:
         This subworkflow applies quality control measures to raw sequencing reads,
@@ -89,7 +89,7 @@ workflow QUALITY_CONTROL {
         }
 
         // Filter out samples with no reads (empty files)
-        // This is critical to prevent downstream errors and ensure accurate sample counting
+        // Ppreventing downstream errors and ensure accurate sample counting
         non_null_fastp_combined = fastp_combined_result.filter { it ->
             def meta = it[0]
             def files = it[1]

@@ -1,19 +1,19 @@
 #!/bin/bash
-#PBS -N eukavarizer_job_nano
-#PBS -l select=1:ncpus=32:mem=768gb:scratch_local=800gb
+#PBS -N eukavarizer_job_dry_run
+#PBS -l select=1:ncpus=64:mem=512gb:scratch_local=400gb
 #PBS -l walltime=24:00:00
 #PBS -m abe
 #PBS -M ondrej.sloup@protonmail.com
 #PBS -j oe
-#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_nano.log
+#PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_dry_run.log
 
 # Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
-LOGFILE="$DATADIR/nano_job/logs/eukavarizer_job_nano_sad.log"
+LOGFILE="$DATADIR/dry_run_job/logs/eukavarizer_job_dry_run_sad.log"
 mkdir -p "$(dirname "$LOGFILE")"
 
-echo "=== Job EUKAVARIZER_JOB_NANO started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
+echo "=== Job EUKAVARIZER_JOB_DRY_RUN started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
 # Load required modules
@@ -43,8 +43,8 @@ export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK=$DATADIR/nano_job/work
-export NXF_LOG_FILE=$DATADIR/nano_job/logs/.nextflow_nano.log
+export NXF_WORK=$DATADIR/dry_run_job/work
+export NXF_LOG_FILE=$DATADIR/dry_run_job/logs/.nextflow_dry.log
 export NXF_HOME="$SCRATCH/.nextflow"
 
 # Enter pipeline directory
@@ -52,16 +52,15 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
-sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_human_nano.csv" > "$SCRATCH/samplesheet_formatted.csv"
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_human_dry_run.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,long_full,qc_off \
+../nextflow run main.nf -profile mamba,mix_medium,qc_off \
     --taxonomy_id 9606 \
     --reference_genome "$DATADIR/eukavarizer/data/9606/ref/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz" \
     --input "$SCRATCH/samplesheet_formatted.csv" \
-    --outdir "$DATADIR/nano_job/out" --seqtk_size 1.0 --seqtk_flag false --minimap2_flag true | tee -a "$LOGFILE"
-
+    --outdir "$DATADIR/dry_run_job/out" --seqtk_size 1.0 --seqtk_flag false --bwamem2 false --minimap2_flag true | tee -a "$LOGFILE"
 
 # Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"

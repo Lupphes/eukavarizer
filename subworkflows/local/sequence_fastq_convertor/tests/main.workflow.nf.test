@@ -1,16 +1,3 @@
-/*
- * SEQUENCE_FASTQ_CONVERTOR Workflow Tests
- *
- * This workflow converts various sequence file formats to standardized FASTQ format for downstream processing.
- * Key features:
- * - Supports multiple input formats: FASTQ.GZ (compressed), FASTQ (uncompressed), SRA archives, BAM, CRAM
- * - Handles both single-end and paired-end data
- * - Converts SRA files using sra-tools (fasterq-dump)
- * - Converts BAM/CRAM files to FASTQ using samtools
- * - Tags and collects FASTQ files with sample metadata
- * Output: Standardized tagged_collected_fastqs for downstream QC and alignment
- */
-
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_FASTQ_CONVERTOR"
@@ -121,7 +108,7 @@ nextflow_workflow {
 
     /*
      * Test scenario 4: SRA archive input
-     * This test validates conversion of SRA (Sequence Read Archive) files to FASTQ format.
+     * This test validates conversion of SRA files to FASTQ format.
      * Expected behavior: The workflow should use sra-tools (fasterq-dump) to extract FASTQ files
      * from the SRA archive, compress them to FASTQ.GZ, and tag them with sample metadata.
      * This enables processing of public sequencing data from NCBI SRA database.

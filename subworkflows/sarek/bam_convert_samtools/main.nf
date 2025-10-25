@@ -6,6 +6,7 @@
 // MODIFICATIONS FROM UPSTREAM:
 // - Added conditional logic to handle single-end data (line 60-72)
 // - Original Sarek version only supported paired-end data
+// - Used updated module versions
 //
 
 include { SAMTOOLS_VIEW         as SAMTOOLS_VIEW_MAP_MAP     } from '../../../modules/nf-core/samtools/view/main'
@@ -57,8 +58,7 @@ workflow BAM_CONVERT_SAMTOOLS {
     // Collate & convert mapped
     COLLATE_FASTQ_MAP(SAMTOOLS_VIEW_MAP_MAP.out.bam.mix(SAMTOOLS_VIEW_MAP_MAP.out.cram), fasta, interleaved)
 
-    // join Mapped & unmapped fastq
-
+    // Join Mapped & unmapped fastq
     reads_to_concat = COLLATE_FASTQ_MAP.out.fastq
         .join(COLLATE_FASTQ_UNMAP.out.fastq, failOnDuplicate: true, failOnMismatch: true)
         .map{ meta, mapped_reads, unmapped_reads ->

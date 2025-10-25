@@ -1,18 +1,3 @@
-/*
- * SV_CALLING_SVABA Workflow Tests
- *
- * SvABA (Structural Variation and Assembly) is an SV caller that uses genome-wide local assembly
- * for high-resolution detection of structural variants and indels.
- * Key features:
- * - Uses local assembly approach for sensitive SV and indel detection
- * - Optimized for Illumina short-read sequencing data
- * - Optional integration with RepeatMasker for annotating variants in repetitive regions
- * - Filters out BWAMEM2-aligned reads (currently incompatible)
- * - Filters out long-read data (optimized for short reads)
- * Platform support: Illumina paired-end reads (not BWAMEM2)
- * Annotation: Optional repeat masking via svaba_annotate parameter
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_SVABA"
@@ -65,7 +50,7 @@ nextflow_workflow {
     }
 
     /*
-     * Test scenario 2: Illumina BAM input with RepeatMasker annotation
+     * Test scenario 2: Illumina BAM input
      * This test validates SvABA with optional repeat masking annotation enabled.
      * Expected behavior: SvABA should perform local assembly-based SV calling and then annotate
      * the variants with repeat masker data, which helps identify SVs in repetitive genomic regions.

@@ -5,7 +5,7 @@
     Complete sequencing data processing pipeline from raw data to analysis-ready BAM files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Description:
-        This subworkflow orchestrates the complete processing of sequencing data, from
+        This workflow uses multiple SV calling algorithms and merges
         format conversion through quality control, alignment, and post-processing. It
         produces analysis-ready BAM files with quality metrics for downstream variant calling.
 

@@ -20,10 +20,6 @@
     Output Channels (emit):
         multiqc_report            path(html)             Aggregated MultiQC report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Author:   Ondřej Sloup (Lupphes)
-    Contact:  ondrej.sloup@protonmail.com
-    GitHub:   @Lupphes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 include { FASTQC        } from '../../../modules/nf-core/fastqc/main'
@@ -53,7 +49,7 @@ workflow FASTQC_MULTIQC_ANALYSIS {
 
             // Collect FastQC outputs for MultiQC
             ch_fastqc_report = FASTQC.out.html
-            ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect { meta, files -> files })
+            ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect { _meta, files -> files })
             ch_versions = ch_versions.mix(FASTQC.out.versions)
         }
 

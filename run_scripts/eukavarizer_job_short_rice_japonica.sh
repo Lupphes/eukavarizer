@@ -53,7 +53,7 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
-sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_rice_japonica.csv" > "$SCRATCH/samplesheet_formatted.csv"
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_rice_japonica.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"

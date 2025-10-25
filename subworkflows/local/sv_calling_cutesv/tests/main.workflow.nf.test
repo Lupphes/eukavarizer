@@ -1,16 +1,3 @@
-/*
- * SV_CALLING_CUTESV Workflow Tests
- *
- * cuteSV is a structural variant caller optimized for long-read sequencing technologies.
- * Key features:
- * - Specialized for Oxford Nanopore (ONT) and PacBio long-read data
- * - Uses signature-based detection with machine learning scoring
- * - Fast and memory-efficient processing of long reads
- * - Detects various SV types: deletions, insertions, inversions, duplications, translocations
- * Platform support: ONT and PacBio long-read sequencing
- * Single-end data: cuteSV works with single-end long reads (typical for ONT/PacBio)
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_CUTESV"

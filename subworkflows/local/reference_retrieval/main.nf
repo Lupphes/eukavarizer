@@ -74,10 +74,7 @@ workflow REFERENCE_RETRIEVAL {
         reference_genome_ungapped_size = biodbcore_json_result.map { result -> result[1] }
 
         if (reference_genome != []) {
-            // User provided reference
-            // In production: reference_genome is a channel from channel.fromPath()
-            // In tests: reference_genome is a file() object
-            // Solution: Use flatMap to handle both - it unwraps channels and works with single values
+            // Provided reference
             reference_genome_input = channel.from(reference_genome)
                 .flatMap { x -> (x instanceof Collection) ? x : [x] }
                 .map { file -> tuple([id: file.simpleName.replaceFirst(/\.gz$/, '')], file) }

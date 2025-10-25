@@ -92,7 +92,6 @@ nextflow_workflow {
      * Test scenario 3: Three VCF files to test multiple caller merging
      * This test validates merging of three different VCF files
      * Expected behavior: Merge across multiple VCF files, producing unified output
-     * Note: File name collision is avoided by using different test files
      */
     test("Three VCFs - complex merge - stub") {
         options '-stub'

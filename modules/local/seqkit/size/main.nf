@@ -13,7 +13,7 @@ process SEQKIT_SIZE {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
+    def _args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     # Compute quick average read length from first 1000 reads (4000 lines)

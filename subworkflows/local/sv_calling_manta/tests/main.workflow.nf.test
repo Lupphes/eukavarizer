@@ -1,16 +1,3 @@
-/*
- * SV_CALLING_MANTA Workflow Tests
- *
- * Manta is a structural variant caller optimized for Illumina paired-end and mate-pair reads.
- * Key features:
- * - Designed specifically for short-read Illumina sequencing data
- * - Requires paired-end reads (filters out single-end data)
- * - Optimized for reads shorter than the long_read_threshold (default 300bp)
- * - Produces three VCF outputs: small variants, candidate SVs, and diploid SVs
- * Platform support: Illumina paired-end reads only
- * Read length filtering: Filters out reads >= long_read_threshold
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_MANTA"

@@ -8,12 +8,12 @@ nextflow_workflow {
     tag "eukavarizer"
 
     /*
-     * Test scenario 1: Comprehensive SV calling with all callers enabled - Illumina short reads
+     * Test scenario 1: SV calling with all callers enabled - Illumina short reads
      * This test validates the complete EUKAVARIZER workflow with all structural variant callers active.
      * Expected behavior: The workflow should execute all 8 SV callers (DELLY, Manta, GRIDSS, DYSGU,
      * TIDDIT, SVABA for short reads, plus Sniffles and CuteSV for long reads) and aggregate their
-     * outputs into unified VCF channels. This tests the workflow's ability to orchestrate multiple
-     * callers simultaneously and merge their results for comprehensive SV detection.
+     * outputs into unified VCF channels. This tests the workflow's ability to use multiple
+     * callers simultaneously and merge their results for SV detection.
      */
     test("All SV callers enabled - Illumina - stub") {
         options '-stub'

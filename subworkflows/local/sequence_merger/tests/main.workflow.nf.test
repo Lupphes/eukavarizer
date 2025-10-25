@@ -1,17 +1,3 @@
-/*
- * SEQUENCE_MERGER Workflow Tests
- *
- * This workflow handles merging of BAM files from multiple lanes, optional deduplication,
- * and optional base quality score recalibration (BQSR).
- * Key features:
- * - Merges multiple BAM files from the same sample (e.g., different lanes) using samtools
- * - Single BAM files pass through without merging
- * - Optional deduplication: Removes PCR/optical duplicates using GATK MarkDuplicates
- * - Optional BQSR: Recalibrates base quality scores using GATK BaseRecalibrator + ApplyBQSR
- * - BQSR requires known variant sites (e.g., dbSNP) for recalibration
- * Output: Merged, optionally deduplicated, and optionally recalibrated BAM + BAI files
- */
-
 nextflow_workflow {
 
     name "Test Workflow SEQUENCE_MERGER"

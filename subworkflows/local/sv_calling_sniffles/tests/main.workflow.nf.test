@@ -1,16 +1,3 @@
-/*
- * SV_CALLING_SNIFFLES Workflow Tests
- *
- * Sniffles is a structural variant caller specialized for long-read sequencing data.
- * Key features:
- * - Optimized for long-read technologies (Oxford Nanopore and PacBio)
- * - Uses read length signatures and split-read alignments to detect SVs
- * - Handles both ONT and PacBio HiFi sequencing platforms
- * - Particularly effective for detecting large SVs (>50bp)
- * Platform support: ONT and PacBio long-read sequencing
- * Single-end data: Sniffles works with single-end long reads (typical for ONT/PacBio)
- */
-
 nextflow_workflow {
 
     name "Test Workflow SV_CALLING_SNIFFLES"

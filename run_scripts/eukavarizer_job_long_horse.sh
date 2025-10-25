@@ -53,7 +53,7 @@ chmod +x bin/simple-event-annotation.R
 # conda config --add channels bioconda
 # conda config --add channels conda-forge
 
-sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/conf/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
+sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
