@@ -1,7 +1,7 @@
 {
     "eukavarizer: test profile": {
         "content": [
-            "4932.html:md5,f8f6759006dfb9737346537ac28d013b",
+            "4932.html:md5,1fb141e9b6bc311b75fc122c7e60b923",
             "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548",
             "nf_core_eukavarizer_software_mqc_versions.yml:md5,01db1fc45ce48e99372b12d5e8ff35a3"
         ],
@@ -9,7 +9,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-25T23:06:19.695490574"
+        "timestamp": "2025-10-26T01:31:12.96239697"
     },
     "eukavarizer: all callers enabled": {
         "content": [
