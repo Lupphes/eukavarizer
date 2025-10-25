@@ -198,5 +198,4 @@ src/out/
 .history
 nextflow.config.bak
 
-# Tests - large test data files are excluded to keep repo size down
-# Download test data separately or use smaller test files
+test_results/
