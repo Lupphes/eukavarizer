@@ -1,7 +1,6 @@
 {
     "eukavarizer: test profile": {
         "content": [
-            "4932.html:md5,82085be03b5dc1451317a7ffafca72df",
             "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548",
             "nf_core_eukavarizer_software_mqc_versions.yml:md5,01db1fc45ce48e99372b12d5e8ff35a3"
         ],
@@ -13,7 +12,6 @@
     },
     "eukavarizer: all callers enabled": {
         "content": [
-            "4932.html:md5,cbe512ebcd57e9e4bc4af329533632da",
             "4932_refseq_results.json:md5,86de71555dc6dc975720072420375548",
             "nf_core_eukavarizer_software_mqc_versions.yml:md5,01db1fc45ce48e99372b12d5e8ff35a3"
         ],

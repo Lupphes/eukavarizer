@@ -20,7 +20,6 @@ nextflow_pipeline {
         then {
             assert workflow.success
             assert snapshot(
-                path("$outputDir/4932/results/4932.html"),
                 path("$outputDir/4932/ref/4932_refseq_results.json"),
                 path("$outputDir/pipeline_info/nf_core_eukavarizer_software_mqc_versions.yml")
             ).match()
@@ -29,7 +28,9 @@ nextflow_pipeline {
             assert path("$outputDir/4932").exists()
             assert path("$outputDir/pipeline_info").exists()
 
-            // Check for timestamped pipeline_info files (can't use wildcards in snapshots)
+            // Check for varify HTML report
+            assert path("$outputDir/4932/results/4932.html").exists()
+
             def pipelineInfoFiles = path("$outputDir/pipeline_info").list()
             assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_report_") && it.fileName.toString().endsWith(".html") }
             assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_timeline_") && it.fileName.toString().endsWith(".html") }
@@ -61,7 +62,6 @@ nextflow_pipeline {
         then {
             assert workflow.success
             assert snapshot(
-                path("$outputDir/4932/results/4932.html"),
                 path("$outputDir/4932/ref/4932_refseq_results.json"),
                 path("$outputDir/pipeline_info/nf_core_eukavarizer_software_mqc_versions.yml")
             ).match()
@@ -70,7 +70,9 @@ nextflow_pipeline {
             assert path("$outputDir/4932").exists()
             assert path("$outputDir/pipeline_info").exists()
 
-            // Check for timestamped pipeline_info files (can't use wildcards in snapshots)
+            // Check for varify HTML report
+            assert path("$outputDir/4932/results/4932.html").exists()
+
             def pipelineInfoFiles = path("$outputDir/pipeline_info").list()
             assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_report_") && it.fileName.toString().endsWith(".html") }
             assert pipelineInfoFiles.any { it.fileName.toString().startsWith("execution_timeline_") && it.fileName.toString().endsWith(".html") }
