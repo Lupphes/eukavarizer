@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.reclassified.vcf:md5,9a6f3a33ce9032d6f3d12984d92cbf5c"
+                        "test.reclassified.vcf:md5,6fc3ea44f2c1f666127f3d811f7c89ab"
                     ]
                 ],
                 "1": [
@@ -24,7 +24,7 @@
                         {
                             "id": "test"
                         },
-                        "test.reclassified.vcf:md5,9a6f3a33ce9032d6f3d12984d92cbf5c"
+                        "test.reclassified.vcf:md5,6fc3ea44f2c1f666127f3d811f7c89ab"
                     ]
                 ],
                 "versions": [
@@ -36,7 +36,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-25T19:38:38.496982711"
+        "timestamp": "2025-10-26T02:15:41.374175856"
     },
     "Annotate empty VCF - should handle gracefully": {
         "content": [

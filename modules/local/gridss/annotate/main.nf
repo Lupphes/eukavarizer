@@ -34,6 +34,9 @@ process GRIDSS_ANNOTATE {
     else
         # Process normally with R script
         simple-event-annotation.R ${args} input.vcf ${prefix}.reclassified.vcf ${prefix}.simple.bed
+
+        # Remove the fileDate line to ensure deterministic output for testing
+        sed -i '/^##fileDate=/d' ${prefix}.reclassified.vcf
     fi
 
     cat <<-END_VERSIONS > versions.yml
