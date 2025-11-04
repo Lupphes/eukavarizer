@@ -63,9 +63,19 @@ chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
 echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-conda config --add channels luppo
-conda config --add channels bioconda
-conda config --add channels conda-forge
+conda config --add channels luppo 2>&1 | tee -a "$LOGFILE"
+conda config --add channels bioconda 2>&1 | tee -a "$LOGFILE"
+conda config --add channels conda-forge 2>&1 | tee -a "$LOGFILE"
+
+echo ">>> Verifying channel configuration..." | tee -a "$LOGFILE"
+conda config --show channels 2>&1 | tee -a "$LOGFILE"
+echo ">>> .condarc location: $HOME/.condarc" | tee -a "$LOGFILE"
+if [ -f "$HOME/.condarc" ]; then
+    echo ">>> .condarc contents:" | tee -a "$LOGFILE"
+    cat "$HOME/.condarc" 2>&1 | tee -a "$LOGFILE"
+else
+    echo ">>> .condarc file not found" | tee -a "$LOGFILE"
+fi
 
 sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
