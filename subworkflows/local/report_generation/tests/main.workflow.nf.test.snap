@@ -1,29 +1,48 @@
 {
-    "Generate report with merged VCFs - stub": {
+    "Generate report with human taxonomy - stub": {
         "content": [
             {
                 "0": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e",
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "1": [
-                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e",
-                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e"
+                    "versions.yml:md5,918ded017d566198729ec7910a4b67cf"
                 ],
                 "report_file": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e",
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "versions": [
-                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e",
-                    "versions.yml:md5,2a162167379ff43e81df916b6d581d2e"
+                    "versions.yml:md5,918ded017d566198729ec7910a4b67cf"
                 ]
             }
         ],
         "meta": {
             "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
+            "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-22T23:55:53.433314709"
+        "timestamp": "2025-11-04T01:15:52.514119308"
+    },
+    "Generate report with SV data - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "versions.yml:md5,918ded017d566198729ec7910a4b67cf"
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,918ded017d566198729ec7910a4b67cf"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-04T01:15:40.998565526"
     }
 }

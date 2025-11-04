@@ -1,107 +1,119 @@
 {
-    "Multiple samtools stats files - stub": {
+    "Verify FAI file is staged correctly - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                ],
+                "genome_files": [
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-04T01:12:02.564142665"
+    },
+    "Generate SV report - stub": {
+        "content": [
+            {
+                "0": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                ],
+                "genome_files": [
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "report_file": [
+                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions": [
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-04T01:11:40.367776322"
+    },
+    "Generate SV report with different taxonomy - stub": {
         "content": [
             {
                 "0": [
                     "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "1": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "2": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
                 ],
-                "3": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                "genome_files": [
+                    [
+                        "genome.bed:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.fasta.fai:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.sizes:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
                 ],
                 "report_file": [
                     "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
-                "report_html": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "report_images": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
                 "versions": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
+                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
                 ]
             }
         ],
         "meta": {
             "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
+            "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-20T22:37:30.744819548"
-    },
-    "Generate report with samtools stats - stub": {
-        "content": [
-            {
-                "0": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "1": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "2": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "3": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
-                ],
-                "report_file": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "report_html": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "report_images": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "versions": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
-                ]
-            }
-        ],
-        "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
-        },
-        "timestamp": "2025-10-20T22:37:08.82982917"
-    },
-    "Generate report without samtools stats - stub": {
-        "content": [
-            {
-                "0": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "1": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "2": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "3": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
-                ],
-                "report_file": [
-                    "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "report_html": [
-                    "dummy.html:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "report_images": [
-                    "dummy.png:md5,d41d8cd98f00b204e9800998ecf8427e"
-                ],
-                "versions": [
-                    "versions.yml:md5,255c4c63bec55e27f22c525d433efaf4"
-                ]
-            }
-        ],
-        "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
-        },
-        "timestamp": "2025-10-20T22:37:19.230092226"
+        "timestamp": "2025-11-04T01:11:51.585425039"
     }
 }

@@ -22,10 +22,8 @@
         bcfmerge_vcf              tuple(meta, vcf.gz)    BCFtools merged VCF
         bcfmerge_tbi              tuple(meta, tbi)       BCFtools VCF index
         bcfmerge_stats            tuple(meta, stats)     BCFtools statistics
-        vcf_list                  tuple(meta, vcf)       Individual caller VCFs
-        tbi_list                  tuple(meta, tbi)       Individual caller indexes
+        reference_genome_faidx    tuple(meta, fai)       Reference genome FAI index
         reference_genome          tuple(meta, fasta)     Reference genome
-        samtools_stats            tuple(meta, stats)     Alignment statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Output Channels (emit):
         report_file               path(html)             Main analysis report
@@ -48,28 +46,11 @@ workflow REPORT_GENERATION {
         bcfmerge_vcf
         bcfmerge_tbi
         bcfmerge_stats
-        vcf_list
-        tbi_list
+        reference_genome_faidx
         reference_genome
-        samtools_stats
 
     main:
         ch_versions = channel.empty()
-
-        vcf_list_cleaned = vcf_list
-            .filter { tuple -> tuple != null }
-            .map { tuple -> tuple[1] }
-
-        _tbi_list_cleaned = tbi_list
-            .filter { tuple -> tuple != null }
-            .map { tuple -> tuple[1] }
-
-        samtools_stats_cleaned = samtools_stats
-            .map { tuple -> tuple[1] }
-            .collect()
-
-        varify_meta = channel.value([id: "varify_merge"])
-        varify_input = varify_meta.combine(vcf_list_cleaned)
 
         VARIFY(
             taxonomy_id,
@@ -79,10 +60,9 @@ workflow REPORT_GENERATION {
             bcfmerge_vcf,
             bcfmerge_tbi,
             bcfmerge_stats,
-            varify_input,
+            reference_genome_faidx,
             reference_genome,
-            workflow.profile,
-            samtools_stats_cleaned
+            workflow.profile
         )
 
         ch_versions = ch_versions.mix(VARIFY.out.versions)
