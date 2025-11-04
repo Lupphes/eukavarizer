@@ -7,7 +7,6 @@
 #PBS -j oe
 #PBS -o /storage/brno2/home/luppo/logs/eukavarizer_job_long_horse.log
 
-# Define paths
 DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
 LOGFILE="$DATADIR/long_job_horse/logs/eukavarizer_job_long_horse_sad.log"
@@ -16,17 +15,28 @@ mkdir -p "$(dirname "$LOGFILE")"
 echo "=== Job EUKAVARIZER_JOB_SHORT started on $(hostname) at $(date) ===" | tee -a "$LOGFILE"
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
-# Load required modules
 module add openjdk/17
 module add mambaforge
 
-# Update mamba to latest version to fix --yes flag compatibility
-echo ">>> Updating mamba to latest version..." | tee -a "$LOGFILE"
-mamba update -n base mamba -y 2>&1 | tee -a "$LOGFILE"
-
+echo ">>> Installing newer micromamba in scratch..." | tee -a "$LOGFILE"
 echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 # Move to scratch space
 cd "$SCRATCH"
+
+curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba 2>&1 | tee -a "$LOGFILE"
+
+mkdir -p "$SCRATCH/.mamba" "$SCRATCH/.mamba/pkgs"
+export MAMBA_ROOT_PREFIX="$SCRATCH/.mamba"
+export MAMBA_PKGS_DIRS="$SCRATCH/.mamba/pkgs"
+export PATH="$SCRATCH/bin:$PATH"
+
+ln -s "$SCRATCH/bin/micromamba" "$SCRATCH/bin/mamba"
+ln -s "$SCRATCH/bin/micromamba" "$SCRATCH/bin/conda"
+
+eval "$(./bin/micromamba shell hook -s bash)" 2>&1 | tee -a "$LOGFILE"
+echo ">>> Micromamba version: $(micromamba --version)" | tee -a "$LOGFILE"
+echo ">>> Mamba version: $(mamba --version)" | tee -a "$LOGFILE"
+echo ">>> Which mamba: $(which mamba)" | tee -a "$LOGFILE"
 
 # Clone the eukavarizer repo
 echo ">>> Cloning repository..." | tee -a "$LOGFILE"
@@ -36,9 +46,9 @@ git clone https://github.com/Lupphes/eukavarizer.git | tee -a "$LOGFILE"
 echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
-# Prepare Conda envs in scratch
-mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_envs" "$SCRATCH/.conda_next" "$SCRATCH/.nextflow"
-export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+# Prepare Nextflow and Conda cache directories in scratch
+mkdir -p "$SCRATCH/.conda_next" "$SCRATCH/.nextflow"
+export CONDA_PKGS_DIRS="$SCRATCH/.mamba/pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
@@ -46,8 +56,8 @@ export NXF_WORK="$DATADIR/long_job_horse/work"
 export NXF_LOG_FILE="$DATADIR/long_job_horse/logs/.nextflow_short.log"
 export NXF_HOME="$SCRATCH/.nextflow"
 export MAMBA_ALWAYS_YES=true
+export MAMBA_NO_BANNER=1
 
-# Enter pipeline directory
 cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
@@ -60,14 +70,12 @@ chmod +x bin/simple-event-annotation.R
 
 sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
-# Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
 ../nextflow run main.nf -profile mamba,horse,qc_off \
     --input "$SCRATCH/samplesheet_formatted.csv" \
     --outdir "$DATADIR/long_job_horse/out" | tee -a "$LOGFILE"
 
 
-# Clean scratch
 echo "Cleaning up scratch..." | tee -a "$LOGFILE"
 clean_scratch
 
