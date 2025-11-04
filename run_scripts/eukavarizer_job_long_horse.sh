@@ -20,6 +20,10 @@ echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 module add openjdk/17
 module add mambaforge
 
+# Update mamba to latest version to fix --yes flag compatibility
+echo ">>> Updating mamba to latest version..." | tee -a "$LOGFILE"
+mamba update -n base mamba -y 2>&1 | tee -a "$LOGFILE"
+
 echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 # Move to scratch space
 cd "$SCRATCH"
