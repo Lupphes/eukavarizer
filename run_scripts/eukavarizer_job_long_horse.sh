@@ -62,11 +62,10 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
-# Configure mamba channels
-# echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-# conda config --add channels luppo
-# conda config --add channels bioconda
-# conda config --add channels conda-forge
+echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
+conda config --add channels luppo
+conda config --add channels bioconda
+conda config --add channels conda-forge
 
 sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
