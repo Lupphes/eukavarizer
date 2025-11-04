@@ -14,7 +14,7 @@
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ],
                 "genome_files": [
                     [
@@ -28,7 +28,7 @@
                     "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "versions": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ]
             }
         ],
@@ -36,7 +36,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-04T01:12:02.564142665"
+        "timestamp": "2025-11-04T23:46:23.934677613"
     },
     "Generate SV report - stub": {
         "content": [
@@ -53,7 +53,7 @@
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ],
                 "genome_files": [
                     [
@@ -67,7 +67,7 @@
                     "4932.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "versions": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ]
             }
         ],
@@ -75,7 +75,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-04T01:11:40.367776322"
+        "timestamp": "2025-11-04T23:45:59.874609238"
     },
     "Generate SV report with different taxonomy - stub": {
         "content": [
@@ -92,7 +92,7 @@
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ],
                 "genome_files": [
                     [
@@ -106,7 +106,7 @@
                     "9606.html:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "versions": [
-                    "versions.yml:md5,df5722a9a7534217ec516cad9404ff95"
+                    "versions.yml:md5,26531289833e20c3d634609d64ba53b2"
                 ]
             }
         ],
@@ -114,6 +114,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-04T01:11:51.585425039"
+        "timestamp": "2025-11-04T23:46:11.613372578"
     }
 }

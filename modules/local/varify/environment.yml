@@ -4,4 +4,4 @@ channels:
   - bioconda
 dependencies:
   - python=3.10
-  - luppo::varify=3.0.0
+  - luppo::varify=1.0.0
