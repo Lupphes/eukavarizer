@@ -57,7 +57,7 @@ sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/sampleshe
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile mamba,rice_japonica,qc_off \
+../nextflow run main.nf -profile conda,rice_japonica,qc_off \
     --reference_genome "$DATADIR/eukavarizer/data/39947/ref/GCF_034140825.1_ASM3414082v1_genomic.fna.gz" \
     --input "$SCRATCH/samplesheet_formatted.csv" \
     --outdir "$DATADIR/short_job_rice_japonica/out" | tee -a "$LOGFILE"
