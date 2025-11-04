@@ -57,7 +57,7 @@ sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/sampleshe
 
 # Actual pipeline run with inputs
 echo ">>> Running main Nextflow pipeline" | tee -a "$LOGFILE"
-../nextflow run main.nf -profile conda,horse,qc_off \
+../nextflow run main.nf -profile mamba,horse,qc_off \
     --input "$SCRATCH/samplesheet_formatted.csv" \
     --outdir "$DATADIR/long_job_horse/out" | tee -a "$LOGFILE"
 
