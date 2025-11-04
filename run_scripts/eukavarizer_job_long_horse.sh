@@ -16,27 +16,25 @@ echo "=== Job EUKAVARIZER_JOB_SHORT started on $(hostname) at $(date) ===" | tee
 echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 
 module add openjdk/17
-module add mambaforge
 
-echo ">>> Installing newer micromamba in scratch..." | tee -a "$LOGFILE"
+echo ">>> Installing mambaforge in scratch..." | tee -a "$LOGFILE"
 echo ">>> Move to scratch..." | tee -a "$LOGFILE"
-# Move to scratch space
 cd "$SCRATCH"
 
-curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba 2>&1 | tee -a "$LOGFILE"
+# Download and install Mambaforge
+echo ">>> Downloading Mambaforge..." | tee -a "$LOGFILE"
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh" 2>&1 | tee -a "$LOGFILE"
+echo ">>> Installing Mambaforge to $SCRATCH/mambaforge..." | tee -a "$LOGFILE"
+bash Mambaforge-$(uname)-$(uname -m).sh -b -p $SCRATCH/mambaforge 2>&1 | tee -a "$LOGFILE"
+export PATH="$SCRATCH/mambaforge/bin:$PATH"
+source "$SCRATCH/mambaforge/etc/profile.d/conda.sh"
+source "$SCRATCH/mambaforge/etc/profile.d/mamba.sh"
+conda activate base 2>&1 | tee -a "$LOGFILE"
 
-mkdir -p "$SCRATCH/.mamba" "$SCRATCH/.mamba/pkgs"
-export MAMBA_ROOT_PREFIX="$SCRATCH/.mamba"
-export MAMBA_PKGS_DIRS="$SCRATCH/.mamba/pkgs"
-export PATH="$SCRATCH/bin:$PATH"
-
-ln -s "$SCRATCH/bin/micromamba" "$SCRATCH/bin/mamba"
-ln -s "$SCRATCH/bin/micromamba" "$SCRATCH/bin/conda"
-
-eval "$(./bin/micromamba shell hook -s bash)" 2>&1 | tee -a "$LOGFILE"
-echo ">>> Micromamba version: $(micromamba --version)" | tee -a "$LOGFILE"
-echo ">>> Mamba version: $(mamba --version)" | tee -a "$LOGFILE"
+echo ">>> Mambaforge version: $(mamba --version)" | tee -a "$LOGFILE"
+echo ">>> Conda version: $(conda --version)" | tee -a "$LOGFILE"
 echo ">>> Which mamba: $(which mamba)" | tee -a "$LOGFILE"
+echo ">>> Which conda: $(which conda)" | tee -a "$LOGFILE"
 
 # Clone the eukavarizer repo
 echo ">>> Cloning repository..." | tee -a "$LOGFILE"
@@ -48,7 +46,7 @@ curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
 # Prepare Nextflow and Conda cache directories in scratch
 mkdir -p "$SCRATCH/.conda_next" "$SCRATCH/.nextflow"
-export CONDA_PKGS_DIRS="$SCRATCH/.mamba/pkgs"
+export CONDA_PKGS_DIRS="$SCRATCH/mambaforge/pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
@@ -62,20 +60,11 @@ cd eukavarizer
 chmod +x bin/svaba_annotate.py
 chmod +x bin/simple-event-annotation.R
 
-echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
-conda config --add channels luppo 2>&1 | tee -a "$LOGFILE"
-conda config --add channels bioconda 2>&1 | tee -a "$LOGFILE"
-conda config --add channels conda-forge 2>&1 | tee -a "$LOGFILE"
-
-echo ">>> Verifying channel configuration..." | tee -a "$LOGFILE"
-conda config --show channels 2>&1 | tee -a "$LOGFILE"
-echo ">>> .condarc location: $HOME/.condarc" | tee -a "$LOGFILE"
-if [ -f "$HOME/.condarc" ]; then
-    echo ">>> .condarc contents:" | tee -a "$LOGFILE"
-    cat "$HOME/.condarc" 2>&1 | tee -a "$LOGFILE"
-else
-    echo ">>> .condarc file not found" | tee -a "$LOGFILE"
-fi
+# Configure mamba channels
+# echo ">>> Configuring mamba channels..." | tee -a "$LOGFILE"
+# conda config --add channels luppo
+# conda config --add channels bioconda
+# conda config --add channels conda-forge
 
 sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_long_horse.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
