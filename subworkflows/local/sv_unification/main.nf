@@ -47,7 +47,6 @@ include { BCFTOOLS_FILTER       } from '../../../modules/nf-core/bcftools/filter
 
 include { TRUVARI_COLLAPSE      } from '../../../modules/local/truvari/collapse/main'
 include { BCFTOOLS_SORT as BCFTOOLS_SORT_TRUVARI    } from '../../../modules/nf-core/bcftools/sort/main'
-include { TABIX_TABIX           } from '../../../modules/nf-core/tabix/tabix/main'
 
 workflow SV_UNIFICATION {
 
