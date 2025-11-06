@@ -42,6 +42,7 @@ HG003,F,1,sample3,illumina,L001,,,,/path/to/sample3.bam,,,,,
 ```
 
 **Required columns:**
+
 - `patient` - Patient/subject identifier (can be "NA" or any identifier)
 - `sex` - Sex of patient (M/F/NA)
 - `status` - Affected status (0=unaffected, 1=affected, NA)
@@ -50,6 +51,7 @@ HG003,F,1,sample3,illumina,L001,,,,/path/to/sample3.bam,,,,,
 - `lane` - Sequencing lane identifier (can be any unique identifier per sample)
 
 **Input data columns (provide ONE per row):**
+
 - `fastq_1` - Path to forward/R1 reads or single-end FASTQ
 - `fastq_2` - Path to reverse/R2 reads (optional, for paired-end)
 - `bam` - Path to BAM file
@@ -62,6 +64,7 @@ HG003,F,1,sample3,illumina,L001,,,,/path/to/sample3.bam,,,,,
 **Example samplesheets:**
 
 **Illumina paired-end short reads:**
+
 ```csv
 patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
 HG002,NA,0,HG002_sample,illumina,L001,/data/HG002_L001_R1.fastq.gz,/data/HG002_L001_R2.fastq.gz,,,,,,
@@ -69,6 +72,7 @@ HG002,NA,0,HG002_sample,illumina,L002,/data/HG002_L002_R1.fastq.gz,/data/HG002_L
 ```
 
 **PacBio long reads:**
+
 ```csv
 patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
 HG002,NA,0,HG002_sample,pacbio,m54238,/data/pacbio_run1.fastq,,,,,,,
@@ -76,6 +80,7 @@ HG002,NA,0,HG002_sample,pacbio,m54239,/data/pacbio_run2.fastq,,,,,,,
 ```
 
 **Mixed sample types:**
+
 ```csv
 patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
 patient1,F,1,sample1,illumina,L001,/data/short_R1.fastq.gz,/data/short_R2.fastq.gz,,,,,,
@@ -84,6 +89,7 @@ patient2,M,0,sample3,illumina,L001,,,,/data/aligned.bam,,,,,
 ```
 
 **BAM/CRAM input:**
+
 ```csv
 patient,sex,status,sample,platform,lane,fastq_1,fastq_2,bam,cram,sra,bax.h5,fast5,pod5
 patient1,NA,0,sample1,illumina,L001,,,/data/sample1.bam,,,,,,
@@ -91,6 +97,7 @@ patient2,NA,0,sample2,illumina,L001,,,,/data/sample2.cram,,,,,
 ```
 
 **Important notes:**
+
 - Multiple rows with the same `sample` are automatically merged (useful for multi-lane data)
 - Only fill in ONE input column per row (fastq_1/fastq_2, bam, cram, sra, etc.)
 - Leave empty columns blank (no quotes needed)
@@ -108,6 +115,7 @@ If no samplesheet is provided via `--input`, the pipeline automatically retrieve
 ```
 
 Configure the automatic retrieval with:
+
 ```bash
 --library_strategy WGS                    # Library strategy (default: WGS)
 --instrument_platform Illumina            # Platform (default: Illumina)
@@ -118,6 +126,7 @@ Configure the automatic retrieval with:
 ```
 
 BioDbCore will:
+
 1. Search ENA/SRA for sequencing data matching the taxonomy ID and filters
 2. Download the best matching dataset(s)
 3. Generate a samplesheet automatically
@@ -126,13 +135,16 @@ BioDbCore will:
 ### Reference genome input
 
 **Local reference:**
+
 ```bash
 --reference_genome /path/to/genome.fa.gz
 ```
+
 - Accepts compressed (`.gz`) or uncompressed FASTA
 - Automatically indexed for BWA/BWA-MEM2/Minimap2
 
 **Automatic retrieval from RefSeq:**
+
 ```bash
 --taxonomy_id 4932
 # Pipeline downloads reference from NCBI RefSeq
@@ -141,6 +153,7 @@ BioDbCore will:
 ### Example usage
 
 **Samplesheet with local reference:**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -151,6 +164,7 @@ nextflow run nf-core/eukavarizer \
 ```
 
 **Samplesheet with automatic reference retrieval:**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -160,6 +174,7 @@ nextflow run nf-core/eukavarizer \
 ```
 
 **Automatic data and reference retrieval (BioDbCore generates samplesheet):**
+
 ```bash
 # When --input is not provided, BioDbCore automatically retrieves data
 nextflow run nf-core/eukavarizer \
@@ -320,18 +335,18 @@ The repository includes example batch job scripts in the `run_scripts/` director
 
 ### Available scripts
 
-| Script | Description | Read Type | Resources |
-|--------|-------------|-----------|-----------|
-| `eukavarizer_job_dry_run.sh` | Minimal test run for validation | Mixed (short+long) | 64 CPUs, 512GB RAM, 24h |
-| `eukavarizer_job_short.sh` | Full short-read analysis | Short reads | 64 CPUs, 1.5TB RAM, 48h |
-| `eukavarizer_job_nano.sh` | Oxford Nanopore long reads | Nanopore | 64 CPUs, 768GB RAM, 24h |
-| `eukavarizer_job_pac.sh` | PacBio long reads | PacBio | 64 CPUs, 768GB RAM, 24h |
-| `eukavarizer_job_long_horse.sh` | Long-read analysis for horse genome | Long reads | 64 CPUs, 768GB RAM, 24h |
-| `eukavarizer_job_short_rice_japonica.sh` | Rice japonica short reads | Short reads | Variable |
-| `eukavarizer_job_short_rice_indica.sh` | Rice indica short reads | Short reads | Variable |
-| `eukavarizer_job_benchmark.sh` | Benchmarking run | Mixed | Variable |
-| `eukavarizer_job_benchmark_hs37d5.sh` | Benchmark with hs37d5 reference | Mixed | Variable |
-| `eukavarizer_job_final.sh` | Production-ready template | Configurable | Variable |
+| Script                                   | Description                         | Read Type          | Resources               |
+| ---------------------------------------- | ----------------------------------- | ------------------ | ----------------------- |
+| `eukavarizer_job_dry_run.sh`             | Minimal test run for validation     | Mixed (short+long) | 64 CPUs, 512GB RAM, 24h |
+| `eukavarizer_job_short.sh`               | Full short-read analysis            | Short reads        | 64 CPUs, 1.5TB RAM, 48h |
+| `eukavarizer_job_nano.sh`                | Oxford Nanopore long reads          | Nanopore           | 64 CPUs, 768GB RAM, 24h |
+| `eukavarizer_job_pac.sh`                 | PacBio long reads                   | PacBio             | 64 CPUs, 768GB RAM, 24h |
+| `eukavarizer_job_long_horse.sh`          | Long-read analysis for horse genome | Long reads         | 64 CPUs, 768GB RAM, 24h |
+| `eukavarizer_job_short_rice_japonica.sh` | Rice japonica short reads           | Short reads        | Variable                |
+| `eukavarizer_job_short_rice_indica.sh`   | Rice indica short reads             | Short reads        | Variable                |
+| `eukavarizer_job_benchmark.sh`           | Benchmarking run                    | Mixed              | Variable                |
+| `eukavarizer_job_benchmark_hs37d5.sh`    | Benchmark with hs37d5 reference     | Mixed              | Variable                |
+| `eukavarizer_job_final.sh`               | Production-ready template           | Configurable       | Variable                |
 
 ### Script structure
 
@@ -367,22 +382,26 @@ nextflow run main.nf \
 ### Key features
 
 **Scratch space management:**
+
 - Uses fast local scratch storage (`$SCRATCHDIR`) for temporary files
 - Stores final results in permanent storage (`$DATADIR`)
 - Automatic cleanup with `clean_scratch`
 
 **Environment setup:**
+
 - Loads required modules (Java, Mamba/Conda)
 - Sets Nextflow working directory (`NXF_WORK`)
 - Configures conda cache directories
 - Enables debug logging (`NXF_LOG_LEVEL=DEBUG`)
 
 **Resource allocation:**
+
 - Requests appropriate CPUs, memory, and scratch space
 - Sets realistic walltime limits
 - Email notifications on job start/finish/abort
 
 **Samplesheet handling:**
+
 - Uses `sed` to replace `$DATADIR` placeholders in samplesheets
 - Formats samplesheets for the current environment
 
@@ -391,6 +410,7 @@ nextflow run main.nf \
 To use these scripts on your HPC cluster:
 
 1. **Modify PBS directives** for your scheduler (SLURM, SGE, etc.):
+
    ```bash
    # SLURM example
    #SBATCH --job-name=eukavarizer
@@ -400,11 +420,13 @@ To use these scripts on your HPC cluster:
    ```
 
 2. **Update paths** to match your filesystem:
+
    ```bash
    DATADIR=/your/storage/path
    ```
 
 3. **Adjust module names** for your system:
+
    ```bash
    module load java/17
    module load anaconda3
@@ -496,6 +518,7 @@ Enable or disable specific SV callers using flags:
 ```
 
 **Example - Enable all short-read callers:**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -522,6 +545,7 @@ Control QC and trimming steps:
 ```
 
 **Example - Full QC pipeline:**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -543,6 +567,7 @@ Choose alignment algorithm:
 ```
 
 **For short reads (BWA/BWA-MEM2):**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -552,6 +577,7 @@ nextflow run nf-core/eukavarizer \
 ```
 
 **For long reads (Minimap2):**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet_long.csv \
@@ -573,6 +599,7 @@ Configure SURVIVOR merge behavior:
 ```
 
 **Example - Strict merging (high confidence):**
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -587,6 +614,7 @@ nextflow run nf-core/eukavarizer \
 Override default resources for specific processes:
 
 **Via command line:**
+
 ```bash
 --max_cpus 32
 --max_memory 128.GB
@@ -596,6 +624,7 @@ Override default resources for specific processes:
 **Via custom config file:**
 
 Create `custom.config`:
+
 ```groovy
 process {
     withName: GRIDSS {
@@ -611,6 +640,7 @@ process {
 ```
 
 Run with:
+
 ```bash
 nextflow run nf-core/eukavarizer \
     --input samplesheet.csv \
@@ -688,24 +718,29 @@ nextflow clean -n
 Use pre-configured tool combinations:
 
 **Short-read profiles:**
+
 - `short_quick` - DELLY + GRIDSS only
 - `short_medium` - DELLY + GRIDSS + Manta
 - `short_full` - All short-read callers
 
 **Long-read profiles:**
+
 - `long_quick` - Sniffles only
 - `long_medium` - Sniffles + CuteSV
 - `long_full` - All long-read callers
 
 **Mixed profiles:**
+
 - `mix_quick` - Minimal callers for both
 - `mix_medium` - Moderate callers for both
 - `mix_full` - All callers
 
 **QC profiles:**
+
 - `qc_off` - Disable QC steps (for testing)
 
 **Example combinations:**
+
 ```bash
 # Quick short-read analysis
 -profile docker,short_quick

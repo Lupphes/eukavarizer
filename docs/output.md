@@ -219,12 +219,14 @@ results/
 The pipeline generates the following intermediate alignment files during execution:
 
 **Alignment process**:
+
 1. **BWA/BWA-MEM2** (for short reads) or **Minimap2** (for long reads) aligns reads to reference
 2. **SAMtools** sorts and indexes alignments
 3. Optionally: **GATK4** marks duplicates and performs BQSR
 4. **SV callers** consume these BAM files directly from work directories
 
 **Intermediate directories in work/**:
+
 ```
 work/
 └── [hash]/
@@ -239,6 +241,7 @@ work/
 ```
 
 If you need to retain alignment files, you can:
+
 - Use the `-resume` flag to keep work directories
 - Modify `modules.config` to enable publishing for specific alignment processes
 - Use `--outdir` to specify a location with sufficient storage
@@ -268,6 +271,7 @@ results/
 ### Short-read SV callers
 
 **DELLY** (`{taxonomy_id}/delly/`, enabled by `--delly_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF with SV calls
 - `*.vcf.gz.tbi` - Tabix index
@@ -275,6 +279,7 @@ results/
 - Detects deletions, duplications, inversions, translocations
 
 **Manta** (`{taxonomy_id}/manta/`, enabled by `--manta_flag`):
+
 - `*.diploidSV.vcf.gz` - Diploid structural variants
 - `*.candidateSV.vcf.gz` - Candidate SVs (all evidence)
 - `*.candidateSmallIndels.vcf.gz` - Small indels
@@ -282,6 +287,7 @@ results/
 - Fast and accurate for germline SVs
 
 **GRIDSS** (`{taxonomy_id}/gridss/`, enabled by `--gridss_flag`):
+
 - `*.vcf.gz` - GRIDSS VCF output
 - `*.tbi` - Tabix index
 - `annotate/` subdirectory (if `--gridss_annotate`):
@@ -289,18 +295,21 @@ results/
 - High-resolution breakpoint detection using de Bruijn graphs
 
 **DYSGU** (`{taxonomy_id}/dysgu/`, enabled by `--dysgu_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF
 - `*.tbi` - Tabix index
 - Works with both short and long reads
 
 **TIDDIT** (`{taxonomy_id}/tiddit/`, enabled by `--tiddit_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF
 - `*.tbi` - Tabix index
 - Fast SV caller using coverage and discordant pairs
 
 **SvABA** (`{taxonomy_id}/svaba/`, enabled by `--svaba_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF
 - `*.tbi` - Tabix index
@@ -312,6 +321,7 @@ results/
 ### Long-read SV callers
 
 **Sniffles** (`{taxonomy_id}/sniffles/`, enabled by `--sniffles_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF
 - `*.tbi` - Tabix index
@@ -319,6 +329,7 @@ results/
 - Accurate detection of complex SVs
 
 **CuteSV** (`{taxonomy_id}/cutesv/`, enabled by `--cutesv_flag`):
+
 - `*.vcf` - Uncompressed VCF
 - `*.vcf.gz` - BGZipped VCF
 - `*.tbi` - Tabix index
@@ -327,6 +338,7 @@ results/
 ### File formats
 
 All VCF files follow standard VCF 4.2 format with the following typical INFO fields:
+
 - `SVTYPE` - Type of structural variant (DEL, DUP, INV, TRA, INS, BND)
 - `SVLEN` - Length of the structural variant
 - `END` - End position of the variant
@@ -369,6 +381,7 @@ results/
 ### SV Standardization
 
 **VCF Reheadering** (`results/reheader/`):
+
 - Before merging, all individual caller VCFs are standardized with:
   - `EUK_CALLER` INFO field - Records which SV calling algorithm was used
   - `EUK_PLATFORM` INFO field - Records sequencing platform (Illumina, PacBio, ONT)
@@ -379,6 +392,7 @@ results/
 ### SURVIVOR Merge Strategy
 
 **SURVIVOR_MERGE** (`results/vcf/*_survivor_merge.vcf.gz`):
+
 - Merges SVs from multiple callers using breakpoint proximity and SV type
 - Parameters controlled by:
   - `--survivor_max_distance` - Maximum distance between breakpoints (default: 1000)
@@ -390,6 +404,7 @@ results/
   - `SVMETHOD` - Comma-separated list of supporting callers
 
 **SURVIVOR_FILTER** (`results/vcf/*_survivor_merge_filtered.vcf.gz`):
+
 - Applies additional filtering to merged SURVIVOR VCF:
   - Minimum SV size threshold
   - Minimum caller support threshold
@@ -397,6 +412,7 @@ results/
 - Produces final high-confidence SV set
 
 **SURVIVOR_STATS** (`results/vcf/*_survivor_stats.tsv`):
+
 - Tab-separated statistics file with:
   - Per-caller SV counts by type
   - Overlap statistics between callers
@@ -405,11 +421,13 @@ results/
 ### BCFtools Merge Strategy
 
 **BCFTOOLS_CONCAT** (`results/vcf/*_bcftools_concat.vcf.gz`):
+
 - Concatenates VCFs from all callers
 - Maintains individual caller information
 - Useful for comparing caller-specific results
 
 **BCFTOOLS_FILTER** (`results/vcf/*_bcftools_filtered.vcf.gz`):
+
 - Applies BCFtools-based filtering:
   - Quality score thresholds
   - Depth filtering
@@ -417,6 +435,7 @@ results/
 - More flexible than SURVIVOR for custom filters
 
 **BCFTOOLS_STATS** (`results/vcf/*_bcftools_stats.txt`):
+
 - Comprehensive statistics including:
   - SV type counts
   - Length distributions
@@ -426,6 +445,7 @@ results/
 ### SVYNC Harmonization (Optional)
 
 **SVYNC** (`results/svync/*.tsv`):
+
 - Harmonizes SV representations across callers
 - Converts VCF to standardized TSV format
 - Includes:
@@ -459,6 +479,7 @@ results/
 ### Varify Report
 
 **Main HTML Report** (`results/{taxonomy_id}.html`):
+
 - Comprehensive interactive HTML report with:
   - **Executive Summary**: Key statistics and QC metrics
   - **SV Type Distribution**: Bar charts and pie charts showing SV types (DEL, DUP, INV, etc.)
@@ -470,6 +491,7 @@ results/
   - **Methods Description**: Automatically generated methods text for publications
 
 **Plots Directory** (`results/plots/`):
+
 - **PNG images**: High-resolution static plots for presentations
 - **HTML files**: Interactive Plotly visualizations
 - Includes:
@@ -482,6 +504,7 @@ results/
 ### Usage
 
 The Varify report is the primary output for interpreting pipeline results. It aggregates:
+
 - Quality control metrics from all samples
 - SV calls from all enabled callers
 - Merged and filtered SV results
@@ -500,30 +523,30 @@ Open `{taxonomy_id}.html` in a web browser to view the complete analysis.
 
 The following table shows which output directories are created based on pipeline configuration flags:
 
-| Parameter | Default | Output Directory | Description |
-|-----------|---------|------------------|-------------|
-| `--taxonomy_id` | Required | `{taxonomy_id}/ref/` | Reference genome retrieval |
-| `--fast5_dir` | - | `{taxonomy_id}/dorado/` | Dorado basecalling for FAST5 |
-| `--pod5_dir` | - | `{taxonomy_id}/dorado/` | Dorado basecalling for POD5 |
-| `--fastqc_flag` | `true` | `{taxonomy_id}/qc/pre_fastqc/`<br>`{taxonomy_id}/qc/after_fastqc/` | FastQC reports |
-| `--multiqc_flag` | `true` | `{taxonomy_id}/qc/pre_multiqc/`<br>`{taxonomy_id}/qc/after_multiqc/` | MultiQC aggregated reports |
-| `--fastp_flag` | `false` | `{taxonomy_id}/qc/fastp/` or `fastplong/` | Read trimming/filtering |
-| `--bbmap_bbduk_flag` | `false` | `{taxonomy_id}/qc/bbduk/` | Contamination removal |
-| `--seqtk_flag` | `false` | `{taxonomy_id}/qc/seqtk/` | Read subsampling |
-| `--bwamem2` | `false` | `{taxonomy_id}/ref/bwamem2/` | BWA-MEM2 indices (vs BWA) |
-| `--minimap2_flag` | `false` | `{taxonomy_id}/ref/minimap/` | Minimap2 indices (long reads) |
-| `--delly_flag` | `true` | `{taxonomy_id}/delly/` | DELLY SV calls |
-| `--manta_flag` | `false` | `{taxonomy_id}/manta/` | Manta SV calls |
-| `--gridss_flag` | `true` | `{taxonomy_id}/gridss/` | GRIDSS SV calls |
-| `--gridss_annotate` | `false` | `{taxonomy_id}/gridss/annotate/` | GRIDSS annotations |
-| `--dysgu_flag` | `false` | `{taxonomy_id}/dysgu/` | DYSGU SV calls |
-| `--tiddit_flag` | `false` | `{taxonomy_id}/tiddit/` | TIDDIT SV calls |
-| `--svaba_flag` | `false` | `{taxonomy_id}/svaba/` | SvABA SV calls (BWA only) |
-| `--sniffles_flag` | `false` | `{taxonomy_id}/sniffles/` | Sniffles SV calls (long reads) |
-| `--cutesv_flag` | `false` | `{taxonomy_id}/cutesv/` | CuteSV SV calls (long reads) |
-| - | Always | `{taxonomy_id}/results/vcf/` | Merged/filtered SV results |
-| - | Always | `{taxonomy_id}/results/{taxonomy_id}.html` | Varify HTML report |
-| - | Always | `pipeline_info/` | Pipeline execution metadata |
+| Parameter            | Default  | Output Directory                                                     | Description                    |
+| -------------------- | -------- | -------------------------------------------------------------------- | ------------------------------ |
+| `--taxonomy_id`      | Required | `{taxonomy_id}/ref/`                                                 | Reference genome retrieval     |
+| `--fast5_dir`        | -        | `{taxonomy_id}/dorado/`                                              | Dorado basecalling for FAST5   |
+| `--pod5_dir`         | -        | `{taxonomy_id}/dorado/`                                              | Dorado basecalling for POD5    |
+| `--fastqc_flag`      | `true`   | `{taxonomy_id}/qc/pre_fastqc/`<br>`{taxonomy_id}/qc/after_fastqc/`   | FastQC reports                 |
+| `--multiqc_flag`     | `true`   | `{taxonomy_id}/qc/pre_multiqc/`<br>`{taxonomy_id}/qc/after_multiqc/` | MultiQC aggregated reports     |
+| `--fastp_flag`       | `false`  | `{taxonomy_id}/qc/fastp/` or `fastplong/`                            | Read trimming/filtering        |
+| `--bbmap_bbduk_flag` | `false`  | `{taxonomy_id}/qc/bbduk/`                                            | Contamination removal          |
+| `--seqtk_flag`       | `false`  | `{taxonomy_id}/qc/seqtk/`                                            | Read subsampling               |
+| `--bwamem2`          | `false`  | `{taxonomy_id}/ref/bwamem2/`                                         | BWA-MEM2 indices (vs BWA)      |
+| `--minimap2_flag`    | `false`  | `{taxonomy_id}/ref/minimap/`                                         | Minimap2 indices (long reads)  |
+| `--delly_flag`       | `true`   | `{taxonomy_id}/delly/`                                               | DELLY SV calls                 |
+| `--manta_flag`       | `false`  | `{taxonomy_id}/manta/`                                               | Manta SV calls                 |
+| `--gridss_flag`      | `true`   | `{taxonomy_id}/gridss/`                                              | GRIDSS SV calls                |
+| `--gridss_annotate`  | `false`  | `{taxonomy_id}/gridss/annotate/`                                     | GRIDSS annotations             |
+| `--dysgu_flag`       | `false`  | `{taxonomy_id}/dysgu/`                                               | DYSGU SV calls                 |
+| `--tiddit_flag`      | `false`  | `{taxonomy_id}/tiddit/`                                              | TIDDIT SV calls                |
+| `--svaba_flag`       | `false`  | `{taxonomy_id}/svaba/`                                               | SvABA SV calls (BWA only)      |
+| `--sniffles_flag`    | `false`  | `{taxonomy_id}/sniffles/`                                            | Sniffles SV calls (long reads) |
+| `--cutesv_flag`      | `false`  | `{taxonomy_id}/cutesv/`                                              | CuteSV SV calls (long reads)   |
+| -                    | Always   | `{taxonomy_id}/results/vcf/`                                         | Merged/filtered SV results     |
+| -                    | Always   | `{taxonomy_id}/results/{taxonomy_id}.html`                           | Varify HTML report             |
+| -                    | Always   | `pipeline_info/`                                                     | Pipeline execution metadata    |
 
 > **Note**: At least one SV caller must be enabled. The default configuration enables DELLY and GRIDSS for a balanced approach to SV detection.
 

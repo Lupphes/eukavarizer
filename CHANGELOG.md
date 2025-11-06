@@ -10,6 +10,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 ### `Added`
 
 #### Pipeline Features
+
 - Multi-caller structural variant detection supporting 8 SV callers (DELLY, Manta, GRIDSS, SVABA, TIDDIT, DYSGU, Sniffles, CuteSV)
 - Support for both short-read and long-read sequencing data
 - Automated reference genome retrieval from RefSeq via BioDbCore
@@ -19,6 +20,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - Comprehensive QC reporting with MultiQC
 
 #### Modules (Local)
+
 - `VARIFY`: Unified structural variant reporting and visualization tool
 - `BIODBCORE_ENA`: Automated ENA sequencing data retrieval
 - `BIODBCORE_REFSEQ`: Automated RefSeq reference genome retrieval
@@ -29,6 +31,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - `GRIDSS_ANNOTATE`: GRIDSS breakend annotation with StructuralVariantAnnotation
 
 #### Modules (nf-core)
+
 - Quality Control: FastQC, MultiQC, Fastp, fastplong, BBDuk, Seqtk
 - Alignment: BWA, BWA-MEM2, Minimap2
 - BAM/VCF Processing: Samtools (view, merge, index, collatefastq, faidx, stats), BCFtools (concat, sort, merge, stats, filter), GATK4, GATK4Spark, Tabix
@@ -37,6 +40,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - Data Retrieval: SRATools
 
 #### Subworkflows
+
 - `REFERENCE_RETRIEVAL`: Automated reference genome download and indexing
 - `SEQUENCE_PROCESSOR`: Complete read processing pipeline (QC, trimming, alignment, BAM processing)
 - `QUALITY_CONTROL`: Read quality control and filtering
@@ -47,6 +51,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - `REPORT_GENERATION`: MultiQC and Varify report generation
 
 #### Configuration
+
 - Pre-configured analysis profiles: `short_quick`, `short_medium`, `short_full`, `long_quick`, `long_medium`, `long_full`, `mix_quick`, `mix_medium`, `mix_full`
 - Optimized resource allocation for each process
 - ENA data retrieval parameters (library strategy, platform, coverage filters)
@@ -63,6 +68,7 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - Updated tests/config/nextflow.config with ENA parameter overrides for test isolation
 
 #### Documentation
+
 - Comprehensive README with workflow overview, usage examples, and parameter documentation
 - SV caller compatibility matrix
 - Enhanced tower.yml for Nextflow Tower/Seqera Platform integration
@@ -71,11 +77,13 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 ### `Fixed`
 
 #### Configuration and Testing
+
 - Fixed .nf-core.yml validation error: removed invalid update.exclude list format
 - Removed global includeConfig for biodbcore.config to prevent test interference
 - ENA retrieval parameters now have null defaults in main config, with specific values in biodbcore.config for relevant profiles
 
 #### Module Modernization
+
 - Added `when` clause for conditional execution to all local modules
 - Added `versions.yml` output to all local modules for reproducibility
 - Added `task.ext.prefix` and `task.ext.args` support for configurability
@@ -84,22 +92,26 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 - Renamed `main.yml` to `meta.yml` for consistency with nf-core standards
 
 #### Meta.yaml Updates
+
 - Updated all local module meta.yaml files with proper input/output documentation
 - Added comprehensive descriptions for all modules
 - Standardized meta.yaml structure across all modules
 
 #### Test Updates
+
 - Added versions.yml assertions to all local module tests
 - Ensured all tests follow nf-core testing standards
 - Added nf-test configuration
 
 #### Workflow Headers
+
 - Modernized headers for main EUKAVARIZER workflow
 - Updated headers for all 8 SV calling subworkflows
 - Updated headers for all 9 sequence processing subworkflows
 - Standardized header format with comprehensive documentation
 
 #### Citations
+
 - **Added missing tools**: Tabix/bgzip (Li 2011), SeqKit (Shen et al. 2016)
 - **Fixed incorrect citations**:
   - seqtk: Changed to GitHub software citation (no formal publication)
@@ -116,16 +128,19 @@ Initial release of nf-core/eukavarizer, created with the [nf-core](https://nf-co
 ### `Dependencies`
 
 #### Core Dependencies
+
 - Nextflow >= 24.04.2
 - nf-schema plugin for parameter validation
 
 #### Container/Environment Management
+
 - Docker support
 - Singularity/Apptainer support
 - Conda/Mamba support
 - Podman support
 
 #### Key Software Versions
+
 - Dorado (Oxford Nanopore Technologies)
 - FastQC, MultiQC
 - Fastp, fastplong, BBDuk, Seqtk, SeqKit

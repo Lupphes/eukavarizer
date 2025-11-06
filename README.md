@@ -9,6 +9,7 @@
 <!-- [![GitHub Actions Linting Status](https://github.com/nf-core/eukavarizer/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/eukavarizer/actions/workflows/linting.yml) -->
 <!-- [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/eukavarizer/results) -->
 <!-- [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX) -->
+
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A5v25.04.0-23aa62.svg)](https://www.nextflow.io/)
@@ -72,7 +73,7 @@ nextflow run nf-core/eukavarizer \
    --outdir results/yeast_test
 ```
 
-This automatically downloads the reference genome for *S. cerevisiae* (taxonomy ID 4932) and retrieves sequencing data from ENA using BioDbCore.
+This automatically downloads the reference genome for _S. cerevisiae_ (taxonomy ID 4932) and retrieves sequencing data from ENA using BioDbCore.
 
 ### Local input with samplesheet
 
@@ -100,6 +101,7 @@ nextflow run nf-core/eukavarizer \
 ### HPC/Cluster execution
 
 Example PBS/SLURM job scripts are provided in `run_scripts/` for different scenarios:
+
 - Short-read analysis: `run_scripts/eukavarizer_job_short.sh`
 - Long-read (PacBio): `run_scripts/eukavarizer_job_pac.sh`
 - Long-read (Nanopore): `run_scripts/eukavarizer_job_nano.sh`
@@ -111,25 +113,25 @@ See [docs/usage.md](docs/usage.md) for detailed HPC deployment instructions.
 
 ## Key Parameters
 
-| Parameter | Description | Required |
-| --------- | ----------- | -------- |
-| `--taxonomy_id` | NCBI Taxonomy ID (e.g., 4932 for yeast, 9606 for human) | Yes |
-| `--outdir` | Output directory | Yes |
-| `--input` | Samplesheet CSV file | No* |
-| `--reference_genome` | Reference FASTA file | No* |
+| Parameter            | Description                                             | Required |
+| -------------------- | ------------------------------------------------------- | -------- |
+| `--taxonomy_id`      | NCBI Taxonomy ID (e.g., 4932 for yeast, 9606 for human) | Yes      |
+| `--outdir`           | Output directory                                        | Yes      |
+| `--input`            | Samplesheet CSV file                                    | No\*     |
+| `--reference_genome` | Reference FASTA file                                    | No\*     |
 
-*If `--input` is not provided, BioDbCore automatically retrieves data from ENA/SRA
+\*If `--input` is not provided, BioDbCore automatically retrieves data from ENA/SRA
 
 ### Analysis Profiles
 
 Combine read type with compute environment: `-profile docker,short_full`
 
-| Profile | Read Type | SV Callers |
-|---------|-----------|------------|
+| Profile                   | Read Type   | SV Callers                                 |
+| ------------------------- | ----------- | ------------------------------------------ |
 | `short_quick/medium/full` | Short reads | DELLY, Manta, GRIDSS, TIDDIT, SVABA, DYSGU |
-| `long_quick/medium/full` | Long reads | Sniffles, CuteSV, DYSGU |
-| `mix_quick/medium/full` | Hybrid | Combined callers |
-| `test` | Test data | Minimal yeast test |
+| `long_quick/medium/full`  | Long reads  | Sniffles, CuteSV, DYSGU                    |
+| `mix_quick/medium/full`   | Hybrid      | Combined callers                           |
+| `test`                    | Test data   | Minimal yeast test                         |
 
 **Compute profiles**: `docker` (recommended), `singularity`, `conda`, `mamba`
 
