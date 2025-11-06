@@ -22,6 +22,7 @@ DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
 LOGFILE="$DATADIR/horse_9796_long/logs/eukavarizer.log"
 mkdir -p "$(dirname "$LOGFILE")"
+export COLUMNS=200 
 
 # Trap to ensure cleanup always happens
 cleanup() {
@@ -39,6 +40,7 @@ echo "Working in scratch: $SCRATCH" | tee -a "$LOGFILE"
 #========================================================================================
 echo ">>> Loading modules..." | tee -a "$LOGFILE"
 module add openjdk/17
+module add micromamba/2.3.3
 
 echo ">>> Move to scratch..." | tee -a "$LOGFILE"
 cd "$SCRATCH"
@@ -56,16 +58,17 @@ curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 # Conda and Nextflow Configuration
 #========================================================================================
 echo ">>> Configuring Nextflow and Conda..." | tee -a "$LOGFILE"
-mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_next" "$SCRATCH/.nextflow"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_next" "$SCRATCH/.nextflow" "$SCRATCH/.micromamba"
 export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
 export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
+export MAMBA_EXE=micromamba
+export MAMBA_ROOT_PREFIX="$SCRATCH/.micromamba"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK="$DATADIR/horse_9796_long/work"
+export NXF_WORK="$SCRATCH/work"
 export NXF_LOG_FILE="$DATADIR/horse_9796_long/logs/.nextflow.log"
 export NXF_HOME="$SCRATCH/.nextflow"
 export MAMBA_ALWAYS_YES=true
-export MAMBA_NO_BANNER=1
 
 #========================================================================================
 # Pipeline Preparation

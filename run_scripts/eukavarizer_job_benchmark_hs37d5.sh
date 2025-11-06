@@ -23,6 +23,7 @@ DATADIR=/storage/brno2/home/luppo
 SCRATCH=$SCRATCHDIR
 LOGFILE="$DATADIR/human_9606_benchmark_hs37d5/logs/eukavarizer.log"
 mkdir -p "$(dirname "$LOGFILE")"
+export COLUMNS=200 
 
 # Trap to ensure cleanup always happens
 cleanup() {
@@ -65,7 +66,8 @@ export MAMBA_EXE=micromamba
 export MAMBA_ROOT_PREFIX="$SCRATCH/.micromamba"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
-export NXF_WORK="$DATADIR/human_9606_benchmark_hs37d5/work"
+# export NXF_WORK="$DATADIR/human_9606_benchmark_hs37d5/work"
+export NXF_WORK="$SCRATCH/work"
 export NXF_LOG_FILE="$DATADIR/human_9606_benchmark_hs37d5/logs/.nextflow.log"
 export NXF_HOME="$SCRATCH/.nextflow"
 export MAMBA_ALWAYS_YES=true
@@ -80,13 +82,24 @@ chmod +x bin/simple-event-annotation.R
 echo ">>> Preparing samplesheet..." | tee -a "$LOGFILE"
 sed "s|\$DATADIR|$DATADIR|g" "$DATADIR/eukavarizer/assets/samplesheets/samplesheet_human_pacbio_hs37d5.csv" > "$SCRATCH/samplesheet_formatted.csv"
 
+echo ">>> Staging reference genome to scratch..." | tee -a "$LOGFILE"
+mkdir -p "$SCRATCH/reference"
+cp "$DATADIR/eukavarizer/data/9606/ref/hs37d5.fa.gz" "$SCRATCH/reference/"
+echo "Reference ready at $SCRATCH/reference/hs37d5.fa.gz" | tee -a "$LOGFILE"
+
 #========================================================================================
 # Pipeline Execution
 #========================================================================================
+echo ">>> Verifying mamba/micromamba configuration..." | tee -a "$LOGFILE"
+echo "MAMBA_EXE: $MAMBA_EXE" | tee -a "$LOGFILE"
+echo "MAMBA_ROOT_PREFIX: $MAMBA_ROOT_PREFIX" | tee -a "$LOGFILE"
+which micromamba | tee -a "$LOGFILE"
+micromamba --version | tee -a "$LOGFILE"
+
 echo ">>> Running Eukavarizer pipeline..." | tee -a "$LOGFILE"
 "$SCRATCH/nextflow" run main.nf -profile mamba,long_full,qc_off \
     --taxonomy_id 9606 \
-    --reference_genome "$DATADIR/eukavarizer/data/9606/ref/hs37d5.fa.gz" \
+    --reference_genome "$SCRATCH/reference/hs37d5.fa.gz" \
     --input "$SCRATCH/samplesheet_formatted.csv" \
     --outdir "$DATADIR/human_9606_benchmark_hs37d5/out" \
     --seqtk_size 1.0 --seqtk_flag false --minimap2_flag true --bcftools_filter_args "--include 'QUAL>=10'" | tee -a "$LOGFILE"
