@@ -10,7 +10,10 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["taxonomy_id", "outdir"],
+            "required": [
+                "taxonomy_id",
+                "outdir"
+            ],
             "properties": {
                 "taxonomy_id": {
                     "type": "integer",
@@ -218,13 +221,6 @@
                     "default": "/models/dna_r9.4.1_e8_fast@v3.4",
                     "description": "Dorado basecalling model for POD5 files"
                 },
-                "minimap2_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Minimap2 for read mapping.",
-                    "default": true,
-                    "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
-                    "fa_icon": "fas fa-directions"
-                },
                 "long_read_threshold": {
                     "type": "integer",
                     "minimum": 0,
@@ -236,14 +232,8 @@
                 "bwamem2": {
                     "type": "boolean",
                     "description": "Use BWA-MEM2 instead of BWA for reference indexing and alignment.",
-                    "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. \u26a0\ufe0f Not recommended unless you know your aligner compatibility and performance needs.",
+                    "help_text": "If set to true, BWA-MEM2 will be used instead of BWA. ⚠️ Not recommended unless you know your aligner compatibility and performance needs.",
                     "fa_icon": "fas fa-exclamation-circle"
-                },
-                "seqtk_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable seqtk sampling.",
-                    "help_text": "Set this flag to true to enable `seqtk sample` to randomly subsample reads from FASTQ files. It uses `seqtk_size` and `seqtk_seed` to control sampling.",
-                    "fa_icon": "fas fa-random"
                 },
                 "seqtk_size": {
                     "type": "number",
@@ -269,6 +259,19 @@
             "fa_icon": "fas fa-filter",
             "description": "Parameters for quality control tools such as FASTP and FASTPLONG.",
             "properties": {
+                "seqtk_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable seqtk sampling.",
+                    "help_text": "Set this flag to true to enable `seqtk sample` to randomly subsample reads from FASTQ files. It uses `seqtk_size` and `seqtk_seed` to control sampling.",
+                    "fa_icon": "fas fa-random"
+                },
+                "minimap2_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Minimap2 for read mapping.",
+                    "default": true,
+                    "help_text": "Set this flag to true to use Minimap2 instead of BWA-MEM or BWA-MEM2 for short read alignment.",
+                    "fa_icon": "fas fa-directions"
+                },
                 "fastp_flag": {
                     "type": "boolean",
                     "default": true,
@@ -295,7 +298,13 @@
                 "bbduk_qtrim": {
                     "type": "string",
                     "default": "r",
-                    "enum": ["r", "l", "rl", "lr", "none"],
+                    "enum": [
+                        "r",
+                        "l",
+                        "rl",
+                        "lr",
+                        "none"
+                    ],
                     "description": "Which end(s) to quality trim in BBDuk.",
                     "help_text": "`r`=right, `l`=left, `rl` or `lr`=both. `none`=no quality trimming. Passed to `qtrim`.",
                     "fa_icon": "fas fa-arrows-alt-h"
@@ -313,6 +322,74 @@
                     "default": "--qualified_quality_phred 15 --length_required 50 --n_base_limit 10 --low_complexity_filter --complexity_threshold 30",
                     "help_text": "These arguments are passed directly to FASTPLONG. Ensure they match FASTPLONG's expected CLI options.",
                     "fa_icon": "fas fa-terminal"
+                }
+            }
+        },
+        "component_flags": {
+            "title": "Component flags",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "delly_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Delly algorithm.",
+                    "help_text": "Set this flag to true to enable the Delly algorithm for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "manta_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Manta for germline variant detection.",
+                    "help_text": "Set this flag to true to enable Manta for germline SV calling.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "gridss_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable GRIDSS for structural variant detection.",
+                    "help_text": "Set this flag to true to enable GRIDSS for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "sniffles_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Sniffles algorithm.",
+                    "help_text": "Set this flag to true to enable Sniffles for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "tiddit_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Tiddit algorithm.",
+                    "help_text": "Set this flag to true to enable Tiddit for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "fastqc_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable FastQC for sequence quality control.",
+                    "help_text": "Set this flag to true to enable FastQC for sequence quality control. This will run quality checks on the input fastq files.",
+                    "fa_icon": "fas fa-flask"
+                },
+                "debug_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable debug views for pipeline steps.",
+                    "help_text": "Set this flag to true to enable debug views for each pipeline step. Use for troubleshooting and detailed logging.",
+                    "fa_icon": "fas fa-bug"
+                },
+                "cutesv_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable CuteSV algorithm.",
+                    "help_text": "Set this flag to true to enable CuteSV for structural variant detection.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "svaba_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable SVABA algorithm.",
+                    "help_text": "Set this flag to true to enable SVABA for variant calling.",
+                    "fa_icon": "fas fa-cogs"
+                },
+                "dysgu_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable Dysgu algorithm.",
+                    "help_text": "Set this flag to true to enable Dysgu for variant detection.",
+                    "fa_icon": "fas fa-cogs"
                 }
             }
         },
@@ -362,11 +439,21 @@
                     "default": true,
                     "description": "Enable SvABA annotation of structural variants"
                 },
+                "multiqc_flag": {
+                    "type": "boolean",
+                    "description": "Enable or disable MultiQC for generating reports.",
+                    "help_text": "Set this flag to true to enable MultiQC for summarising quality metrics from FastQC or other tools. A final report will be generated at the end.",
+                    "fa_icon": "fas fa-chart-bar"
+                },
                 "manta_args": {
                     "type": "string",
                     "description": "Additional arguments to pass to Manta.",
                     "fa_icon": "fas fa-sliders-h",
                     "help_text": "Extra command-line arguments for Manta structural variant caller."
+                },
+                "truvari_collapse": {
+                    "type": "boolean",
+                    "default": true
                 },
                 "tiddit_args": {
                     "type": "string",
@@ -472,6 +559,31 @@
                 }
             }
         },
+        "advanced_options": {
+            "title": "Advanced options",
+            "type": "object",
+            "fa_icon": "fas fa-cogs",
+            "description": "Advanced pipeline options",
+            "properties": {
+                "seq_center": {
+                    "type": "string",
+                    "default": "unspecified",
+                    "description": "Sequencing center name to be added to read group information"
+                },
+                "recalibrate_flag": {
+                    "type": "boolean",
+                    "description": "Enable base quality score recalibration (BQSR)"
+                },
+                "known_sites": {
+                    "type": "string",
+                    "description": "Known variant sites VCF file for base quality score recalibration"
+                },
+                "known_sites_tbi": {
+                    "type": "string",
+                    "description": "Tabix index for known variant sites VCF file"
+                }
+            }
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -527,85 +639,20 @@
             "description": "Less common options for the pipeline, typically set in a config file.",
             "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "delly_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Delly algorithm.",
-                    "help_text": "Set this flag to true to enable the Delly algorithm for structural variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "manta_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Manta for germline variant detection.",
-                    "help_text": "Set this flag to true to enable Manta for germline SV calling.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "gridss_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable GRIDSS for structural variant detection.",
-                    "help_text": "Set this flag to true to enable GRIDSS for structural variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "dysgu_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Dysgu algorithm.",
-                    "help_text": "Set this flag to true to enable Dysgu for variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "tiddit_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Tiddit algorithm.",
-                    "help_text": "Set this flag to true to enable Tiddit for structural variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "svaba_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable SVABA algorithm.",
-                    "help_text": "Set this flag to true to enable SVABA for variant calling.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "sniffles_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable Sniffles algorithm.",
-                    "help_text": "Set this flag to true to enable Sniffles for structural variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "cutesv_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable CuteSV algorithm.",
-                    "help_text": "Set this flag to true to enable CuteSV for structural variant detection.",
-                    "fa_icon": "fas fa-cogs"
-                },
-                "debug_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable debug views for pipeline steps.",
-                    "help_text": "Set this flag to true to enable debug views for each pipeline step. Use for troubleshooting and detailed logging.",
-                    "fa_icon": "fas fa-bug"
-                },
-                "fastqc_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable FastQC for sequence quality control.",
-                    "help_text": "Set this flag to true to enable FastQC for sequence quality control. This will run quality checks on the input fastq files.",
-                    "fa_icon": "fas fa-flask"
-                },
-                "multiqc_flag": {
-                    "type": "boolean",
-                    "description": "Enable or disable MultiQC for generating reports.",
-                    "help_text": "Set this flag to true to enable MultiQC for summarising quality metrics from FastQC or other tools. A final report will be generated at the end.",
-                    "fa_icon": "fas fa-chart-bar"
-                },
-                "version": {
-                    "type": "boolean",
-                    "description": "Display version and exit.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
                 "publish_dir_mode": {
                     "type": "string",
                     "default": "copy",
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -680,31 +727,12 @@
                     "fa_icon": "far calendar",
                     "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
                     "hidden": true
-                }
-            }
-        },
-        "advanced_options": {
-            "title": "Advanced options",
-            "type": "object",
-            "fa_icon": "fas fa-cogs",
-            "description": "Advanced pipeline options",
-            "properties": {
-                "seq_center": {
-                    "type": "string",
-                    "default": "unspecified",
-                    "description": "Sequencing center name to be added to read group information"
                 },
-                "recalibrate_flag": {
+                "version": {
                     "type": "boolean",
-                    "description": "Enable base quality score recalibration (BQSR)"
-                },
-                "known_sites": {
-                    "type": "string",
-                    "description": "Known variant sites VCF file for base quality score recalibration"
-                },
-                "known_sites_tbi": {
-                    "type": "string",
-                    "description": "Tabix index for known variant sites VCF file"
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
                 }
             }
         }
@@ -720,20 +748,22 @@
             "$ref": "#/$defs/quality_control_options"
         },
         {
+            "$ref": "#/$defs/component_flags"
+        },
+        {
             "$ref": "#/$defs/sv_caller_arguments"
         },
         {
             "$ref": "#/$defs/filtering_options"
         },
         {
+            "$ref": "#/$defs/advanced_options"
+        },
+        {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
-        },
-        {
-            "$ref": "#/$defs/advanced_options"
         }
-    ],
-    "properties": {}
+    ]
 }

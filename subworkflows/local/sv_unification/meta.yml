@@ -16,6 +16,7 @@ components:
   - bcftools/sort
   - bcftools/filter
   - bcftools/stats
+  - truvari/collapse
 input:
   - vcf_list:
       type: file

@@ -4,7 +4,7 @@ process VARIFY {
     cache false
 
     conda "${moduleDir}/environment.yml"
-    container "docker.io/luppo/varify:9ac2aa398e45159688d411787c53790eac57c529"
+    container "docker.io/luppo/varify:ed5c06d6409879bfbe9a4aeeb5775409d119ba69"
 
     input:
     val taxonomy_id
