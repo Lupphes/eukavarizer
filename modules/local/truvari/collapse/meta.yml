@@ -1,0 +1,91 @@
+name: "truvari_collapse"
+description: Collapse redundant structural variant calls from a VCF file
+keywords:
+  - structural variants
+  - sv
+  - vcf
+  - collapse
+  - deduplication
+  - merge
+tools:
+  - "truvari":
+      description: "Structural variant comparison tool for VCFs"
+      homepage: "https://github.com/ACEnglish/truvari"
+      documentation: "https://github.com/acenglish/truvari/wiki"
+      tool_dev_url: "https://github.com/ACEnglish/truvari"
+      doi: "10.1186/s13059-022-02840-6"
+      licence: ["MIT"]
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'test' ]`
+    - vcf:
+        type: file
+        description: Input SV VCF file to collapse
+        pattern: "*.vcf.gz"
+        ontologies:
+          - edam: http://edamontology.org/format_3989 # GZIP format
+    - tbi:
+        type: file
+        description: Input SV VCF index file
+        pattern: "*.vcf.gz.tbi"
+        ontologies: []
+  - - meta2:
+        type: map
+        description: |
+          Groovy Map containing fasta information
+          e.g. `[ id:'test' ]`
+    - fasta:
+        type: file
+        description: Reference FASTA file
+        pattern: "*.{fasta,fa,fna}"
+        ontologies: []
+  - - meta3:
+        type: map
+        description: |
+          Groovy Map containing fasta index information
+          e.g. `[ id:'test' ]`
+    - fai:
+        type: file
+        description: Reference FASTA index file
+        pattern: "*.fai"
+        ontologies: []
+output:
+  collapsed_vcf:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'test' ]`
+      - "*.collapsed.vcf.gz":
+          type: file
+          description: Collapsed VCF file with redundant variants merged
+          pattern: "*.collapsed.vcf.gz"
+          ontologies:
+            - edam: http://edamontology.org/format_3989 # GZIP format
+  removed_vcf:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'test' ]`
+      - "*.removed.vcf":
+          type: file
+          description: VCF file containing variants that were collapsed/removed
+          pattern: "*.removed.vcf"
+          ontologies:
+            - edam: http://edamontology.org/format_3016 # VCF
+  versions:
+    - versions.yml:
+        type: file
+        description: File containing software versions
+        pattern: "versions.yml"
+        ontologies:
+          - edam: http://edamontology.org/format_3750 # YAML
+authors:
+  - "@Lupphes"
+maintainers:
+  - "@Lupphes"

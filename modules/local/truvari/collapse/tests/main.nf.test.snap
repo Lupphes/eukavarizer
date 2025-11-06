@@ -1,0 +1,90 @@
+{
+    "truvari collapse": {
+        "content": [
+            "test.collapsed.vcf.gz",
+            [
+                "\"TRUVARI_COLLAPSE\":",
+                "    truvari: 5.3.0"
+            ],
+            [
+                "versions.yml:md5,8b9bd8ca453610efada7e4a8bbe97b8f"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-06T02:12:43.15028529"
+    },
+    "truvari collapse with removed output": {
+        "content": [
+            "test.collapsed.vcf.gz",
+            "test.removed.vcf",
+            [
+                "\"TRUVARI_COLLAPSE\":",
+                "    truvari: 5.3.0"
+            ],
+            [
+                "versions.yml:md5,8b9bd8ca453610efada7e4a8bbe97b8f"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-06T02:12:57.79198099"
+    },
+    "truvari collapse -- stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,8b9bd8ca453610efada7e4a8bbe97b8f"
+                ],
+                "collapsed_vcf": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                    ]
+                ],
+                "removed_vcf": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,8b9bd8ca453610efada7e4a8bbe97b8f"
+                ]
+            },
+            [
+                "\"TRUVARI_COLLAPSE\":",
+                "    truvari: 5.3.0"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-06T02:13:28.645249026"
+    }
+}

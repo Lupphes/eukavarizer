@@ -85,7 +85,8 @@ workflow NFCORE_EUKAVARIZER {
                 EUKAVARIZER.out.vcf_list,
                 EUKAVARIZER.out.vcfgz_list,
                 EUKAVARIZER.out.tbi_list,
-                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped
+                REFERENCE_RETRIEVAL.out.reference_genome_bgzipped,
+                REFERENCE_RETRIEVAL.out.reference_genome_faidx
             )
 
             report = REPORT_GENERATION(
@@ -93,8 +94,8 @@ workflow NFCORE_EUKAVARIZER {
                 outdir,
                 SV_UNIFICATION.out.survivor_vcf,
                 SV_UNIFICATION.out.survivor_stats,
-                SV_UNIFICATION.out.bcfmerge_vcf,
-                SV_UNIFICATION.out.bcfmerge_tbi,
+                SV_UNIFICATION.out.concat_vcf,
+                SV_UNIFICATION.out.concat_tbi,
                 SV_UNIFICATION.out.bcfmerge_stats,
                 REFERENCE_RETRIEVAL.out.reference_genome_faidx,
                 REFERENCE_RETRIEVAL.out.reference_genome_unzipped

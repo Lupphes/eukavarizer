@@ -15,6 +15,7 @@
         3. Generate statistics for SURVIVOR merged variants
         4. Merge VCF files using BCFtools for sample-level consolidation
         5. Filter BCFtools merged VCF and generate statistics
+        6. (Optional) Collapse redundant variants using Truvari
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Input Channels (take):
         vcf_list                  tuple(meta, vcf)       Individual caller VCF files
@@ -25,8 +26,8 @@
     Output Channels (emit):
         survivor_vcf              tuple(meta, vcf)       SURVIVOR merged and filtered VCF
         survivor_stats            tuple(meta, stats)     SURVIVOR statistics
-        bcfmerge_vcf              tuple(meta, vcf.gz)    BCFtools merged and filtered VCF
-        bcfmerge_tbi              tuple(meta, tbi)       BCFtools VCF index
+        concat_vcf                tuple(meta, vcf.gz)    BCFtools concat with truvari
+        concat_tbi                tuple(meta, tbi)       BCFtools VCF index
         bcfmerge_stats            tuple(meta, stats)     BCFtools statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Author:   Ondřej Sloup (Lupphes)
@@ -44,6 +45,10 @@ include { BCFTOOLS_SORT         } from '../../../modules/nf-core/bcftools/sort/m
 include { BCFTOOLS_STATS        } from '../../../modules/nf-core/bcftools/stats/main'
 include { BCFTOOLS_FILTER       } from '../../../modules/nf-core/bcftools/filter/main'
 
+include { TRUVARI_COLLAPSE      } from '../../../modules/local/truvari/collapse/main'
+include { BCFTOOLS_SORT as BCFTOOLS_SORT_TRUVARI    } from '../../../modules/nf-core/bcftools/sort/main'
+include { TABIX_TABIX           } from '../../../modules/nf-core/tabix/tabix/main'
+
 workflow SV_UNIFICATION {
 
     take:
@@ -51,6 +56,7 @@ workflow SV_UNIFICATION {
         vcfgz_list
         tbi_list
         reference_genome_bgzipped
+        reference_genome_faidx
 
     main:
         ch_versions = channel.empty()
@@ -97,6 +103,12 @@ workflow SV_UNIFICATION {
             params.sur_min_allele_freq_filter,
             params.sur_min_num_reads_filter
         )
+        
+        /*
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            SURVIVOR STATS
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        */
 
         SURVIVOR_STATS(
             SURVIVOR_FILTER.out.vcf,
@@ -131,9 +143,42 @@ workflow SV_UNIFICATION {
             BCFTOOLS_FILTER.out.vcf
         )
 
+        /*
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            TRUVARI COLLAPSE
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        */
+        
+        if (params.truvari_collapse) {
+            TRUVARI_COLLAPSE(
+                BCFTOOLS_SORT.out.vcf
+                .join(BCFTOOLS_SORT.out.tbi, by: 0),
+                reference_genome_bgzipped,
+                reference_genome_faidx
+            )
+
+            BCFTOOLS_SORT_TRUVARI(
+                TRUVARI_COLLAPSE.out.collapsed_vcf
+            )
+
+            ch_versions = ch_versions.mix(TRUVARI_COLLAPSE.out.versions)
+            ch_versions = ch_versions.mix(BCFTOOLS_SORT_TRUVARI.out.versions)
+            concat_vcf = BCFTOOLS_SORT_TRUVARI.out.vcf
+            concat_tbi = BCFTOOLS_SORT_TRUVARI.out.tbi
+        } else {
+            concat_vcf = BCFTOOLS_SORT.out.vcf
+            concat_tbi = BCFTOOLS_SORT.out.tbi
+        }
+
+        /*
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            BCFTOOLS STATS
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        */
+
         BCFTOOLS_STATS(
-            BCFTOOLS_SORT.out.vcf
-            .join(BCFTOOLS_SORT.out.tbi, by: 0),
+            concat_vcf
+            .join(concat_tbi, by: 0),
             [[id: "regions"], []],
             [[id: "targets"], []],
             [[id: "samples"], []],
@@ -152,8 +197,8 @@ workflow SV_UNIFICATION {
     emit:
         survivor_vcf    = SURVIVOR_FILTER.out.vcf
         survivor_stats  = SURVIVOR_STATS.out.stats
-        bcfmerge_vcf    = BCFTOOLS_SORT.out.vcf
-        bcfmerge_tbi    = BCFTOOLS_SORT.out.tbi
+        concat_vcf      = concat_vcf
+        concat_tbi      = concat_tbi
         bcfmerge_stats  = BCFTOOLS_STATS.out.stats
         versions        = ch_versions
 }
