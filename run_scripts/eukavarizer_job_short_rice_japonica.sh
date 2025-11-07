@@ -89,6 +89,7 @@ echo "Reference ready at $SCRATCH/reference/GCF_034140825.1_ASM3414082v1_genomic
 #========================================================================================
 # Pipeline Execution
 #========================================================================================
+# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_034140825.1/
 echo ">>> Running Eukavarizer pipeline..." | tee -a "$LOGFILE"
 "$SCRATCH/nextflow" run main.nf -profile mamba,rice_japonica,qc_off \
     --reference_genome "$SCRATCH/reference/GCF_034140825.1_ASM3414082v1_genomic.fna.gz" \
