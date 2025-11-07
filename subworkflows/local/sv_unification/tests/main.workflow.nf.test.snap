@@ -7,7 +7,7 @@
                         {
                             "id": "survivor_merge"
                         },
-                        "survivor_merge_survivor_merge_filtered.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "survivor_merge_filtered.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "1": [
@@ -23,7 +23,7 @@
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        "bcftools_concat_truvari_sorted.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
                     ]
                 ],
                 "3": [
@@ -31,7 +31,7 @@
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "bcftools_concat_truvari_sorted.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "4": [
@@ -39,15 +39,17 @@
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.bcftools_stats.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "bcftools_concat_truvari.bcftools_stats.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "5": [
+                    "versions.yml:md5,285b5ed1743bf9f9e277826669f48177",
                     "versions.yml:md5,34416b061b5b06e6b88411520f15d279",
                     "versions.yml:md5,582cf2dd9b93657c7766db82e41f9c2d",
                     "versions.yml:md5,64f9431cfda16903407f91347629f098",
                     "versions.yml:md5,6e03f1bde763433bf418503f519e5a5f",
                     "versions.yml:md5,8953b6495de2d66a743e61015eef2c7a",
+                    "versions.yml:md5,9cf14edf3a1f3a4bbec6cc92a4d03cfb",
                     "versions.yml:md5,ab78f9223e2ada690f19086070f6f9e8",
                     "versions.yml:md5,fc7b8a3d99cf981e92a7b570af624d22"
                 ],
@@ -56,23 +58,23 @@
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.bcftools_stats.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "bcftools_concat_truvari.bcftools_stats.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
-                "bcfmerge_tbi": [
+                "concat_tbi": [
                     [
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "bcftools_concat_truvari_sorted.vcf.gz.tbi:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
-                "bcfmerge_vcf": [
+                "concat_vcf": [
                     [
                         {
                             "id": "bcftools_concat"
                         },
-                        "bcftools_concat.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        "bcftools_concat_truvari_sorted.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
                     ]
                 ],
                 "survivor_stats": [
@@ -88,15 +90,17 @@
                         {
                             "id": "survivor_merge"
                         },
-                        "survivor_merge_survivor_merge_filtered.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "survivor_merge_filtered.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "versions": [
+                    "versions.yml:md5,285b5ed1743bf9f9e277826669f48177",
                     "versions.yml:md5,34416b061b5b06e6b88411520f15d279",
                     "versions.yml:md5,582cf2dd9b93657c7766db82e41f9c2d",
                     "versions.yml:md5,64f9431cfda16903407f91347629f098",
                     "versions.yml:md5,6e03f1bde763433bf418503f519e5a5f",
                     "versions.yml:md5,8953b6495de2d66a743e61015eef2c7a",
+                    "versions.yml:md5,9cf14edf3a1f3a4bbec6cc92a4d03cfb",
                     "versions.yml:md5,ab78f9223e2ada690f19086070f6f9e8",
                     "versions.yml:md5,fc7b8a3d99cf981e92a7b570af624d22"
                 ]
@@ -104,8 +108,8 @@
         ],
         "meta": {
             "nf-test": "0.9.3",
-            "nextflow": "25.04.8"
+            "nextflow": "25.10.0"
         },
-        "timestamp": "2025-10-22T01:37:41.588628996"
+        "timestamp": "2025-11-06T23:03:57.429610191"
     }
 }

@@ -34,6 +34,7 @@ nextflow_workflow {
                     [[id: 'sample1_sniffles'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.vcf.gz.tbi', checkIfExists: true)]
                 )
                 input[3] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[4] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz.fai', checkIfExists: true)])
                 """
             }
         }
@@ -43,8 +44,8 @@ nextflow_workflow {
                 { assert workflow.success },
                 { assert workflow.out.survivor_vcf != null },
                 { assert workflow.out.survivor_stats != null },
-                { assert workflow.out.bcfmerge_vcf != null },
-                { assert workflow.out.bcfmerge_tbi != null },
+                { assert workflow.out.concat_vcf != null },
+                { assert workflow.out.concat_tbi != null },
                 { assert workflow.out.bcfmerge_stats != null },
                 { assert snapshot(workflow.out).match() }
             )
@@ -72,6 +73,7 @@ nextflow_workflow {
                     [[id: 'sample1'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/haplotypecaller_calls/test2_haplotc.vcf.gz.tbi', checkIfExists: true)]
                 )
                 input[3] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[4] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz.fai', checkIfExists: true)])
                 """
             }
         }
@@ -81,8 +83,8 @@ nextflow_workflow {
                 { assert workflow.success },
                 { assert workflow.out.survivor_vcf != null },
                 { assert workflow.out.survivor_stats != null },
-                { assert workflow.out.bcfmerge_vcf != null },
-                { assert workflow.out.bcfmerge_tbi != null },
+                { assert workflow.out.concat_vcf != null },
+                { assert workflow.out.concat_tbi != null },
                 { assert workflow.out.bcfmerge_stats != null }
             )
         }
@@ -112,6 +114,7 @@ nextflow_workflow {
                     [[id: 'sample1_sniffles'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/gatk/paired_mutect2_calls/test_test2_paired_mutect2_calls.vcf.gz.tbi', checkIfExists: true)]
                 )
                 input[3] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz', checkIfExists: true)])
+                input[4] = channel.value([[id: 'genome'], file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta.gz.fai', checkIfExists: true)])
                 """
             }
         }
@@ -121,8 +124,8 @@ nextflow_workflow {
                 { assert workflow.success },
                 { assert workflow.out.survivor_vcf != null },
                 { assert workflow.out.survivor_stats != null },
-                { assert workflow.out.bcfmerge_vcf != null },
-                { assert workflow.out.bcfmerge_tbi != null },
+                { assert workflow.out.concat_vcf != null },
+                { assert workflow.out.concat_tbi != null },
                 { assert workflow.out.bcfmerge_stats != null }
             )
         }

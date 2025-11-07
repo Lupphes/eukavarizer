@@ -1,7 +1,7 @@
 {
     "truvari collapse": {
         "content": [
-            "test.collapsed.vcf.gz",
+            "test_truvari.collapsed.vcf.gz",
             [
                 "\"TRUVARI_COLLAPSE\":",
                 "    truvari: 5.3.0"
@@ -14,12 +14,12 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-06T02:12:43.15028529"
+        "timestamp": "2025-11-06T22:48:33.658076709"
     },
     "truvari collapse with removed output": {
         "content": [
-            "test.collapsed.vcf.gz",
-            "test.removed.vcf",
+            "test_truvari.collapsed.vcf.gz",
+            "test_truvari.removed.vcf",
             [
                 "\"TRUVARI_COLLAPSE\":",
                 "    truvari: 5.3.0"
@@ -32,7 +32,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-06T02:12:57.79198099"
+        "timestamp": "2025-11-06T22:48:44.264726305"
     },
     "truvari collapse -- stub": {
         "content": [
@@ -42,7 +42,7 @@
                         {
                             "id": "test"
                         },
-                        "test.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        "test_truvari.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
                     ]
                 ],
                 "1": [
@@ -50,7 +50,7 @@
                         {
                             "id": "test"
                         },
-                        "test.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "test_truvari.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "2": [
@@ -61,7 +61,7 @@
                         {
                             "id": "test"
                         },
-                        "test.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                        "test_truvari.collapsed.vcf.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
                     ]
                 ],
                 "removed_vcf": [
@@ -69,7 +69,7 @@
                         {
                             "id": "test"
                         },
-                        "test.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        "test_truvari.removed.vcf:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
                 "versions": [
@@ -85,6 +85,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-06T02:13:28.645249026"
+        "timestamp": "2025-11-06T22:48:54.462747309"
     }
 }
