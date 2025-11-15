@@ -27,8 +27,8 @@ export COLUMNS=200
 
 # Trap to ensure cleanup always happens
 cleanup() {
-    echo "Cleaning up scratch..." | tee -a "$LOGFILE"
-    clean_scratch
+    echo "Not cleaning up scratch..." | tee -a "$LOGFILE"
+    # clean_scratch
 }
 trap cleanup EXIT
 
