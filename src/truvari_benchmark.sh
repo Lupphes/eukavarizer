@@ -52,7 +52,8 @@ Optional Arguments:
     -c, --collapse           Run truvari collapse before benchmarking
     --refdist INT            Maximum distance for variants [default: 1000]
     --pctseq FLOAT           Percent sequence similarity [default: 0.0]
-    --pctsize FLOAT          Percent size similarity [default: 0.7]
+    --pctsize FLOAT          Percent size similarity (omit to use truvari default)
+    --sizemax INT            Maximum variant size to consider (omit to use truvari default)
     --dup-to-ins             Convert duplications to insertions
     --passonly               Only consider PASS variants
     --no-collapse-args       Use default collapse parameters (strict)
@@ -63,7 +64,7 @@ Example:
 
     # With custom parameters
     $0 -i calls.vcf.gz -t truth.vcf.gz -r ref.fa -b regions.bed -o results \\
-        --collapse --refdist 500 --pctsize 0.9
+        --collapse --refdist 500 --pctsize 0.9 --sizemax 10000
 
 EOF
     exit 1
@@ -92,7 +93,8 @@ OUTPUT_DIR=""
 RUN_COLLAPSE=false
 REFDIST=1000
 PCTSEQ=0.0
-PCTSIZE=0.7
+PCTSIZE=""
+SIZEMAX=""
 DUP_TO_INS="--dup-to-ins"
 PASSONLY="--passonly"
 COLLAPSE_REFDIST=1000
@@ -136,6 +138,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         --pctsize)
             PCTSIZE="$2"
+            COLLAPSE_PCTSIZE="$2"
+            shift 2
+            ;;
+        --sizemax)
+            SIZEMAX="$2"
             shift 2
             ;;
         --dup-to-ins)
@@ -203,7 +210,6 @@ if [[ "$RUN_COLLAPSE" == true ]]; then
     fi
     
     COLLAPSED_VCF="${OUTPUT_DIR}/collapsed.vcf.gz"
-    COLLAPSED_SORTED="${OUTPUT_DIR}/collapsed_sorted.vcf.gz"
     
     if [[ "$USE_STRICT_COLLAPSE" == false ]]; then
         log_info "Using relaxed collapse parameters for best F1 score:"
@@ -257,9 +263,30 @@ log_info "  Reference: $REFERENCE"
 log_info "  BED file: $BED_FILE"
 log_info "  refdist: $REFDIST"
 log_info "  pctseq: $PCTSEQ"
-log_info "  pctsize: $PCTSIZE"
+
+if [[ -n "$SIZEMAX" ]]; then
+    log_info "  sizemax: $SIZEMAX"
+else
+    log_info "  sizemax: (truvari default)"
+fi
+
+if [[ -n "$PCTSIZE" ]]; then
+    log_info "  pctsize: $PCTSIZE"
+else
+    log_info "  pctsize: (truvari default)"
+fi
 
 BENCH_OUTPUT="${OUTPUT_DIR}/truvari_bench"
+
+SIZEMAX_ARG=()
+if [[ -n "$SIZEMAX" ]]; then
+    SIZEMAX_ARG=(--sizemax "$SIZEMAX")
+fi
+
+PCTSIZE_ARG=()
+if [[ -n "$PCTSIZE" ]]; then
+    PCTSIZE_ARG=(-P "$PCTSIZE")
+fi
 
 truvari bench \
     -f "$REFERENCE" \
@@ -268,10 +295,11 @@ truvari bench \
     -c "$BENCH_VCF" \
     -r $REFDIST \
     -p $PCTSEQ \
-    -P $PCTSIZE \
+    "${PCTSIZE_ARG[@]}" \
     $DUP_TO_INS \
     $PASSONLY \
-    -o "$BENCH_OUTPUT"
+    -o "$BENCH_OUTPUT" \
+    "${SIZEMAX_ARG[@]}"
 
 log_success "Benchmarking completed!"
 
