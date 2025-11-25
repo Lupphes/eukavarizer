@@ -45,7 +45,7 @@ fi
 # Repository and Tool Setup
 #========================================================================================
 echo ">>> Cloning repository..." | tee -a "$LOGFILE"
-git clone https://github.com/Lupphes/eukavarizer.git | tee -a "$LOGFILE"
+git clone  https://github.com/Lupphes/SV_Benchmark_CMRG_GIAB.git | tee -a "$LOGFILE"
 
 echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
