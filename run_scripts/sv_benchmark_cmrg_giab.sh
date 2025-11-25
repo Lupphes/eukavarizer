@@ -31,6 +31,7 @@ trap cleanup EXIT
 echo "=== SV Benchmark: CMRG GIAB ===" | tee -a "$LOGFILE"
 echo "Started on $(hostname) at $(date)" | tee -a "$LOGFILE"
 
+module add micromamba/2.3.3
 module add openjdk/17
 cd "$SCRATCH"
 
@@ -40,15 +41,30 @@ if [ ! -d "$DATADIR/SV_Benchmark_CMRG_GIAB" ]; then
     exit 1
 fi
 
-cp -r "$DATADIR/SV_Benchmark_CMRG_GIAB" . | tee -a "$LOGFILE"
+#========================================================================================
+# Repository and Tool Setup
+#========================================================================================
+echo ">>> Cloning repository..." | tee -a "$LOGFILE"
+git clone https://github.com/Lupphes/eukavarizer.git | tee -a "$LOGFILE"
+
+echo ">>> Downloading Nextflow..." | tee -a "$LOGFILE"
 curl -s https://get.nextflow.io | bash | tee -a "$LOGFILE"
 
-mkdir -p "$SCRATCH/.nextflow"
+#========================================================================================
+# Conda and Nextflow Configuration
+#========================================================================================
+echo ">>> Configuring Nextflow and Conda..." | tee -a "$LOGFILE"
+mkdir -p "$SCRATCH/.conda_pkgs" "$SCRATCH/.conda_next" "$SCRATCH/.nextflow" "$SCRATCH/.micromamba"
+export CONDA_PKGS_DIRS="$SCRATCH/.conda_pkgs"
+export NXF_CONDA_CACHEDIR="$SCRATCH/.conda_next"
+export MAMBA_EXE=micromamba
+export MAMBA_ROOT_PREFIX="$SCRATCH/.micromamba"
 export NXF_LOG_LEVEL=DEBUG
 export NXF_TRACE=true
 export NXF_WORK="$SCRATCH/work"
 export NXF_LOG_FILE="$DATADIR/sv_benchmark_cmrg_giab/logs/.nextflow.log"
 export NXF_HOME="$SCRATCH/.nextflow"
+export MAMBA_ALWAYS_YES=true
 
 cd SV_Benchmark_CMRG_GIAB
 
