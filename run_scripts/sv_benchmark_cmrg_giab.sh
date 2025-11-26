@@ -106,6 +106,12 @@ if [ -n "$ONT_DATA" ]; then
     ONT_DATA="$ONT_BASENAME"
 fi
 
+# Copy benchmark/truth files
+echo "  Copying benchmark truth files..." | tee -a "$LOGFILE"
+cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz .
+cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz.tbi .
+cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.bed .
+
 echo ">>> Running pipeline with parameters:" | tee -a "$LOGFILE"
 echo "  Dataset: $DATASET" | tee -a "$LOGFILE"
 echo "  Bench params: $BENCH_PARAMS" | tee -a "$LOGFILE"
