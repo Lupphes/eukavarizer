@@ -115,9 +115,13 @@ fi
 
 # Copy benchmark/truth files
 echo "  Copying benchmark truth files..." | tee -a "$LOGFILE"
-cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz .
-cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz.tbi .
-cp "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.bed .
+cp -v "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz . 2>&1 | tee -a "$LOGFILE"
+cp -v "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.vcf.gz.tbi . 2>&1 | tee -a "$LOGFILE"
+cp -v "$DATADIR/SV_Benchmark_CMRG_GIAB"/*.bed . 2>&1 | tee -a "$LOGFILE"
+
+# Verify files were copied
+echo "  Verifying benchmark files..." | tee -a "$LOGFILE"
+ls -lh *.vcf.gz *.bed 2>&1 | tee -a "$LOGFILE"
 
 echo ">>> Running pipeline with parameters:" | tee -a "$LOGFILE"
 echo "  Dataset: $DATASET" | tee -a "$LOGFILE"
